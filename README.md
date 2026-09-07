@@ -14,6 +14,23 @@ Multi-step web form for Ignite Individual Coaching's lead intake, accessed via a
 - **Data destinations:** Google Sheets API (spreadsheet) + transactional email API (e.g. Resend/SendGrid)
 - **Localization:** i18n-ready via JSON locale files, starting with `pt-PT` only
 
+## Getting started
+
+Prerequisites: [Node.js](https://nodejs.org/) (18+) and npm.
+
+```bash
+npm install
+cp .env.example .env   # fill in the values (see "Environment variables" below)
+npm run dev             # runs `netlify dev` — serves index.html + functions locally
+```
+
+If `npm run dev` isn't available (e.g. `netlify-cli` fails to install), serve the static files directly — the serverless function won't be reachable this way, but the form itself will load:
+
+```bash
+python -m http.server 8080
+# then open http://localhost:8080
+```
+
 ## Repository structure
 
 ```
