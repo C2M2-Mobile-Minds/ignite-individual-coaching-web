@@ -18,3 +18,4 @@ Multi-step lead-intake web form for Ignite Individual Coaching. Static frontend 
 
 - **Issue #1 — Project scaffold and tooling**: created base folder structure (`css/`, `js/`, `locales/`, `netlify/functions/`), stub `index.html`, `.env.example`, `netlify.toml`, `package.json` (netlify-cli dev dependency), added `.netlify/` to `.gitignore`, and a "Getting started" section in the README.
   - Known issue: `npm install` may time out downloading `netlify-cli`'s `sharp` dependency (native binary fetch) depending on network — not a scaffold defect, retry or install on a better connection.
+- **Issue #2 — i18n infrastructure**: implemented `loadLocale(locale)` and `t(key)` in `js/i18n.js` (fetches `locales/<locale>.json`, missing keys log a `console.warn` and fall back to the key itself instead of throwing). Seeded `locales/pt-PT.json` with a placeholder `app.title` key and wired `js/formEngine.js` to load the locale and render through `t()` instead of a hardcoded string.
