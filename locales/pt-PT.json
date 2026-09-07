@@ -1,3 +1,64 @@
 {
-  "app.title": "Ignite Individual Coaching"
+  "app.title": "Ignite Individual Coaching",
+
+  "form.step.dados_basicos.title": "Dados básicos",
+  "form.step.treino_geral.title": "Treino geral",
+  "form.step.fase_gestacao.title": "Em que fase está?",
+  "form.step.gestacao.title": "Gestação",
+  "form.step.posparto.title": "Pós-parto",
+
+  "form.field.nome": "Nome (primeiro e último)",
+  "form.field.contacto_telefonico": "Contacto telefónico",
+  "form.field.email": "E-mail",
+  "form.field.como_chegou": "Como chegou até à Ignite?",
+  "form.field.como_chegou_outro": "Outro — indique como",
+  "form.field.objetivo_treino": "Qual o seu objetivo de treino?",
+  "form.field.onde_treina": "Onde treina?",
+  "form.field.maior_dificuldade": "Qual a sua maior dificuldade atual?",
+  "form.field.rotina_treinos": "Com que frequência treina?",
+  "form.field.orientacao_nutricionista": "Tem orientação alimentar por nutricionista?",
+  "form.field.compromisso_online": "Sente confiança e compromisso com o acompanhamento online?",
+  "form.field.fase": "Está em gestação ou em pós-parto?",
+  "form.field.fisio_pelvica": "Tem acompanhamento por fisioterapia pélvica?",
+  "form.field.semanas_gravidez": "Quantas semanas de gravidez?",
+  "form.field.historial_risco": "Tem historial de risco segundo o/a obstetra?",
+  "form.field.preferencia_treino_presencial": "Preferência de treino presencial",
+  "form.field.disponibilidade_horario": "Disponibilidade de horário (2ª, 3ª, 4ª, 6ª)",
+  "form.field.aviso_contacto": "Compreendo que serei contactada pela treinadora.",
+  "form.field.tipo_parto": "Tipo de parto",
+  "form.field.complicacoes_parto": "Houve complicações no parto?",
+  "form.field.acompanhamento_exercicio_gravidez": "Teve acompanhamento por profissional de exercício físico na gravidez?",
+  "form.field.fisio_pelvica_gravidez": "Teve acompanhamento por fisioterapia pélvica na gravidez?",
+  "form.field.tempo_posparto": "Há quanto tempo foi o parto?",
+  "form.field.primeira_consulta_posparto": "Já teve a primeira consulta pós-parto com obstetrícia?",
+
+  "form.option.sim": "Sim",
+  "form.option.nao": "Não",
+
+  "form.option.como_chegou.instagram": "Instagram",
+  "form.option.como_chegou.recomendacao": "Recomendação",
+  "form.option.como_chegou.pesquisa": "Pesquisa online",
+  "form.option.como_chegou.outro": "Outro",
+
+  "form.option.objetivo_treino.perda_peso": "Perda de peso",
+  "form.option.objetivo_treino.ganho_massa": "Ganho de massa muscular",
+  "form.option.objetivo_treino.condicao_fisica": "Melhorar a condição física",
+  "form.option.objetivo_treino.saude_bem_estar": "Saúde e bem-estar",
+  "form.option.objetivo_treino.gestacao_posparto": "Acompanhamento gestação e pós-parto",
+
+  "form.option.onde_treina.casa": "Em casa",
+  "form.option.onde_treina.ginasio": "No ginásio",
+
+  "form.option.rotina_treinos.2_3x": "2-3x por semana",
+  "form.option.rotina_treinos.4_5x": "4-5x por semana",
+  "form.option.rotina_treinos.5_mais": "5+ por semana",
+
+  "form.option.fase.gestacao": "Gestação",
+  "form.option.fase.posparto": "Pós-parto",
+
+  "form.option.preferencia_treino_presencial.crossfit_4475": "CrossFit 4475",
+  "form.option.preferencia_treino_presencial.templo_fitness": "Templo Fitness Estúdio",
+
+  "form.option.tipo_parto.normal": "Normal",
+  "form.option.tipo_parto.cesariana": "Cesariana"
 }

@@ -49,6 +49,8 @@ ignite-individual-coaching-web/
 │   └── functions/
 │       └── submit.js      # Sheets write + email send
 ├── netlify.toml
+├── docs/
+│   └── field-ids.md      # generated field-ID reference (types, options, conditions)
 └── README.md
 ```
 
@@ -93,7 +95,7 @@ flowchart TD
 | 3a. Gestação | Acompanhamento por fisioterapia pélvica (sim/não); semanas de gravidez (texto); historial de risco segundo obstetra (texto livre); preferência de treino presencial (CrossFit 4475 / Templo Fitness Estúdio); disponibilidade de horário (2ª, 3ª, 4ª, 6ª — texto livre); aviso de contacto pela treinadora |
 | 3b. Pós-parto | Tipo de parto (normal/cesariana); complicações no parto (texto livre); acompanhamento por profissional de exercício físico na gravidez (sim/não); acompanhamento por fisioterapia pélvica na gravidez (sim/não); tempo pós-parto (texto livre); primeira consulta pós-parto com obstetrícia (sim/não); preferência de treino presencial; disponibilidade de horário; aviso de contacto pela treinadora |
 
-Each field has a stable ID (e.g. `nome`, `objetivo_treino`, `fase`, `semanas_gravidez`) used consistently across the form schema, the locale file, the submitted payload, and the spreadsheet columns — only the *display label* changes per locale, never the ID.
+Each field has a stable ID (e.g. `nome`, `objetivo_treino`, `fase`, `semanas_gravidez`) used consistently across the form schema, the locale file, the submitted payload, and the spreadsheet columns — only the *display label* changes per locale, never the ID. The full field-ID list (types, options, branch conditions) is documented in [`docs/field-ids.md`](docs/field-ids.md).
 
 ## Submission flow
 
