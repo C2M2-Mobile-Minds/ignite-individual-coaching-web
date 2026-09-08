@@ -42,6 +42,16 @@ test("every treino_geral labelKey (field + option) resolves in pt-PT.json", () =
   }
 });
 
+test("every fase_gestacao labelKey (field + option) resolves in pt-PT.json", () => {
+  assert.ok(locale[stepById.fase_gestacao.titleKey], "missing step title key");
+  for (const field of stepById.fase_gestacao.fields) {
+    assert.ok(locale[field.labelKey], `missing locale key ${field.labelKey}`);
+    for (const opt of field.options ?? []) {
+      assert.ok(locale[opt.labelKey], `missing locale key ${opt.labelKey}`);
+    }
+  }
+});
+
 test("gestacao branch: gestacao_posparto goal + fase=gestacao", () => {
   const answers = { objetivo_treino: ["gestacao_posparto"], fase: "gestacao" };
   assert.equal(selectedGestacaoPosparto(answers), true);

@@ -3,7 +3,7 @@
 
   "form.step.dados_basicos.title": "Dados básicos",
   "form.step.treino_geral.title": "Treino geral",
-  "form.step.fase_gestacao.title": "Em que fase está?",
+  "form.step.fase_gestacao.title": "Em que fase te encontras",
   "form.step.gestacao.title": "Gestação",
   "form.step.posparto.title": "Pós-parto",
 
@@ -18,7 +18,7 @@
   "form.field.frequencia_treino": "Como é a tua rotina de treinos",
   "form.field.orientacao_nutricional": "Segues alguma orientação alimentar por parte de um nutricionista?",
   "form.field.comprometimento": "Estás confiante e comprometido(a) a investir em ti neste acompanhamento on-line?",
-  "form.field.fase": "Está em gestação ou em pós-parto?",
+  "form.field.fase": "Em que fase te encontras",
   "form.field.fisio_pelvica": "Tem acompanhamento por fisioterapia pélvica?",
   "form.field.semanas_gravidez": "Quantas semanas de gravidez?",
   "form.field.historial_risco": "Tem historial de risco segundo o/a obstetra?",
