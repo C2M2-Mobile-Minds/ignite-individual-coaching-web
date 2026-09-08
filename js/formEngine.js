@@ -16,9 +16,9 @@ import { steps, visibleSteps, visibleFields } from "./formSchema.js";
 export const state = {
   answers: {},
   currentStepId: steps[0].id,
-  // Field ids currently showing a "required" error. Populated on a blocked
-  // "next" click, cleared per-field as the user edits.
-  errors: new Set(),
+  // Map of field id -> error message key currently shown. Populated on a
+  // blocked "next" click, cleared per-field as the user edits.
+  errors: new Map(),
 };
 
 // --- Pure navigation helpers (no DOM) ---------------------------------------
@@ -63,11 +63,33 @@ export function isFieldFilled(field, answers) {
   return typeof value === "string" && value.trim() !== "";
 }
 
-/** Ids of the step's visible, required fields that are still empty. */
+// Pragmatic email shape check — one @, a dot in the domain, no spaces.
+// Not RFC 5322; the serverless function is the real gate.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Format error key for a filled field, or null if it looks fine. */
+function formatError(field, answers) {
+  if (field.type === "email" && !EMAIL_RE.test(String(answers[field.id]).trim())) {
+    return "validation.email";
+  }
+  return null;
+}
+
+/**
+ * `{ id, messageKey }` for every visible field that fails validation:
+ * required fields left empty, then filled fields with a bad format.
+ */
 export function validateStep(step, answers) {
-  return visibleFields(step, answers)
-    .filter((field) => field.required && !isFieldFilled(field, answers))
-    .map((field) => field.id);
+  const errors = [];
+  for (const field of visibleFields(step, answers)) {
+    if (!isFieldFilled(field, answers)) {
+      if (field.required) errors.push({ id: field.id, messageKey: "validation.required" });
+      continue;
+    }
+    const format = formatError(field, answers);
+    if (format) errors.push({ id: field.id, messageKey: format });
+  }
+  return errors;
 }
 
 /** Drop a field's error and remove its message node without a full re-render. */
@@ -211,7 +233,7 @@ export function renderStep() {
       const message = el("span", {
         className: "error",
         role: "alert",
-        textContent: t("validation.required"),
+        textContent: t(state.errors.get(field.id)),
       });
       message.setAttribute("data-for", field.id);
       node.append(message);
@@ -234,7 +256,7 @@ export function goNext() {
   const step = steps.find((s) => s.id === state.currentStepId);
   const invalid = validateStep(step, state.answers);
   if (invalid.length > 0) {
-    state.errors = new Set(invalid);
+    state.errors = new Map(invalid.map((e) => [e.id, e.messageKey]));
     renderStep();
     return;
   }

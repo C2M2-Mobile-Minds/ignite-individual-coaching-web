@@ -65,5 +65,6 @@
   "form.nav.next": "Seguinte",
   "form.nav.back": "Voltar",
 
-  "validation.required": "Este campo é obrigatório"
+  "validation.required": "Este campo é obrigatório",
+  "validation.email": "Introduz um endereço de email válido"
 }

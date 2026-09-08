@@ -173,12 +173,32 @@ test("isFieldFilled covers every field type", () => {
 });
 
 test("validateStep flags empty required fields and ignores hidden conditionals", () => {
-  const invalid = validateStep(stepById("dados_basicos"), {});
-  assert.ok(invalid.includes("nome"));
-  assert.ok(invalid.includes("como_chegou"));
-  assert.ok(invalid.includes("objetivo_treino"));
+  const ids = validateStep(stepById("dados_basicos"), {}).map((e) => e.id);
+  assert.ok(ids.includes("nome"));
+  assert.ok(ids.includes("como_chegou"));
+  assert.ok(ids.includes("objetivo_treino"));
   // como_chegou_outro is hidden until "outro" is checked
-  assert.ok(!invalid.includes("como_chegou_outro"));
+  assert.ok(!ids.includes("como_chegou_outro"));
+  // every entry carries a message key
+  assert.ok(validateStep(stepById("dados_basicos"), {}).every((e) => e.messageKey === "validation.required"));
+});
+
+test("validateStep flags a filled-but-malformed email", () => {
+  const answers = {
+    nome: "Ana",
+    contacto_telefonico: "912345678",
+    email: "ana(at)example",
+    como_chegou: ["instagram"],
+    objetivo_treino: ["perda_peso"],
+  };
+  assert.deepEqual(validateStep(stepById("dados_basicos"), answers), [
+    { id: "email", messageKey: "validation.email" },
+  ]);
+});
+
+test("an empty email reports 'required', not 'email'", () => {
+  const entry = validateStep(stepById("dados_basicos"), {}).find((e) => e.id === "email");
+  assert.equal(entry.messageKey, "validation.required");
 });
 
 test("validateStep passes once every visible required field is filled", () => {
@@ -226,6 +246,37 @@ test("required checkbox group is validated and clears when one box is checked", 
   box.checked = true;
   box.dispatchEvent(new dom.window.Event("change"));
   assert.equal(errorFor("objetivo_treino"), null);
+});
+
+test("Seguinte with a malformed email shows the email error and blocks advance", () => {
+  state.answers = {
+    nome: "Ana",
+    contacto_telefonico: "912345678",
+    email: "not-an-email",
+    como_chegou: ["instagram"],
+    objetivo_treino: ["perda_peso"],
+  };
+  renderStep();
+  buttonByText("Seguinte").click();
+  assert.equal(title(), "Dados básicos");
+  assert.equal(errorFor("email").textContent, "Introduz um endereço de email válido");
+});
+
+test("fixing the email clears its error on input", () => {
+  state.answers = {
+    nome: "Ana",
+    contacto_telefonico: "912345678",
+    email: "bad",
+    como_chegou: ["instagram"],
+    objetivo_treino: ["perda_peso"],
+  };
+  renderStep();
+  buttonByText("Seguinte").click();
+  assert.ok(errorFor("email"));
+  const input = root().querySelector("input#email");
+  input.value = "ana@example.com";
+  input.dispatchEvent(new dom.window.Event("input"));
+  assert.equal(errorFor("email"), null);
 });
 
 test("advancing is allowed once all required fields are valid", () => {
