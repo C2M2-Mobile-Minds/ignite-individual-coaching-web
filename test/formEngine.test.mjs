@@ -117,6 +117,46 @@ test("single checkbox field (aviso_contacto) renders one control", () => {
   assert.equal(boxes.length, 1);
 });
 
+test("tel field renders a country <select> and a number input", () => {
+  renderStep();
+  const select = root().querySelector('select[name="contacto_telefonico_country"]');
+  const input = root().querySelector("input#contacto_telefonico");
+  assert.ok(select);
+  assert.equal(input.type, "tel");
+  assert.ok(select.querySelectorAll("option").length >= 27);
+  assert.equal(select.value, "+351"); // Portugal default
+});
+
+test("typing a number stores the combined dial code + number", () => {
+  renderStep();
+  const input = root().querySelector("input#contacto_telefonico");
+  input.value = "912345678";
+  input.dispatchEvent(new dom.window.Event("input"));
+  assert.equal(state.answers.contacto_telefonico, "+351 912345678");
+});
+
+test("changing the country updates the stored prefix", () => {
+  state.answers = { contacto_telefonico: "+351 912345678" };
+  renderStep();
+  const select = root().querySelector('select[name="contacto_telefonico_country"]');
+  select.value = "+33";
+  select.dispatchEvent(new dom.window.Event("change"));
+  assert.equal(state.answers.contacto_telefonico, "+33 912345678");
+});
+
+test("validateStep flags a too-short phone number", () => {
+  const answers = {
+    nome: "Ana",
+    contacto_telefonico: "+351 123",
+    email: "ana@example.com",
+    como_chegou: ["instagram"],
+    objetivo_treino: ["perda_peso"],
+  };
+  assert.deepEqual(validateStep(stepById("dados_basicos"), answers), [
+    { id: "contacto_telefonico", messageKey: "validation.phone" },
+  ]);
+});
+
 test("field-level condition: como_chegou_outro appears only after 'outro' is checked", () => {
   renderStep();
   assert.equal(root().querySelector("input#como_chegou_outro"), null);

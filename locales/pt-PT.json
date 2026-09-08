@@ -66,5 +66,6 @@
   "form.nav.back": "Voltar",
 
   "validation.required": "Este campo é obrigatório",
-  "validation.email": "Introduz um endereço de email válido"
+  "validation.email": "Introduz um endereço de email válido",
+  "validation.phone": "Introduz um número de telefone válido"
 }

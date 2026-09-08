@@ -11,6 +11,7 @@
 
 import { loadLocale, t } from "./i18n.js";
 import { steps, visibleSteps, visibleFields } from "./formSchema.js";
+import { EEA_COUNTRIES, DEFAULT_DIAL_CODE, parsePhone, combinePhone } from "./countries.js";
 
 /** The single source of truth for what the user has entered and where they are. */
 export const state = {
@@ -69,8 +70,14 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /** Format error key for a filled field, or null if it looks fine. */
 function formatError(field, answers) {
-  if (field.type === "email" && !EMAIL_RE.test(String(answers[field.id]).trim())) {
+  const value = String(answers[field.id] ?? "").trim();
+  if (field.type === "email" && !EMAIL_RE.test(value)) {
     return "validation.email";
+  }
+  if (field.type === "tel") {
+    const { local } = parsePhone(value);
+    const digits = local.replace(/\D/g, "");
+    if (digits.length < 6 || digits.length > 15) return "validation.phone";
   }
   return null;
 }
@@ -140,7 +147,29 @@ function el(tag, props = {}, children = []) {
 export function renderField(field) {
   const { id, type } = field;
 
-  if (type === "text" || type === "email" || type === "tel") {
+  if (type === "tel") {
+    const { dialCode, local } = parsePhone(state.answers[id]);
+    const select = el("select", { name: `${id}_country` });
+    for (const c of EEA_COUNTRIES) {
+      select.append(
+        el("option", {
+          value: c.dialCode,
+          textContent: `${c.name} (${c.dialCode})`,
+          selected: c.dialCode === dialCode,
+        }),
+      );
+    }
+    const input = el("input", { type: "tel", id, name: id, value: local });
+    const sync = () => setText(id, combinePhone(select.value, input.value));
+    select.addEventListener("change", sync);
+    input.addEventListener("input", sync);
+    return el("label", { className: "field", htmlFor: id }, [
+      t(field.labelKey),
+      el("span", { className: "tel-group" }, [select, input]),
+    ]);
+  }
+
+  if (type === "text" || type === "email") {
     const input = el("input", {
       type,
       id,
@@ -237,7 +266,8 @@ export function renderStep() {
       });
       message.setAttribute("data-for", field.id);
       node.append(message);
-      node.querySelector("input, select, textarea")?.setAttribute("aria-invalid", "true");
+      (node.querySelector("input") ?? node.querySelector("select, textarea"))
+        ?.setAttribute("aria-invalid", "true");
     }
     root.append(node);
   }
