@@ -48,7 +48,11 @@ ignite-individual-coaching-web/
 │   └── pt-PT.json
 ├── netlify/
 │   └── functions/
-│       └── submit.js      # Sheets write + email send
+│       ├── submit.mjs     # POST handler: derives flow, writes the Sheets row
+│       └── lib/
+│           ├── columns.mjs  # per-flow column order (derived from formSchema.js)
+│           └── sheets.mjs   # Google Sheets v4 client (JWT auth + append)
+├── .github/workflows/    # ci.yml (test on PR) + deploy.yml (Netlify on main)
 ├── netlify.toml
 ├── docs/
 │   └── field-ids.md      # generated field-ID reference (types, options, conditions)
@@ -110,14 +114,50 @@ sequenceDiagram
 
     U->>W: Preenche formulário (respostas por página)
     W->>W: Valida respostas obrigatórias por página
-    W->>F: POST payload JSON (flow + respostas)
+    W->>F: POST /.netlify/functions/submit — payload JSON (respostas)
+    F->>F: Deriva o flow de objetivo_treino / fase
     F->>S: Escreve linha na tab correspondente (Geral / Gestação-Pós-parto)
-    F->>E: Envia email com template correspondente ao flow
-    F-->>W: Resposta de sucesso/erro
+    F-->>W: 200 { ok, flow }  ·  502 em falha de escrita
     W-->>U: Ecrã de confirmação ou erro com retry
 ```
 
-The spreadsheet write is treated as the source of truth (retried/alerted on failure); the email is a notification and can fail without blocking the submission.
+**Implemented (issue #14):** the browser POSTs the flat `answers` object to
+`/.netlify/functions/submit`. The function derives the flow itself
+(`gestacao_posparto` when `objetivo_treino` includes it, else `geral`), maps
+it to a tab (`Geral` / `Gestação-Pós-parto`), and appends a row via the
+Google Sheets API — writing the field-id header row first if the tab is
+empty. Column order lives in `netlify/functions/lib/columns.mjs`, derived
+from `formSchema.js`. A failed Sheets write returns **502** and the browser
+shows the retry screen; the spreadsheet is the source of truth.
+
+**Deferred:** the notification email (`EMAIL_API_KEY` / `COMPANY_EMAIL_TO`)
+is a separate issue and does not gate the response.
+
+### Google Sheets setup
+
+1. Google Cloud project → enable the **Google Sheets API**.
+2. Create a **service account**; download its JSON key.
+3. Create the spreadsheet with two tabs named exactly **`Geral`** and
+   **`Gestação-Pós-parto`** (leave them empty — headers are written on the
+   first submission).
+4. Share the spreadsheet with the service-account email as **Editor**.
+5. Set `GOOGLE_SHEETS_CLIENT_EMAIL`, `GOOGLE_SHEETS_PRIVATE_KEY` (the
+   `\n`-escaped `private_key` from the JSON), and `GOOGLE_SHEETS_SPREADSHEET_ID`
+   locally in `.env` and in **Netlify → Site settings → Environment variables**.
+
+## CI/CD
+
+GitHub Actions (`.github/workflows/`):
+
+- **`ci.yml`** — on every PR and non-`main` push: `npm ci` + `npm test`.
+- **`deploy.yml`** — on push to `main`: tests, then
+  `netlify-cli deploy --prod`.
+
+Repo secrets required: `NETLIFY_AUTH_TOKEN` (Netlify user → Applications →
+personal access token) and `NETLIFY_SITE_ID` (Netlify site → Site settings →
+General → Site ID). Runtime `GOOGLE_SHEETS_*` vars live in the Netlify site,
+not in GitHub. Disable Netlify's own auto Git deploy so Actions is the only
+deploy path.
 
 ## Localization
 

@@ -15,6 +15,10 @@ global.fetch = async (url) => {
   if (String(url).endsWith("locales/pt-PT.json")) {
     return { json: async () => JSON.parse(readFileSync(localePath, "utf8")) };
   }
+  // The Netlify submit endpoint: succeed here; failure paths use __MOCK_SUBMIT_FAIL.
+  if (String(url).endsWith("/.netlify/functions/submit")) {
+    return { ok: true, json: async () => ({ ok: true, flow: "geral" }) };
+  }
   throw new Error(`unexpected fetch: ${url}`);
 };
 

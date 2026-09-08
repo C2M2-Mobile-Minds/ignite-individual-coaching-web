@@ -1,21 +1,39 @@
 // Sends the final answers to the backend.
 //
-// Phase 1 stub: this resolves (or rejects) locally so the confirmation / error
-// screens can be built and tested without the serverless function. The real
-// implementation will POST `payload` to `/.netlify/functions/submit` and land
-// with the backend issue.
+// POSTs the flat `answers` object as JSON to the Netlify function, which
+// derives the flow, writes the spreadsheet row, and returns { ok, flow }.
+// A non-2xx response (e.g. a failed Sheets write -> 502) rejects, so the
+// caller shows the error/retry screen.
 //
 // Test / manual hook: set `globalThis.__MOCK_SUBMIT_FAIL = true` to force the
-// rejection path.
+// rejection path without touching the network.
+
+const ENDPOINT = "/.netlify/functions/submit";
 
 /**
- * @param {Record<string, unknown>} payload - the flat `answers` object for now.
- * @returns {Promise<{ ok: true }>} resolves on a successful submission.
+ * @param {Record<string, unknown>} payload - the flat `answers` object.
+ * @returns {Promise<{ ok: true, flow: string }>} resolves on a successful write.
  */
 export async function submitForm(payload) {
-  await new Promise((resolve) => setTimeout(resolve, 0));
   if (globalThis.__MOCK_SUBMIT_FAIL) {
     throw new Error("submit failed (mock)");
   }
-  return { ok: true };
+
+  const res = await fetch(ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    let detail = "";
+    try {
+      detail = (await res.json()).error || "";
+    } catch {
+      /* body not JSON */
+    }
+    throw new Error(`submit failed (${res.status}${detail ? ` ${detail}` : ""})`);
+  }
+
+  return res.json();
 }
