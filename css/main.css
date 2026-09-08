@@ -94,6 +94,14 @@ fieldset.field label {
   border-radius: 6px;
 }
 
+.note {
+  margin-block: 1.25rem;
+  padding: 0.75rem 1rem;
+  border-left: 3px solid var(--border);
+  background: #f4f4f4;
+  font-size: 0.95rem;
+}
+
 .error {
   display: block;
   margin-top: 0.25rem;

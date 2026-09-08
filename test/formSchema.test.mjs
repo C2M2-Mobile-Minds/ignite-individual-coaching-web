@@ -58,6 +58,32 @@ test("gestacao branch: gestacao_posparto goal + fase=gestacao", () => {
   assert.deepEqual(visibleStepIds(answers), ["dados_basicos", "fase_gestacao", "gestacao"]);
 });
 
+test("gestacao step exposes the issue #9 field ids in order", () => {
+  const answers = { objetivo_treino: ["gestacao_posparto"], fase: "gestacao" };
+  assert.deepEqual(
+    visibleFields(stepById.gestacao, answers).map((f) => f.id),
+    ["fisio_pelvica", "semanas_gravidez", "historial_risco", "preferencia_local", "disponibilidade_horario", "nota_contacto"],
+  );
+});
+
+test("gestacao closing note is a read-only `note` field, not a control", () => {
+  const nota = stepById.gestacao.fields.find((f) => f.id === "nota_contacto");
+  assert.equal(nota.type, "note");
+  assert.ok(!nota.required);
+  assert.equal(nota.labelKey, undefined);
+  assert.ok(locale[nota.textKey], `missing locale key ${nota.textKey}`);
+});
+
+test("every gestacao labelKey / textKey (field + option) resolves in pt-PT.json", () => {
+  assert.ok(locale[stepById.gestacao.titleKey], "missing step title key");
+  for (const field of stepById.gestacao.fields) {
+    assert.ok(locale[field.labelKey ?? field.textKey], `missing locale key for ${field.id}`);
+    for (const opt of field.options ?? []) {
+      assert.ok(locale[opt.labelKey], `missing locale key ${opt.labelKey}`);
+    }
+  }
+});
+
 test("posparto branch: gestacao_posparto goal + fase=posparto", () => {
   const answers = { objetivo_treino: ["gestacao_posparto"], fase: "posparto" };
   assert.deepEqual(visibleStepIds(answers), ["dados_basicos", "fase_gestacao", "posparto"]);
@@ -85,8 +111,13 @@ test("every field has a stable id and a labelKey; options have ids", () => {
     assert.ok(step.id && step.titleKey, `step ${step.id} needs id + titleKey`);
     for (const field of step.fields) {
       assert.ok(field.id, "field needs id");
+      assert.ok(["text", "email", "tel", "radio", "checkbox", "note"].includes(field.type));
+      if (field.type === "note") {
+        assert.ok(field.textKey, `note ${field.id} needs textKey`);
+        assert.ok(!field.required, `note ${field.id} must not be required`);
+        continue;
+      }
       assert.ok(field.labelKey, `field ${field.id} needs labelKey`);
-      assert.ok(["text", "email", "tel", "radio", "checkbox"].includes(field.type));
       if (field.options) {
         for (const opt of field.options) {
           assert.ok(opt.id && opt.labelKey, `option in ${field.id} needs id + labelKey`);

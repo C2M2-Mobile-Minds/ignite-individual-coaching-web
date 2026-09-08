@@ -12,6 +12,7 @@ spreadsheet columns. Only the display label changes per locale — never the id.
 | `radio` | selected option id (string) |
 | `checkbox` (single) | boolean-ish / option id |
 | `checkbox` with `multiple: true` | array of selected option ids |
+| `note` | none — read-only informational text, never stored or validated |
 
 ## Step: `dados_basicos`
 
@@ -55,9 +56,9 @@ Condition: `objetivo_treino` includes `gestacao_posparto` **and** `fase === "ges
 | `fisio_pelvica` | radio | yes | `sim`, `nao` | pelvic physiotherapy follow-up |
 | `semanas_gravidez` | text | yes | — | weeks of pregnancy |
 | `historial_risco` | text | yes | — | risk history per obstetrician |
-| `preferencia_treino_presencial` | radio | yes | `crossfit_4475`, `templo_fitness` | |
+| `preferencia_local` | radio | yes | `crossfit_4475`, `templo_fitness` | in-person training location (renamed from `preferencia_treino_presencial` in #9 — one-off, step unshipped) |
 | `disponibilidade_horario` | text | yes | — | availability (2ª, 3ª, 4ª, 6ª) |
-| `aviso_contacto` | checkbox | yes | — | acknowledges the trainer will make contact |
+| `nota_contacto` | note | — | — | read-only closing note (`form.note.contacto_treinadora`); replaced the `aviso_contacto` checkbox for this step in #9 |
 
 ## Step: `posparto`
 
@@ -71,11 +72,11 @@ Condition: `objetivo_treino` includes `gestacao_posparto` **and** `fase === "pos
 | `fisio_pelvica_gravidez` | radio | yes | `sim`, `nao` | pelvic physiotherapy during pregnancy |
 | `tempo_posparto` | text | yes | — | time since birth |
 | `primeira_consulta_posparto` | radio | yes | `sim`, `nao` | first post-partum obstetric appointment done |
-| `preferencia_treino_presencial` | radio | yes | `crossfit_4475`, `templo_fitness` | |
+| `preferencia_local` | radio | yes | `crossfit_4475`, `templo_fitness` | |
 | `disponibilidade_horario` | text | yes | — | |
 | `aviso_contacto` | checkbox | yes | — | acknowledges the trainer will make contact |
 
 ## Shared option sets
 
 - **sim/não**: `sim`, `nao`
-- **preferência de treino presencial**: `crossfit_4475`, `templo_fitness`
+- **preferência de local**: `crossfit_4475`, `templo_fitness`

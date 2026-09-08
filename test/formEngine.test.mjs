@@ -161,11 +161,44 @@ test("fase_gestacao validation: 1 required error when empty, none when filled", 
 });
 
 test("single checkbox field (aviso_contacto) renders one control", () => {
-  state.answers = { objetivo_treino: ["gestacao_posparto"], fase: "gestacao" };
-  state.currentStepId = "gestacao";
+  state.answers = { objetivo_treino: ["gestacao_posparto"], fase: "posparto" };
+  state.currentStepId = "posparto";
   renderStep();
   const boxes = root().querySelectorAll('input[type="checkbox"][name="aviso_contacto"]');
   assert.equal(boxes.length, 1);
+});
+
+test("gestacao renders all five controls plus the read-only closing note", () => {
+  state.answers = { objetivo_treino: ["gestacao_posparto"], fase: "gestacao" };
+  state.currentStepId = "gestacao";
+  renderStep();
+  assert.equal(title(), "Gestação");
+  for (const id of ["fisio_pelvica", "semanas_gravidez", "historial_risco", "preferencia_local", "disponibilidade_horario"]) {
+    assert.ok(root().querySelector(`#${id}, [name="${id}"]`), `no control rendered for ${id}`);
+  }
+  assert.equal(root().querySelectorAll('input[type="radio"][name="preferencia_local"]').length, 2);
+  // The note is plain text, not a form control.
+  const note = root().querySelector("p.note");
+  assert.ok(note);
+  assert.ok(note.textContent.startsWith("Será contactada por parte da treinadora"));
+  assert.equal(root().querySelectorAll('[name="nota_contacto"]').length, 0);
+  assert.ok(!root().textContent.includes("form.note."), "unresolved locale key rendered");
+});
+
+test("gestacao validation: 5 required errors when empty, none when filled; note never blocks", () => {
+  const step = stepById("gestacao");
+  assert.deepEqual(
+    validateStep(step, {}).map((e) => e.messageKey),
+    Array(5).fill("validation.required"),
+  );
+  const filled = {
+    fisio_pelvica: "sim",
+    semanas_gravidez: "20",
+    historial_risco: "Não",
+    preferencia_local: "crossfit_4475",
+    disponibilidade_horario: "2ª e 4ª de manhã",
+  };
+  assert.deepEqual(validateStep(step, filled), []);
 });
 
 test("tel field renders a country <select> and a number input", () => {

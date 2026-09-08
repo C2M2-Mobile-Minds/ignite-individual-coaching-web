@@ -89,6 +89,7 @@ function formatError(field, answers) {
 export function validateStep(step, answers) {
   const errors = [];
   for (const field of visibleFields(step, answers)) {
+    if (field.type === "note") continue; // read-only text, nothing to validate
     if (!isFieldFilled(field, answers)) {
       if (field.required) errors.push({ id: field.id, messageKey: "validation.required" });
       continue;
@@ -180,6 +181,11 @@ export function renderField(field) {
       t(field.labelKey),
       el("span", { className: "tel-group" }, [select, input]),
     ]);
+  }
+
+  if (type === "note") {
+    // Read-only informational text — not a form control, not validated.
+    return el("p", { className: "note", textContent: t(field.textKey) });
   }
 
   if (type === "text" || type === "email") {
