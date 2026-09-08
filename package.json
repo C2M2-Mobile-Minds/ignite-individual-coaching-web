@@ -2,7 +2,11 @@
   "name": "ignite-individual-coaching-web",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "description": "Multi-step web form for Ignite Individual Coaching's lead intake.",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "dev": "netlify dev",
     "test": "node --test"
@@ -10,5 +14,8 @@
   "devDependencies": {
     "jsdom": "^29.1.1",
     "netlify-cli": "^17.0.0"
+  },
+  "dependencies": {
+    "google-auth-library": "^9.15.1"
   }
 }

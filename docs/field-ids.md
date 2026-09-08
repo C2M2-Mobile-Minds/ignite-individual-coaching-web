@@ -80,3 +80,25 @@ Condition: `objetivo_treino` includes `gestacao_posparto` **and** `fase === "pos
 
 - **sim/não**: `sim`, `nao`
 - **preferência de local**: `crossfit_4475`, `templo_fitness`
+
+## Spreadsheet tabs
+
+The Netlify function (`netlify/functions/submit.mjs`) writes one row per
+submission. Column order is derived from this schema by
+`netlify/functions/lib/columns.mjs` — headers are the field ids, auto-written
+to row 1 when a tab is empty. One synthetic leading column:
+
+| column | value |
+|---|---|
+| `submitted_at` | ISO-8601 timestamp set server-side at write time (not a form field) |
+
+Array answers (`como_chegou`, `objetivo_treino`) are joined with `, `;
+booleans render as `Sim` / `Não`. `note` fields (`nota_contacto`) are never
+written.
+
+- **Tab `Geral`** — flow `geral` (`objetivo_treino` excludes `gestacao_posparto`).
+  Columns: `submitted_at` + `dados_basicos` ids + `treino_geral` ids.
+- **Tab `Gestação-Pós-parto`** — flow `gestacao_posparto` (`objetivo_treino`
+  includes `gestacao_posparto`, either `fase`). Columns: `submitted_at` +
+  `dados_basicos` ids + `fase` + the union of `gestacao` and `posparto` ids
+  (shared ids `preferencia_local` / `disponibilidade_horario` appear once).
