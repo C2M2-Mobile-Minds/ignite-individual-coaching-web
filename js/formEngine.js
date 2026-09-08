@@ -7,11 +7,14 @@
 // every move, so going back and changing an answer transparently reroutes the
 // remaining steps.
 //
-// Required-field validation and submission are intentionally out of scope here.
+// On the last step, "next" becomes a submit action; the result swaps #form-root
+// for a success or error screen (see renderConfirmation). The network call itself
+// lives in submit.js (a stub for now).
 
 import { loadLocale, t } from "./i18n.js";
 import { steps, visibleSteps, visibleFields } from "./formSchema.js";
 import { EEA_COUNTRIES, DEFAULT_DIAL_CODE, parsePhone, combinePhone } from "./countries.js";
+import { submitForm } from "./submit.js";
 
 /** The single source of truth for what the user has entered and where they are. */
 export const state = {
@@ -20,6 +23,9 @@ export const state = {
   // Map of field id -> error message key currently shown. Populated on a
   // blocked "next" click, cleared per-field as the user edits.
   errors: new Map(),
+  // True while a submit / retry request is in flight — guards against a
+  // double submission and disables the button.
+  submitting: false,
 };
 
 // --- Pure navigation helpers (no DOM) ---------------------------------------
@@ -259,8 +265,8 @@ export function renderField(field) {
   throw new Error(`renderField: unknown field type "${type}" for "${id}"`);
 }
 
-function navButton(labelKey, onClick) {
-  const button = el("button", { type: "button", textContent: t(labelKey) });
+function navButton(labelKey, onClick, disabled = false) {
+  const button = el("button", { type: "button", textContent: t(labelKey), disabled });
   button.addEventListener("click", onClick);
   return button;
 }
@@ -297,8 +303,72 @@ export function renderStep() {
   }
   if (nextVisibleStep(answers, currentStepId)) {
     nav.append(navButton("form.nav.next", goNext));
+  } else {
+    nav.append(navButton("form.nav.submit", goSubmit, state.submitting));
   }
   root.append(nav);
+}
+
+/**
+ * Replace #form-root with a terminal screen: a success message, or an error
+ * message plus a retry button. Retry re-runs the submit and is disabled while
+ * that request is in flight, so duplicate submissions can't slip through.
+ */
+export function renderConfirmation(status) {
+  const root = document.getElementById("form-root");
+  root.replaceChildren();
+
+  const key = status === "success" ? "form.confirmation.success" : "form.confirmation.error";
+  const message = el("p", { className: "confirmation" });
+  const lines = t(key).split("\n");
+  lines.forEach((line, i) => {
+    if (i > 0) message.append(el("br"));
+    message.append(line);
+  });
+  root.append(message);
+
+  if (status === "error") {
+    const retry = navButton(
+      "form.confirmation.retry_button",
+      () => runSubmit("error"),
+      state.submitting,
+    );
+    root.append(el("div", { className: "nav" }, [retry]));
+  }
+}
+
+/**
+ * Fire the (mocked) submit once, guarding against a concurrent request.
+ * `from` is the screen the call came from ("step" or "error"), re-rendered
+ * with its button disabled for the duration of the request.
+ */
+async function runSubmit(from) {
+  if (state.submitting) return;
+  state.submitting = true;
+  // Re-render the originating screen so its button shows as disabled.
+  if (from === "error") renderConfirmation("error");
+  else renderStep();
+
+  let ok = false;
+  try {
+    await submitForm(state.answers);
+    ok = true;
+  } catch {
+    ok = false;
+  }
+  state.submitting = false;
+  renderConfirmation(ok ? "success" : "error");
+}
+
+export function goSubmit() {
+  const step = steps.find((s) => s.id === state.currentStepId);
+  const invalid = validateStep(step, state.answers);
+  if (invalid.length > 0) {
+    state.errors = new Map(invalid.map((e) => [e.id, e.messageKey]));
+    renderStep();
+    return;
+  }
+  runSubmit("step");
 }
 
 export function goNext() {

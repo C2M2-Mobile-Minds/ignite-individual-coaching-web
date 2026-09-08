@@ -1,4 +1,4 @@
-import test, { before, beforeEach } from "node:test";
+import test, { before, beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -25,6 +25,8 @@ const {
   init,
   renderStep,
   renderField,
+  renderConfirmation,
+  goSubmit,
   nextVisibleStep,
   prevVisibleStep,
   currentStepIndex,
@@ -480,4 +482,88 @@ test("advancing is allowed once all required fields are valid", () => {
   buttonByText("Seguinte").click();
   assert.equal(title(), "Treino geral");
   assert.equal(state.errors.size, 0);
+});
+
+// --- Submission: confirmation / error screens --------------------------------
+
+const settle = () => new Promise((r) => setTimeout(r, 5));
+
+// A fully valid last step (general-training branch ends on treino_geral).
+const onFilledLastStep = () => {
+  state.answers = {
+    objetivo_treino: ["ganho_massa"],
+    onde_treina: "casa",
+    dificuldade_atual: "Falta de tempo",
+    frequencia_treino: "2_3x",
+    orientacao_nutricional: "sim",
+    comprometimento: "sim",
+  };
+  state.currentStepId = "treino_geral";
+  renderStep();
+};
+
+afterEach(() => {
+  delete globalThis.__MOCK_SUBMIT_FAIL;
+  state.submitting = false;
+});
+
+test("the last step offers a submit button, not 'Seguinte'", () => {
+  onFilledLastStep();
+  assert.ok(buttonByText("Enviar"));
+  assert.equal(buttonByText("Seguinte"), undefined);
+});
+
+test("submit blocked while a required field on the last step is empty", () => {
+  state.answers = { objetivo_treino: ["ganho_massa"] };
+  state.currentStepId = "treino_geral";
+  renderStep();
+  buttonByText("Enviar").click();
+  assert.equal(title(), "Treino geral");
+  assert.ok(errorFor("onde_treina"));
+});
+
+test("a mocked successful submit shows the success screen with no retry", async () => {
+  onFilledLastStep();
+  buttonByText("Enviar").click();
+  await settle();
+  const confirmation = root().querySelector("p.confirmation");
+  assert.ok(confirmation);
+  assert.ok(confirmation.textContent.startsWith("A nossa equipa será informada"));
+  assert.equal(buttonByText("Tentar novamente"), undefined);
+});
+
+test("a mocked failed submit shows the error screen with a working retry", async () => {
+  globalThis.__MOCK_SUBMIT_FAIL = true;
+  onFilledLastStep();
+  buttonByText("Enviar").click();
+  await settle();
+  const confirmation = root().querySelector("p.confirmation");
+  assert.ok(confirmation.textContent.startsWith("Não foi possível enviar"));
+  const retry = buttonByText("Tentar novamente");
+  assert.ok(retry);
+
+  delete globalThis.__MOCK_SUBMIT_FAIL;
+  retry.click();
+  await settle();
+  assert.ok(root().querySelector("p.confirmation").textContent.startsWith("A nossa equipa"));
+});
+
+test("the submit button is disabled while the request is in flight", async () => {
+  onFilledLastStep();
+  goSubmit();
+  assert.equal(state.submitting, true);
+  assert.equal(buttonByText("Enviar").disabled, true);
+  // A second trigger while in flight is a no-op, not a duplicate submission.
+  goSubmit();
+  assert.equal(state.submitting, true);
+  await settle();
+  assert.equal(state.submitting, false);
+  assert.ok(root().querySelector("p.confirmation"));
+});
+
+test("renderConfirmation('success') splits the copy on its line break", () => {
+  renderConfirmation("success");
+  const p = root().querySelector("p.confirmation");
+  assert.equal(p.querySelectorAll("br").length, 1);
+  assert.ok(p.textContent.includes("Obrigado!"));
 });

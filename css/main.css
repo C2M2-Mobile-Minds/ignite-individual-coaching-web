@@ -132,3 +132,14 @@ fieldset.field label {
 .nav button:hover {
   background: var(--button-bg-hover);
 }
+
+.nav button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.confirmation {
+  margin: 3rem 0 2rem;
+  font-size: 1.1rem;
+  text-align: center;
+}
