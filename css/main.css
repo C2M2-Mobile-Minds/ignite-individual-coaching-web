@@ -138,6 +138,11 @@ fieldset.field label {
   cursor: not-allowed;
 }
 
+#form-root[aria-busy="true"] {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
 .confirmation {
   margin: 3rem 0 2rem;
   font-size: 1.1rem;

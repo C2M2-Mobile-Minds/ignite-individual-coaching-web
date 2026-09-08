@@ -73,6 +73,7 @@
   "form.nav.next": "Seguinte",
   "form.nav.back": "Voltar",
   "form.nav.submit": "Enviar",
+  "form.nav.submitting": "A enviar…",
 
   "form.confirmation.success": "A nossa equipa será informada do interesse no acompanhamento, em breve um treinador entrará em contacto contigo.\nObrigado!",
   "form.confirmation.error": "Não foi possível enviar a tua resposta. Verifica a tua ligação à internet e tenta novamente. Se o problema persistir, contacta-nos diretamente através do Instagram.",

@@ -1,12 +1,9 @@
 // Sends the final answers to the backend.
 //
 // POSTs the flat `answers` object as JSON to the Netlify function, which
-// derives the flow, writes the spreadsheet row, and returns { ok, flow }.
-// A non-2xx response (e.g. a failed Sheets write -> 502) rejects, so the
-// caller shows the error/retry screen.
-//
-// Test / manual hook: set `globalThis.__MOCK_SUBMIT_FAIL = true` to force the
-// rejection path without touching the network.
+// derives the flow, injects the timestamp, writes the spreadsheet row, and
+// returns { ok, flow }. A non-2xx response (e.g. a failed Sheets write -> 502)
+// or a network error rejects, so the caller shows the error/retry screen.
 
 const ENDPOINT = "/.netlify/functions/submit";
 
@@ -15,10 +12,6 @@ const ENDPOINT = "/.netlify/functions/submit";
  * @returns {Promise<{ ok: true, flow: string }>} resolves on a successful write.
  */
 export async function submitForm(payload) {
-  if (globalThis.__MOCK_SUBMIT_FAIL) {
-    throw new Error("submit failed (mock)");
-  }
-
   const res = await fetch(ENDPOINT, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

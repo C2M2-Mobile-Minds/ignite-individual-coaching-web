@@ -11,12 +11,16 @@ const localePath = fileURLToPath(new URL("../locales/pt-PT.json", import.meta.ur
 const dom = new JSDOM('<!doctype html><html><body><div id="form-root"></div></body></html>');
 global.window = dom.window;
 global.document = dom.window.document;
+
+// Flip to make the submit endpoint reject (network/server failure path).
+let failSubmit = false;
+
 global.fetch = async (url) => {
   if (String(url).endsWith("locales/pt-PT.json")) {
     return { json: async () => JSON.parse(readFileSync(localePath, "utf8")) };
   }
-  // The Netlify submit endpoint: succeed here; failure paths use __MOCK_SUBMIT_FAIL.
   if (String(url).endsWith("/.netlify/functions/submit")) {
+    if (failSubmit) return { ok: false, status: 502, json: async () => ({ error: "sheets_write_failed" }) };
     return { ok: true, json: async () => ({ ok: true, flow: "geral" }) };
   }
   throw new Error(`unexpected fetch: ${url}`);
@@ -507,7 +511,7 @@ const onFilledLastStep = () => {
 };
 
 afterEach(() => {
-  delete globalThis.__MOCK_SUBMIT_FAIL;
+  failSubmit = false;
   state.submitting = false;
 });
 
@@ -536,8 +540,8 @@ test("a mocked successful submit shows the success screen with no retry", async 
   assert.equal(buttonByText("Tentar novamente"), undefined);
 });
 
-test("a mocked failed submit shows the error screen with a working retry", async () => {
-  globalThis.__MOCK_SUBMIT_FAIL = true;
+test("a failed submit shows the error screen with a working retry", async () => {
+  failSubmit = true;
   onFilledLastStep();
   buttonByText("Enviar").click();
   await settle();
@@ -546,22 +550,27 @@ test("a mocked failed submit shows the error screen with a working retry", async
   const retry = buttonByText("Tentar novamente");
   assert.ok(retry);
 
-  delete globalThis.__MOCK_SUBMIT_FAIL;
+  failSubmit = false;
   retry.click();
   await settle();
   assert.ok(root().querySelector("p.confirmation").textContent.startsWith("A nossa equipa"));
 });
 
-test("the submit button is disabled while the request is in flight", async () => {
+test("the submit button shows a loading state while the request is in flight", async () => {
   onFilledLastStep();
   goSubmit();
   assert.equal(state.submitting, true);
-  assert.equal(buttonByText("Enviar").disabled, true);
+  const sending = buttonByText("A enviar…");
+  assert.ok(sending);
+  assert.equal(sending.disabled, true);
+  assert.equal(buttonByText("Enviar"), undefined);
+  assert.equal(root().getAttribute("aria-busy"), "true");
   // A second trigger while in flight is a no-op, not a duplicate submission.
   goSubmit();
   assert.equal(state.submitting, true);
   await settle();
   assert.equal(state.submitting, false);
+  assert.equal(root().hasAttribute("aria-busy"), false);
   assert.ok(root().querySelector("p.confirmation"));
 });
 
