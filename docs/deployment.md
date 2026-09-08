@@ -101,10 +101,9 @@ Verified 2026-09-08:
   deployed).
 - [x] A real end-to-end submission on production writes to Sheets and sends an
   email — `POST /.netlify/functions/submit` with a `QA TEST Deploy 18` geral
-  payload → `200 {"ok":true,"flow":"geral"}` (a Sheets write failure would be
-  502). **Manual confirmation still needed:** the row in the `Geral` tab and the
-  notification in the `COMPANY_EMAIL_TO` inbox (email is best-effort — a failed
-  send does not change the 200).
+  payload → `200 {"ok":true,"flow":"geral"}`. Confirmed: the row landed in the
+  `Geral` tab in `columnsFor("geral")` order, and the notification email
+  reached `COMPANY_EMAIL_TO` with the pt-PT question labels resolved.
 - [x] Environment variables are not exposed in any client-side bundle or public
   repo — `/`, `index.html`, and every file under `js/` served from production
   contain no key/secret markers; frontend is unbundled vanilla JS, secrets only
