@@ -63,5 +63,7 @@
   "form.option.tipo_parto.cesariana": "Cesariana",
 
   "form.nav.next": "Seguinte",
-  "form.nav.back": "Voltar"
+  "form.nav.back": "Voltar",
+
+  "validation.required": "Este campo é obrigatório"
 }

@@ -16,6 +16,9 @@ import { steps, visibleSteps, visibleFields } from "./formSchema.js";
 export const state = {
   answers: {},
   currentStepId: steps[0].id,
+  // Field ids currently showing a "required" error. Populated on a blocked
+  // "next" click, cleared per-field as the user edits.
+  errors: new Set(),
 };
 
 // --- Pure navigation helpers (no DOM) ---------------------------------------
@@ -42,14 +45,49 @@ export function prevVisibleStep(answers, currentStepId) {
   return idx > 0 ? visible[idx - 1] : null;
 }
 
+// --- Validation (no DOM) -------------------------------------------------------
+
+/** Is this field's stored answer non-empty for its type? */
+export function isFieldFilled(field, answers) {
+  const value = answers[field.id];
+  if (field.type === "checkbox" && field.options) {
+    return Array.isArray(value) && value.length > 0;
+  }
+  if (field.type === "checkbox") {
+    return value === true;
+  }
+  if (field.type === "radio") {
+    return value !== undefined && value !== null && value !== "";
+  }
+  // text / email / tel
+  return typeof value === "string" && value.trim() !== "";
+}
+
+/** Ids of the step's visible, required fields that are still empty. */
+export function validateStep(step, answers) {
+  return visibleFields(step, answers)
+    .filter((field) => field.required && !isFieldFilled(field, answers))
+    .map((field) => field.id);
+}
+
+/** Drop a field's error and remove its message node without a full re-render. */
+function clearFieldError(fieldId) {
+  if (!state.errors.delete(fieldId)) return;
+  const root = document.getElementById("form-root");
+  root?.querySelector(`.error[data-for="${fieldId}"]`)?.remove();
+  root?.querySelector(`#${fieldId}`)?.removeAttribute("aria-invalid");
+}
+
 // --- Answer mutation -------------------------------------------------------
 
 function setText(fieldId, value) {
   state.answers[fieldId] = value;
+  clearFieldError(fieldId);
 }
 
 function setRadio(fieldId, optionId) {
   state.answers[fieldId] = optionId;
+  clearFieldError(fieldId);
 }
 
 function toggleCheckboxOption(fieldId, optionId, checked) {
@@ -57,10 +95,12 @@ function toggleCheckboxOption(fieldId, optionId, checked) {
   state.answers[fieldId] = checked
     ? [...current, optionId]
     : current.filter((id) => id !== optionId);
+  clearFieldError(fieldId);
 }
 
 function setBooleanCheckbox(fieldId, checked) {
   state.answers[fieldId] = checked;
+  clearFieldError(fieldId);
 }
 
 // --- Rendering ----------------------------------------------------------------
@@ -166,7 +206,18 @@ export function renderStep() {
   root.append(el("h1", { textContent: t(step.titleKey) }));
 
   for (const field of visibleFields(step, answers)) {
-    root.append(renderField(field));
+    const node = renderField(field);
+    if (state.errors.has(field.id)) {
+      const message = el("span", {
+        className: "error",
+        role: "alert",
+        textContent: t("validation.required"),
+      });
+      message.setAttribute("data-for", field.id);
+      node.append(message);
+      node.querySelector("input, select, textarea")?.setAttribute("aria-invalid", "true");
+    }
+    root.append(node);
   }
 
   const nav = el("div", { className: "nav" });
@@ -180,8 +231,16 @@ export function renderStep() {
 }
 
 export function goNext() {
+  const step = steps.find((s) => s.id === state.currentStepId);
+  const invalid = validateStep(step, state.answers);
+  if (invalid.length > 0) {
+    state.errors = new Set(invalid);
+    renderStep();
+    return;
+  }
   const next = nextVisibleStep(state.answers, state.currentStepId);
   if (next) {
+    state.errors.clear();
     state.currentStepId = next.id;
     renderStep();
   }
@@ -190,6 +249,7 @@ export function goNext() {
 export function goBack() {
   const prev = prevVisibleStep(state.answers, state.currentStepId);
   if (prev) {
+    state.errors.clear();
     state.currentStepId = prev.id;
     renderStep();
   }
