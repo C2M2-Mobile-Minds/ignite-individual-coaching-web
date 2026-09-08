@@ -129,6 +129,22 @@ test("rowFor(geral): values in column order, serialized", () => {
   ]);
 });
 
+test("rowFor(geral): stale branch answers left after a branch switch are ignored", () => {
+  // User entered the gestação branch, went back, and cleared the goal. `fase`
+  // and leaf answers linger in the flat answers object; the geral projection
+  // must not carry them.
+  const row = rowFor("geral", {
+    nome: "Ana",
+    fase: "gestacao",
+    semanas_gravidez: "20",
+    onde_treina: "casa",
+  });
+  assert.equal(columnsFor("geral").includes("fase"), false);
+  assert.equal(row.length, columnsFor("geral").length);
+  assert.equal(row[1], "Ana");
+  assert.equal(row[columnsFor("geral").indexOf("onde_treina")], "casa");
+});
+
 test("rowFor length always matches columnsFor length", () => {
   assert.equal(rowFor("geral", {}).length, columnsFor("geral").length);
   assert.equal(

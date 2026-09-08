@@ -75,6 +75,68 @@ test("routes gestacao_posparto submissions to the other tab", async () => {
   assert.equal(appended[0].tab, "Gestação-Pós-parto");
 });
 
+test("a fase=gestacao submission fills the row cell-for-cell, pós-parto cells blank", async () => {
+  const { handler, appended } = makeHandler();
+  const answers = {
+    nome: "Bea",
+    email: "bea@example.com",
+    contacto_telefonico: "+351 912000111",
+    como_chegou: ["fisioterapia"],
+    objetivo_treino: ["gestacao_posparto"],
+    fase: "gestacao",
+    fisio_pelvica: "sim",
+    semanas_gravidez: "24",
+    historial_risco: "Nenhum",
+    preferencia_local: "crossfit_4475",
+    disponibilidade_horario: "Manhãs",
+  };
+  const res = await handler(post(answers));
+  assert.equal(res.statusCode, 200);
+  assert.equal(JSON.parse(res.body).flow, "gestacao_posparto");
+
+  const { headers, row } = appended[0];
+  const cell = (name) => row[headers.indexOf(name)];
+  assert.equal(headers[0], "submitted_at");
+  assert.match(cell("submitted_at"), /^\d{4}-\d{2}-\d{2}T/);
+  assert.equal(cell("nome"), "Bea");
+  assert.equal(cell("como_chegou"), "fisioterapia");
+  assert.equal(cell("objetivo_treino"), "gestacao_posparto");
+  assert.equal(cell("fase"), "gestacao");
+  // radios are stored as raw option ids in the sheet (label resolution happens
+  // only in the notification email, see lib/labels.mjs)
+  assert.equal(cell("fisio_pelvica"), "sim");
+  assert.equal(cell("semanas_gravidez"), "24");
+  assert.equal(cell("historial_risco"), "Nenhum");
+  assert.equal(cell("preferencia_local"), "crossfit_4475");
+  assert.equal(cell("disponibilidade_horario"), "Manhãs");
+  // pós-parto-only columns present but empty for a gestação submission
+  for (const empty of [
+    "tipo_parto",
+    "complicacoes_parto",
+    "acomp_exercicio_gravidez",
+    "acomp_fisio_gravidez",
+    "tempo_posparto",
+    "primeira_consulta_posparto",
+  ]) {
+    assert.equal(cell(empty), "", `${empty} should be blank`);
+  }
+  assert.equal(row.length, headers.length);
+});
+
+test("a submission still succeeds when no sendNotification dep is wired", async () => {
+  const appended = [];
+  const handler = createHandler({
+    appendRow: async (args) => {
+      appended.push(args);
+    },
+    // sendNotification omitted — defaults to a no-op
+  });
+  const res = await handler(post(validAnswers));
+  assert.equal(res.statusCode, 200);
+  assert.equal(JSON.parse(res.body).ok, true);
+  assert.equal(appended.length, 1);
+});
+
 test("sends one notification email after a successful write", async () => {
   const { handler, emails } = makeHandler();
   await handler(post(validAnswers));
