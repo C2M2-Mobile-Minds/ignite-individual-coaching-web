@@ -89,6 +89,36 @@ test("posparto branch: gestacao_posparto goal + fase=posparto", () => {
   assert.deepEqual(visibleStepIds(answers), ["dados_basicos", "fase_gestacao", "posparto"]);
 });
 
+test("posparto step exposes the issue #10 field ids in order", () => {
+  const answers = { objetivo_treino: ["gestacao_posparto"], fase: "posparto" };
+  assert.deepEqual(
+    visibleFields(stepById.posparto, answers).map((f) => f.id),
+    [
+      "tipo_parto", "complicacoes_parto", "acomp_exercicio_gravidez", "acomp_fisio_gravidez",
+      "tempo_posparto", "primeira_consulta_posparto", "preferencia_local", "disponibilidade_horario",
+      "nota_contacto",
+    ],
+  );
+});
+
+test("posparto closing note is a read-only `note` field, not a control", () => {
+  const nota = stepById.posparto.fields.find((f) => f.id === "nota_contacto");
+  assert.equal(nota.type, "note");
+  assert.ok(!nota.required);
+  assert.equal(nota.labelKey, undefined);
+  assert.ok(locale[nota.textKey], `missing locale key ${nota.textKey}`);
+});
+
+test("every posparto labelKey / textKey (field + option) resolves in pt-PT.json", () => {
+  assert.ok(locale[stepById.posparto.titleKey], "missing step title key");
+  for (const field of stepById.posparto.fields) {
+    assert.ok(locale[field.labelKey ?? field.textKey], `missing locale key for ${field.id}`);
+    for (const opt of field.options ?? []) {
+      assert.ok(locale[opt.labelKey], `missing locale key ${opt.labelKey}`);
+    }
+  }
+});
+
 test("fase not yet answered: splitter shown, neither leaf shown", () => {
   const answers = { objetivo_treino: ["gestacao_posparto"] };
   assert.deepEqual(visibleStepIds(answers), ["dados_basicos", "fase_gestacao"]);

@@ -24,6 +24,7 @@ const {
   state,
   init,
   renderStep,
+  renderField,
   nextVisibleStep,
   prevVisibleStep,
   currentStepIndex,
@@ -160,12 +161,52 @@ test("fase_gestacao validation: 1 required error when empty, none when filled", 
   assert.deepEqual(validateStep(step, { fase: "gestacao" }), []);
 });
 
-test("single checkbox field (aviso_contacto) renders one control", () => {
+test("bare checkbox field (no options) renders a single box wired to a boolean answer", () => {
+  state.answers = {};
+  const field = { id: "_bare", type: "checkbox", required: true, labelKey: "form.nav.next" };
+  const node = renderField(field);
+  const boxes = node.querySelectorAll('input[type="checkbox"]');
+  assert.equal(boxes.length, 1);
+  boxes[0].checked = true;
+  boxes[0].dispatchEvent(new dom.window.Event("change"));
+  assert.equal(state.answers._bare, true);
+});
+
+test("posparto renders all eight controls plus the read-only closing note", () => {
   state.answers = { objetivo_treino: ["gestacao_posparto"], fase: "posparto" };
   state.currentStepId = "posparto";
   renderStep();
-  const boxes = root().querySelectorAll('input[type="checkbox"][name="aviso_contacto"]');
-  assert.equal(boxes.length, 1);
+  assert.equal(title(), "Pós-parto");
+  for (const id of [
+    "tipo_parto", "complicacoes_parto", "acomp_exercicio_gravidez", "acomp_fisio_gravidez",
+    "tempo_posparto", "primeira_consulta_posparto", "preferencia_local", "disponibilidade_horario",
+  ]) {
+    assert.ok(root().querySelector(`#${id}, [name="${id}"]`), `no control rendered for ${id}`);
+  }
+  const note = root().querySelector("p.note");
+  assert.ok(note);
+  assert.ok(note.textContent.startsWith("Será contactada por parte da treinadora"));
+  assert.equal(root().querySelectorAll('[name="nota_contacto"]').length, 0);
+  assert.ok(!root().textContent.includes("form.field."), "unresolved locale key rendered");
+});
+
+test("posparto validation: 8 required errors when empty, none when filled; note never blocks", () => {
+  const step = stepById("posparto");
+  assert.deepEqual(
+    validateStep(step, {}).map((e) => e.messageKey),
+    Array(8).fill("validation.required"),
+  );
+  const filled = {
+    tipo_parto: "normal",
+    complicacoes_parto: "Nenhuma",
+    acomp_exercicio_gravidez: "sim",
+    acomp_fisio_gravidez: "nao",
+    tempo_posparto: "3 meses",
+    primeira_consulta_posparto: "sim",
+    preferencia_local: "templo_fitness",
+    disponibilidade_horario: "Fins de semana",
+  };
+  assert.deepEqual(validateStep(step, filled), []);
 });
 
 test("gestacao renders all five controls plus the read-only closing note", () => {
