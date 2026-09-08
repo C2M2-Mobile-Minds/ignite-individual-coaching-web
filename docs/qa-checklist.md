@@ -151,6 +151,17 @@ On each, check:
 - [ ] No horizontal scroll / clipped labels / overlapping controls at that width.
 - [ ] Success and error screens render correctly.
 
+## Known cosmetic issues (not blockers)
+
+Found during the issue #17 live pass — data is correct, only presentation:
+
+- The notification email renders `submitted_at` as a raw ISO string
+  ("Recebida em 2026-09-08T15:33:18.007Z") instead of a friendly date.
+- In the **pós-parto** notification email, `preferencia_local` and
+  `disponibilidade_horario` are listed before the parto questions, because the
+  email follows `columnsFor("gestacao_posparto")` order (where those ids first
+  appear in the gestação block) rather than the on-screen pós-parto field order.
+
 ## Sign-off
 
 - [ ] All three branches produce correct, complete submissions — no missing or
