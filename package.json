@@ -5,7 +5,7 @@
   "type": "module",
   "description": "Multi-step web form for Ignite Individual Coaching's lead intake.",
   "engines": {
-    "node": ">=18"
+    "node": ">=20.19"
   },
   "scripts": {
     "dev": "netlify dev",

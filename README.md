@@ -16,7 +16,7 @@ Multi-step web form for Ignite Individual Coaching's lead intake, accessed via a
 
 ## Getting started
 
-Prerequisites: [Node.js](https://nodejs.org/) (18+) and npm.
+Prerequisites: [Node.js](https://nodejs.org/) 22 (see `.nvmrc`; 20.19+ works) and npm.
 
 ```bash
 npm install
