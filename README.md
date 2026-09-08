@@ -133,6 +133,11 @@ shows the retry screen; the spreadsheet is the source of truth.
 **Deferred:** the notification email (`EMAIL_API_KEY` / `COMPANY_EMAIL_TO`)
 is a separate issue and does not gate the response.
 
+> Issue #13 ("serverless function scaffold and environment config") was closed
+> as superseded — #14 delivered the handler, `netlify.toml` functions config,
+> and `.env.example` vars ahead of it, and replaced the planned mocked success
+> with the real Sheets write.
+
 ### Google Sheets setup
 
 1. Google Cloud project → enable the **Google Sheets API**.
