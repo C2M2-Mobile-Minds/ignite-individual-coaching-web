@@ -109,6 +109,35 @@ test("radio group renders one control per option, reflecting the stored answer",
   assert.equal(checked.value, "ginasio");
 });
 
+test("treino_geral renders all five fields with resolved (non-key) labels", () => {
+  state.answers = { objetivo_treino: ["ganho_massa"] };
+  state.currentStepId = "treino_geral";
+  renderStep();
+  assert.equal(title(), "Treino geral");
+  for (const id of ["onde_treina", "dificuldade_atual", "frequencia_treino", "orientacao_nutricional", "comprometimento"]) {
+    assert.ok(root().querySelector(`#${id}, [name="${id}"]`), `no control rendered for ${id}`);
+  }
+  assert.equal(root().querySelector("input#dificuldade_atual").type, "text");
+  assert.equal(root().querySelectorAll('input[type="radio"][name="frequencia_treino"]').length, 3);
+  assert.ok(!root().textContent.includes("form.field."), "unresolved locale key rendered");
+});
+
+test("treino_geral validation: 5 required errors when empty, none when filled", () => {
+  const step = stepById("treino_geral");
+  assert.deepEqual(
+    validateStep(step, {}).map((e) => e.messageKey),
+    Array(5).fill("validation.required"),
+  );
+  const filled = {
+    onde_treina: "casa",
+    dificuldade_atual: "Falta de tempo",
+    frequencia_treino: "2_3x",
+    orientacao_nutricional: "sim",
+    comprometimento: "sim",
+  };
+  assert.deepEqual(validateStep(step, filled), []);
+});
+
 test("single checkbox field (aviso_contacto) renders one control", () => {
   state.answers = { objetivo_treino: ["gestacao_posparto"], fase: "gestacao" };
   state.currentStepId = "gestacao";

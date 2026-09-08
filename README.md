@@ -91,7 +91,7 @@ flowchart TD
 | Page | Fields |
 |---|---|
 | 1. Dados básicos | Nome (primeiro e último); contacto telefónico e e-mail; como chegou até à Ignite (checkbox + "outro" com texto livre); objetivo(s) de treino (checkbox, múltipla escolha) |
-| 2a. Treino geral | Onde treina (casa/ginásio); maior dificuldade atual (texto livre); rotina de treinos (2-3x, 4-5x, 5+/semana); orientação alimentar por nutricionista (sim/não); confiança/compromisso com acompanhamento online (sim/não) |
+| 2a. Treino geral | Onde treinas (casa/ginásio); qual a maior dificuldade neste momento (texto livre); como é a tua rotina de treinos (2-3x, 4-5x, 5+/semana); segues orientação alimentar de um nutricionista (sim/não); confiança/compromisso a investir no acompanhamento on-line (sim/não) |
 | 2b. Em que fase | Gestação ou pós-parto (checkbox) |
 | 3a. Gestação | Acompanhamento por fisioterapia pélvica (sim/não); semanas de gravidez (texto); historial de risco segundo obstetra (texto livre); preferência de treino presencial (CrossFit 4475 / Templo Fitness Estúdio); disponibilidade de horário (2ª, 3ª, 4ª, 6ª — texto livre); aviso de contacto pela treinadora |
 | 3b. Pós-parto | Tipo de parto (normal/cesariana); complicações no parto (texto livre); acompanhamento por profissional de exercício físico na gravidez (sim/não); acompanhamento por fisioterapia pélvica na gravidez (sim/não); tempo pós-parto (texto livre); primeira consulta pós-parto com obstetrícia (sim/não); preferência de treino presencial; disponibilidade de horário; aviso de contacto pela treinadora |
