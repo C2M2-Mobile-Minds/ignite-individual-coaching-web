@@ -22,9 +22,9 @@ Always shown (entry step).
 | `nome` | text | yes | — | first + last name in one field |
 | `contacto_telefonico` | tel | yes | — | |
 | `email` | email | yes | — | |
-| `como_chegou` | checkbox (multiple) | yes | `redes_sociais`, `fisioterapia`, `amigos_familiares`, `outro` | how they found Ignite |
+| `como_chegou` | checkbox (multiple) | yes | `instagram`, `recomendacao`, `pesquisa`, `redes_sociais`, `fisioterapia`, `amigos_familiares`, `outro` | how they found Ignite |
 | `como_chegou_outro` | text | yes | — | shown only when `como_chegou` includes `outro`; cleared when `outro` is unchecked |
-| `objetivo_treino` | checkbox (multiple) | yes | `ganho_massa`, `recomposicao`, `saude_longevidade`, `reforco_modalidade`, `forca_atletismo`, `gestacao_posparto` | training goals; `gestacao_posparto` drives the branch |
+| `objetivo_treino` | checkbox (multiple) | yes | `perda_peso`, `ganho_massa`, `condicao_fisica`, `saude_bem_estar`, `recomposicao`, `saude_longevidade`, `reforco_modalidade`, `forca_atletismo`, `gestacao_posparto` | training goals; `gestacao_posparto` drives the branch |
 
 ## Step: `treino_geral`
 

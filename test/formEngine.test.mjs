@@ -189,10 +189,10 @@ test("unchecking 'outro' hides the free-text input and clears its stored answer"
   assert.equal(state.answers.como_chegou_outro, undefined);
 });
 
-test("page 1 renders the approved option counts (4 como_chegou, 6 objetivo_treino)", () => {
+test("page 1 renders the merged option counts (7 como_chegou, 9 objetivo_treino)", () => {
   renderStep();
-  assert.equal(root().querySelectorAll('input[type="checkbox"][name="como_chegou"]').length, 4);
-  assert.equal(root().querySelectorAll('input[type="checkbox"][name="objetivo_treino"]').length, 6);
+  assert.equal(root().querySelectorAll('input[type="checkbox"][name="como_chegou"]').length, 7);
+  assert.equal(root().querySelectorAll('input[type="checkbox"][name="objetivo_treino"]').length, 9);
 });
 
 test("clicking Seguinte advances to the next step with no reload", () => {
