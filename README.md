@@ -55,7 +55,8 @@ ignite-individual-coaching-web/
 ├── .github/workflows/    # ci.yml (test on PR) + deploy.yml (Netlify on main)
 ├── netlify.toml
 ├── docs/
-│   └── field-ids.md      # generated field-ID reference (types, options, conditions)
+│   ├── field-ids.md      # generated field-ID reference (types, options, conditions)
+│   └── qa-checklist.md   # manual end-to-end QA pass (all branches, devices, sign-off)
 └── README.md
 ```
 
@@ -188,6 +189,13 @@ GitHub Actions (`.github/workflows/`):
 - **`ci.yml`** — on every PR and non-`main` push: `npm ci` + `npm test`.
 - **`deploy.yml`** — on push to `main`: tests, then
   `netlify-cli deploy --prod`.
+
+`npm test` (node:test + jsdom) covers the schema branch predicates, the engine's
+navigation / validation / submit, full button-by-button walks of all three
+branches, mid-flow branch switching, and the per-flow spreadsheet rows. Before a
+release, also run the manual pass in [`docs/qa-checklist.md`](docs/qa-checklist.md)
+— real-device rendering, the live Google Sheet, and the notification email, which
+the automated suite can't see.
 
 Repo secrets required: `NETLIFY_AUTH_TOKEN` (Netlify user → Applications →
 personal access token) and `NETLIFY_SITE_ID` (Netlify site → Site settings →

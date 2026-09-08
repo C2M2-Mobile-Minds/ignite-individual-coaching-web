@@ -580,3 +580,185 @@ test("renderConfirmation('success') splits the copy on its line break", () => {
   assert.equal(p.querySelectorAll("br").length, 1);
   assert.ok(p.textContent.includes("Obrigado!"));
 });
+
+// --- End-to-end branch walks (issue #17) -----------------------------------
+//
+// These drive the whole branch through the rendered nav buttons — no direct
+// state.currentStepId pokes — and end on a real goSubmit() via the "Enviar"
+// button, so branch routing, per-step gating, and the terminal submit are all
+// exercised together.
+
+const IDENTITY = {
+  nome: "Ana",
+  contacto_telefonico: "912345678",
+  email: "ana@example.com",
+  como_chegou: ["redes_sociais"],
+};
+
+const clickAdvance = () => buttonByText("Seguinte").click();
+const submittedOk = () =>
+  root().querySelector("p.confirmation")?.textContent.startsWith("A nossa equipa");
+
+test("E2E: walk the geral branch button-by-button and submit", async () => {
+  state.answers = {
+    ...IDENTITY,
+    objetivo_treino: ["ganho_massa"],
+    onde_treina: "casa",
+    dificuldade_atual: "Falta de tempo",
+    frequencia_treino: "2_3x",
+    orientacao_nutricional: "sim",
+    comprometimento: "sim",
+  };
+  renderStep();
+  assert.equal(title(), "Dados básicos");
+  clickAdvance();
+  assert.equal(title(), "Treino geral");
+  assert.equal(buttonByText("Seguinte"), undefined, "last step: no 'Seguinte'");
+  buttonByText("Enviar").click();
+  await settle();
+  assert.ok(submittedOk());
+  assert.equal(buttonByText("Tentar novamente"), undefined);
+});
+
+test("E2E: walk the gestação branch button-by-button and submit", async () => {
+  state.answers = {
+    ...IDENTITY,
+    objetivo_treino: ["gestacao_posparto"],
+    fase: "gestacao",
+    fisio_pelvica: "sim",
+    semanas_gravidez: "20",
+    historial_risco: "Não",
+    preferencia_local: "crossfit_4475",
+    disponibilidade_horario: "2ª e 4ª de manhã",
+  };
+  renderStep();
+  clickAdvance();
+  assert.equal(title(), "Em que fase te encontras");
+  clickAdvance();
+  assert.equal(title(), "Gestação");
+  assert.ok(root().querySelector("p.note"), "leaf step still renders the closing note");
+  assert.equal(buttonByText("Seguinte"), undefined);
+  buttonByText("Enviar").click();
+  await settle();
+  assert.ok(submittedOk());
+});
+
+test("E2E: walk the pós-parto branch button-by-button and submit", async () => {
+  state.answers = {
+    ...IDENTITY,
+    objetivo_treino: ["gestacao_posparto"],
+    fase: "posparto",
+    tipo_parto: "cesariana",
+    complicacoes_parto: "Nenhuma",
+    acomp_exercicio_gravidez: "sim",
+    acomp_fisio_gravidez: "nao",
+    tempo_posparto: "3 meses",
+    primeira_consulta_posparto: "sim",
+    preferencia_local: "templo_fitness",
+    disponibilidade_horario: "Fins de semana",
+  };
+  renderStep();
+  clickAdvance();
+  assert.equal(title(), "Em que fase te encontras");
+  clickAdvance();
+  assert.equal(title(), "Pós-parto");
+  buttonByText("Enviar").click();
+  await settle();
+  assert.ok(submittedOk());
+});
+
+test("E2E: an empty required field on the fase splitter blocks submit", () => {
+  state.answers = { ...IDENTITY, objetivo_treino: ["gestacao_posparto"] };
+  renderStep();
+  clickAdvance(); // dados_basicos -> fase_gestacao
+  assert.equal(title(), "Em que fase te encontras");
+  // With `fase` unanswered the splitter is the last visible step, so it shows
+  // "Enviar", not "Seguinte". Submitting is blocked until `fase` is picked.
+  buttonByText("Enviar").click();
+  assert.equal(title(), "Em que fase te encontras");
+  assert.ok(root().querySelector('.error[data-for="fase"]'));
+});
+
+// --- Mid-flow branch switching (issue #17) --------------------------------
+
+test("switching the goal off after entering the gestação branch reroutes to geral", () => {
+  state.answers = { ...IDENTITY, objetivo_treino: ["gestacao_posparto"] };
+  renderStep();
+  clickAdvance();
+  assert.equal(state.currentStepId, "fase_gestacao");
+
+  const fase = [...root().querySelectorAll('input[name="fase"]')].find((r) => r.value === "gestacao");
+  fase.checked = true;
+  fase.dispatchEvent(new dom.window.Event("change"));
+  assert.equal(state.answers.fase, "gestacao");
+
+  buttonByText("Voltar").click();
+  assert.equal(state.currentStepId, "dados_basicos");
+
+  const goal = [...root().querySelectorAll('input[name="objetivo_treino"]')].find(
+    (c) => c.value === "gestacao_posparto",
+  );
+  goal.checked = false;
+  goal.dispatchEvent(new dom.window.Event("change"));
+
+  // The branch is recomputed from answers on every move.
+  assert.equal(nextVisibleStep(state.answers, "dados_basicos").id, "treino_geral");
+
+  // objetivo_treino is now empty and still required — the user must pick a
+  // replacement goal before the form lets them leave step 1.
+  clickAdvance();
+  assert.equal(state.currentStepId, "dados_basicos");
+  assert.ok(root().querySelector('.error[data-for="objetivo_treino"]'));
+  const replacement = [...root().querySelectorAll('input[name="objetivo_treino"]')].find(
+    (c) => c.value === "ganho_massa",
+  );
+  replacement.checked = true;
+  replacement.dispatchEvent(new dom.window.Event("change"));
+
+  clickAdvance();
+  assert.equal(state.currentStepId, "treino_geral");
+
+  // `fase` is not a field of dados_basicos, so pruneHiddenFieldAnswers leaves it
+  // behind; the server drops it because columnsFor("geral") has no `fase` column
+  // (locked by test/columns.test.mjs).
+  assert.equal(state.answers.fase, "gestacao");
+});
+
+test("flipping the fase radio swaps the leaf step", () => {
+  state.answers = { ...IDENTITY, objetivo_treino: ["gestacao_posparto"], fase: "gestacao" };
+  state.currentStepId = "fase_gestacao";
+  renderStep();
+  assert.equal(nextVisibleStep(state.answers, "fase_gestacao").id, "gestacao");
+
+  const posparto = [...root().querySelectorAll('input[name="fase"]')].find(
+    (r) => r.value === "posparto",
+  );
+  posparto.checked = true;
+  posparto.dispatchEvent(new dom.window.Event("change"));
+
+  assert.equal(state.answers.fase, "posparto");
+  assert.equal(nextVisibleStep(state.answers, "fase_gestacao").id, "posparto");
+});
+
+test("Voltar does not run validation on the current step", () => {
+  state.answers = { objetivo_treino: ["ganho_massa"] }; // treino_geral fields all empty
+  state.currentStepId = "treino_geral";
+  renderStep();
+  buttonByText("Voltar").click();
+  assert.equal(state.currentStepId, "dados_basicos");
+  assert.equal(state.errors.size, 0);
+});
+
+test("como_chegou_outro is required once 'outro' is checked", () => {
+  const step = stepById("dados_basicos");
+  const answers = {
+    ...IDENTITY,
+    como_chegou: ["outro"],
+    objetivo_treino: ["ganho_massa"],
+  };
+  assert.deepEqual(validateStep(step, answers), [
+    { id: "como_chegou_outro", messageKey: "validation.required" },
+  ]);
+  answers.como_chegou_outro = "Um evento no ginásio";
+  assert.deepEqual(validateStep(step, answers), []);
+});
