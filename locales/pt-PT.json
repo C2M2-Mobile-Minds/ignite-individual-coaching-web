@@ -35,15 +35,16 @@
   "form.option.sim": "Sim",
   "form.option.nao": "Não",
 
-  "form.option.como_chegou.instagram": "Instagram",
-  "form.option.como_chegou.recomendacao": "Recomendação",
-  "form.option.como_chegou.pesquisa": "Pesquisa online",
+  "form.option.como_chegou.redes_sociais": "Redes sociais",
+  "form.option.como_chegou.fisioterapia": "Fisioterapia ou outro profissional de saúde",
+  "form.option.como_chegou.amigos_familiares": "Através de amigos/familiares",
   "form.option.como_chegou.outro": "Outro",
 
-  "form.option.objetivo_treino.perda_peso": "Perda de peso",
-  "form.option.objetivo_treino.ganho_massa": "Ganho de massa muscular",
-  "form.option.objetivo_treino.condicao_fisica": "Melhorar a condição física",
-  "form.option.objetivo_treino.saude_bem_estar": "Saúde e bem-estar",
+  "form.option.objetivo_treino.ganho_massa": "Aumento de massa muscular",
+  "form.option.objetivo_treino.recomposicao": "Recomposição corporal",
+  "form.option.objetivo_treino.saude_longevidade": "Saúde/longevidade/bem-estar",
+  "form.option.objetivo_treino.reforco_modalidade": "Reforço muscular e complemento à modalidade desportiva principal",
+  "form.option.objetivo_treino.forca_atletismo": "Aumento de força/atleticismo/agilidade",
   "form.option.objetivo_treino.gestacao_posparto": "Acompanhamento gestação e pós-parto",
 
   "form.option.onde_treina.casa": "Em casa",

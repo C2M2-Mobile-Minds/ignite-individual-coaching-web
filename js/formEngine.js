@@ -109,6 +109,17 @@ function clearFieldError(fieldId) {
 
 // --- Answer mutation -------------------------------------------------------
 
+/** Drop stored answers for current-step fields whose condition no longer passes. */
+function pruneHiddenFieldAnswers() {
+  const step = steps.find((s) => s.id === state.currentStepId);
+  for (const field of step.fields) {
+    if (field.condition && !field.condition(state.answers) && field.id in state.answers) {
+      delete state.answers[field.id];
+      state.errors.delete(field.id);
+    }
+  }
+}
+
 function setText(fieldId, value) {
   state.answers[fieldId] = value;
   clearFieldError(fieldId);
@@ -117,6 +128,7 @@ function setText(fieldId, value) {
 function setRadio(fieldId, optionId) {
   state.answers[fieldId] = optionId;
   clearFieldError(fieldId);
+  pruneHiddenFieldAnswers();
 }
 
 function toggleCheckboxOption(fieldId, optionId, checked) {
@@ -125,6 +137,7 @@ function toggleCheckboxOption(fieldId, optionId, checked) {
     ? [...current, optionId]
     : current.filter((id) => id !== optionId);
   clearFieldError(fieldId);
+  pruneHiddenFieldAnswers();
 }
 
 function setBooleanCheckbox(fieldId, checked) {
