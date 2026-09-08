@@ -60,5 +60,8 @@
   "form.option.preferencia_treino_presencial.templo_fitness": "Templo Fitness Estúdio",
 
   "form.option.tipo_parto.normal": "Normal",
-  "form.option.tipo_parto.cesariana": "Cesariana"
+  "form.option.tipo_parto.cesariana": "Cesariana",
+
+  "form.nav.next": "Seguinte",
+  "form.nav.back": "Voltar"
 }
