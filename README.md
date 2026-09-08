@@ -203,6 +203,15 @@ General → Site ID). Runtime `GOOGLE_SHEETS_*` vars live in the Netlify site,
 not in GitHub. Disable Netlify's own auto Git deploy so Actions is the only
 deploy path.
 
+## Deployment
+
+Production runs on Netlify, deployed only via `deploy.yml` (never Netlify's own
+Git integration). Live URL: `https://ignite-coaching.netlify.app`.
+
+Full setup, environment-variable, HTTPS, and post-deploy verification steps are
+in [`docs/deployment.md`](docs/deployment.md). Launching on the default
+`*.netlify.app` subdomain; a custom domain is deferred.
+
 ## Localization
 
 Locale files live in `/locales`, keyed by translation ID, not by page:
