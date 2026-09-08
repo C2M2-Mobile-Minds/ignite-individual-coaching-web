@@ -63,5 +63,9 @@
   "form.option.tipo_parto.cesariana": "Cesariana",
 
   "form.nav.next": "Seguinte",
-  "form.nav.back": "Voltar"
+  "form.nav.back": "Voltar",
+
+  "validation.required": "Este campo é obrigatório",
+  "validation.email": "Introduz um endereço de email válido",
+  "validation.phone": "Introduz um número de telefone válido"
 }

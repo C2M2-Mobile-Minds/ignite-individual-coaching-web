@@ -11,11 +11,15 @@
 
 import { loadLocale, t } from "./i18n.js";
 import { steps, visibleSteps, visibleFields } from "./formSchema.js";
+import { EEA_COUNTRIES, DEFAULT_DIAL_CODE, parsePhone, combinePhone } from "./countries.js";
 
 /** The single source of truth for what the user has entered and where they are. */
 export const state = {
   answers: {},
   currentStepId: steps[0].id,
+  // Map of field id -> error message key currently shown. Populated on a
+  // blocked "next" click, cleared per-field as the user edits.
+  errors: new Map(),
 };
 
 // --- Pure navigation helpers (no DOM) ---------------------------------------
@@ -42,14 +46,77 @@ export function prevVisibleStep(answers, currentStepId) {
   return idx > 0 ? visible[idx - 1] : null;
 }
 
+// --- Validation (no DOM) -------------------------------------------------------
+
+/** Is this field's stored answer non-empty for its type? */
+export function isFieldFilled(field, answers) {
+  const value = answers[field.id];
+  if (field.type === "checkbox" && field.options) {
+    return Array.isArray(value) && value.length > 0;
+  }
+  if (field.type === "checkbox") {
+    return value === true;
+  }
+  if (field.type === "radio") {
+    return value !== undefined && value !== null && value !== "";
+  }
+  // text / email / tel
+  return typeof value === "string" && value.trim() !== "";
+}
+
+// Pragmatic email shape check — one @, a dot in the domain, no spaces.
+// Not RFC 5322; the serverless function is the real gate.
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Format error key for a filled field, or null if it looks fine. */
+function formatError(field, answers) {
+  const value = String(answers[field.id] ?? "").trim();
+  if (field.type === "email" && !EMAIL_RE.test(value)) {
+    return "validation.email";
+  }
+  if (field.type === "tel") {
+    const { local } = parsePhone(value);
+    const digits = local.replace(/\D/g, "");
+    if (digits.length < 6 || digits.length > 15) return "validation.phone";
+  }
+  return null;
+}
+
+/**
+ * `{ id, messageKey }` for every visible field that fails validation:
+ * required fields left empty, then filled fields with a bad format.
+ */
+export function validateStep(step, answers) {
+  const errors = [];
+  for (const field of visibleFields(step, answers)) {
+    if (!isFieldFilled(field, answers)) {
+      if (field.required) errors.push({ id: field.id, messageKey: "validation.required" });
+      continue;
+    }
+    const format = formatError(field, answers);
+    if (format) errors.push({ id: field.id, messageKey: format });
+  }
+  return errors;
+}
+
+/** Drop a field's error and remove its message node without a full re-render. */
+function clearFieldError(fieldId) {
+  if (!state.errors.delete(fieldId)) return;
+  const root = document.getElementById("form-root");
+  root?.querySelector(`.error[data-for="${fieldId}"]`)?.remove();
+  root?.querySelector(`#${fieldId}`)?.removeAttribute("aria-invalid");
+}
+
 // --- Answer mutation -------------------------------------------------------
 
 function setText(fieldId, value) {
   state.answers[fieldId] = value;
+  clearFieldError(fieldId);
 }
 
 function setRadio(fieldId, optionId) {
   state.answers[fieldId] = optionId;
+  clearFieldError(fieldId);
 }
 
 function toggleCheckboxOption(fieldId, optionId, checked) {
@@ -57,10 +124,12 @@ function toggleCheckboxOption(fieldId, optionId, checked) {
   state.answers[fieldId] = checked
     ? [...current, optionId]
     : current.filter((id) => id !== optionId);
+  clearFieldError(fieldId);
 }
 
 function setBooleanCheckbox(fieldId, checked) {
   state.answers[fieldId] = checked;
+  clearFieldError(fieldId);
 }
 
 // --- Rendering ----------------------------------------------------------------
@@ -78,7 +147,29 @@ function el(tag, props = {}, children = []) {
 export function renderField(field) {
   const { id, type } = field;
 
-  if (type === "text" || type === "email" || type === "tel") {
+  if (type === "tel") {
+    const { dialCode, local } = parsePhone(state.answers[id]);
+    const select = el("select", { name: `${id}_country` });
+    for (const c of EEA_COUNTRIES) {
+      select.append(
+        el("option", {
+          value: c.dialCode,
+          textContent: `${c.name} (${c.dialCode})`,
+          selected: c.dialCode === dialCode,
+        }),
+      );
+    }
+    const input = el("input", { type: "tel", id, name: id, value: local });
+    const sync = () => setText(id, combinePhone(select.value, input.value));
+    select.addEventListener("change", sync);
+    input.addEventListener("input", sync);
+    return el("label", { className: "field", htmlFor: id }, [
+      t(field.labelKey),
+      el("span", { className: "tel-group" }, [select, input]),
+    ]);
+  }
+
+  if (type === "text" || type === "email") {
     const input = el("input", {
       type,
       id,
@@ -166,7 +257,19 @@ export function renderStep() {
   root.append(el("h1", { textContent: t(step.titleKey) }));
 
   for (const field of visibleFields(step, answers)) {
-    root.append(renderField(field));
+    const node = renderField(field);
+    if (state.errors.has(field.id)) {
+      const message = el("span", {
+        className: "error",
+        role: "alert",
+        textContent: t(state.errors.get(field.id)),
+      });
+      message.setAttribute("data-for", field.id);
+      node.append(message);
+      (node.querySelector("input") ?? node.querySelector("select, textarea"))
+        ?.setAttribute("aria-invalid", "true");
+    }
+    root.append(node);
   }
 
   const nav = el("div", { className: "nav" });
@@ -180,8 +283,16 @@ export function renderStep() {
 }
 
 export function goNext() {
+  const step = steps.find((s) => s.id === state.currentStepId);
+  const invalid = validateStep(step, state.answers);
+  if (invalid.length > 0) {
+    state.errors = new Map(invalid.map((e) => [e.id, e.messageKey]));
+    renderStep();
+    return;
+  }
   const next = nextVisibleStep(state.answers, state.currentStepId);
   if (next) {
+    state.errors.clear();
     state.currentStepId = next.id;
     renderStep();
   }
@@ -190,6 +301,7 @@ export function goNext() {
 export function goBack() {
   const prev = prevVisibleStep(state.answers, state.currentStepId);
   if (prev) {
+    state.errors.clear();
     state.currentStepId = prev.id;
     renderStep();
   }

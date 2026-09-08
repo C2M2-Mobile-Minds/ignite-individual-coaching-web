@@ -27,7 +27,12 @@ const {
   nextVisibleStep,
   prevVisibleStep,
   currentStepIndex,
+  isFieldFilled,
+  validateStep,
 } = await import("../js/formEngine.js");
+
+const { steps } = await import("../js/formSchema.js");
+const stepById = (id) => steps.find((s) => s.id === id);
 
 before(async () => {
   await init(); // loads the locale so t() resolves real strings
@@ -36,6 +41,7 @@ before(async () => {
 beforeEach(() => {
   state.answers = {};
   state.currentStepId = "dados_basicos";
+  state.errors = new Set();
 });
 
 const root = () => document.getElementById("form-root");
@@ -111,6 +117,46 @@ test("single checkbox field (aviso_contacto) renders one control", () => {
   assert.equal(boxes.length, 1);
 });
 
+test("tel field renders a country <select> and a number input", () => {
+  renderStep();
+  const select = root().querySelector('select[name="contacto_telefonico_country"]');
+  const input = root().querySelector("input#contacto_telefonico");
+  assert.ok(select);
+  assert.equal(input.type, "tel");
+  assert.ok(select.querySelectorAll("option").length >= 27);
+  assert.equal(select.value, "+351"); // Portugal default
+});
+
+test("typing a number stores the combined dial code + number", () => {
+  renderStep();
+  const input = root().querySelector("input#contacto_telefonico");
+  input.value = "912345678";
+  input.dispatchEvent(new dom.window.Event("input"));
+  assert.equal(state.answers.contacto_telefonico, "+351 912345678");
+});
+
+test("changing the country updates the stored prefix", () => {
+  state.answers = { contacto_telefonico: "+351 912345678" };
+  renderStep();
+  const select = root().querySelector('select[name="contacto_telefonico_country"]');
+  select.value = "+33";
+  select.dispatchEvent(new dom.window.Event("change"));
+  assert.equal(state.answers.contacto_telefonico, "+33 912345678");
+});
+
+test("validateStep flags a too-short phone number", () => {
+  const answers = {
+    nome: "Ana",
+    contacto_telefonico: "+351 123",
+    email: "ana@example.com",
+    como_chegou: ["instagram"],
+    objetivo_treino: ["perda_peso"],
+  };
+  assert.deepEqual(validateStep(stepById("dados_basicos"), answers), [
+    { id: "contacto_telefonico", messageKey: "validation.phone" },
+  ]);
+});
+
 test("field-level condition: como_chegou_outro appears only after 'outro' is checked", () => {
   renderStep();
   assert.equal(root().querySelector("input#como_chegou_outro"), null);
@@ -126,7 +172,13 @@ test("field-level condition: como_chegou_outro appears only after 'outro' is che
 });
 
 test("clicking Seguinte advances to the next step with no reload", () => {
-  state.answers = { objetivo_treino: ["perda_peso"] };
+  state.answers = {
+    nome: "Ana",
+    contacto_telefonico: "912345678",
+    email: "ana@example.com",
+    como_chegou: ["instagram"],
+    objetivo_treino: ["perda_peso"],
+  };
   renderStep();
   assert.equal(title(), "Dados básicos");
   buttonByText("Seguinte").click();
@@ -141,4 +193,142 @@ test("Voltar returns to the previous visible step, answers intact", () => {
   buttonByText("Voltar").click();
   assert.equal(title(), "Dados básicos");
   assert.equal(root().querySelector("input#nome").value, "Ana");
+});
+
+// --- Validation ---------------------------------------------------------------
+
+const errorFor = (fieldId) => root().querySelector(`.error[data-for="${fieldId}"]`);
+
+test("isFieldFilled covers every field type", () => {
+  assert.equal(isFieldFilled({ type: "text" }, {}), false);
+  assert.equal(isFieldFilled({ id: "x", type: "text" }, { x: "   " }), false);
+  assert.equal(isFieldFilled({ id: "x", type: "text" }, { x: "Ana" }), true);
+  assert.equal(isFieldFilled({ id: "r", type: "radio" }, {}), false);
+  assert.equal(isFieldFilled({ id: "r", type: "radio" }, { r: "sim" }), true);
+  assert.equal(isFieldFilled({ id: "b", type: "checkbox" }, {}), false);
+  assert.equal(isFieldFilled({ id: "b", type: "checkbox" }, { b: true }), true);
+  const group = { id: "g", type: "checkbox", options: [] };
+  assert.equal(isFieldFilled(group, { g: [] }), false);
+  assert.equal(isFieldFilled(group, { g: ["a"] }), true);
+});
+
+test("validateStep flags empty required fields and ignores hidden conditionals", () => {
+  const ids = validateStep(stepById("dados_basicos"), {}).map((e) => e.id);
+  assert.ok(ids.includes("nome"));
+  assert.ok(ids.includes("como_chegou"));
+  assert.ok(ids.includes("objetivo_treino"));
+  // como_chegou_outro is hidden until "outro" is checked
+  assert.ok(!ids.includes("como_chegou_outro"));
+  // every entry carries a message key
+  assert.ok(validateStep(stepById("dados_basicos"), {}).every((e) => e.messageKey === "validation.required"));
+});
+
+test("validateStep flags a filled-but-malformed email", () => {
+  const answers = {
+    nome: "Ana",
+    contacto_telefonico: "912345678",
+    email: "ana(at)example",
+    como_chegou: ["instagram"],
+    objetivo_treino: ["perda_peso"],
+  };
+  assert.deepEqual(validateStep(stepById("dados_basicos"), answers), [
+    { id: "email", messageKey: "validation.email" },
+  ]);
+});
+
+test("an empty email reports 'required', not 'email'", () => {
+  const entry = validateStep(stepById("dados_basicos"), {}).find((e) => e.id === "email");
+  assert.equal(entry.messageKey, "validation.required");
+});
+
+test("validateStep passes once every visible required field is filled", () => {
+  state.answers = {
+    nome: "Ana",
+    contacto_telefonico: "912345678",
+    email: "ana@example.com",
+    como_chegou: ["instagram"],
+    objetivo_treino: ["perda_peso"],
+  };
+  assert.deepEqual(validateStep(stepById("dados_basicos"), state.answers), []);
+});
+
+test("Seguinte with an empty required field shows an inline error and does not advance", () => {
+  renderStep();
+  buttonByText("Seguinte").click();
+  assert.equal(title(), "Dados básicos");
+  assert.equal(state.currentStepId, "dados_basicos");
+  assert.ok(errorFor("nome"));
+  assert.equal(root().querySelector("input#nome").getAttribute("aria-invalid"), "true");
+});
+
+test("error copy comes from the locale, not hardcoded", () => {
+  renderStep();
+  buttonByText("Seguinte").click();
+  assert.equal(errorFor("email").textContent, "Este campo é obrigatório");
+});
+
+test("error clears on input without clicking Seguinte again", () => {
+  renderStep();
+  buttonByText("Seguinte").click();
+  assert.ok(errorFor("nome"));
+  const input = root().querySelector("input#nome");
+  input.value = "Ana";
+  input.dispatchEvent(new dom.window.Event("input"));
+  assert.equal(errorFor("nome"), null);
+  assert.equal(input.getAttribute("aria-invalid"), null);
+});
+
+test("required checkbox group is validated and clears when one box is checked", () => {
+  renderStep();
+  buttonByText("Seguinte").click();
+  assert.ok(errorFor("objetivo_treino"));
+  const box = [...root().querySelectorAll('input[name="objetivo_treino"]')][0];
+  box.checked = true;
+  box.dispatchEvent(new dom.window.Event("change"));
+  assert.equal(errorFor("objetivo_treino"), null);
+});
+
+test("Seguinte with a malformed email shows the email error and blocks advance", () => {
+  state.answers = {
+    nome: "Ana",
+    contacto_telefonico: "912345678",
+    email: "not-an-email",
+    como_chegou: ["instagram"],
+    objetivo_treino: ["perda_peso"],
+  };
+  renderStep();
+  buttonByText("Seguinte").click();
+  assert.equal(title(), "Dados básicos");
+  assert.equal(errorFor("email").textContent, "Introduz um endereço de email válido");
+});
+
+test("fixing the email clears its error on input", () => {
+  state.answers = {
+    nome: "Ana",
+    contacto_telefonico: "912345678",
+    email: "bad",
+    como_chegou: ["instagram"],
+    objetivo_treino: ["perda_peso"],
+  };
+  renderStep();
+  buttonByText("Seguinte").click();
+  assert.ok(errorFor("email"));
+  const input = root().querySelector("input#email");
+  input.value = "ana@example.com";
+  input.dispatchEvent(new dom.window.Event("input"));
+  assert.equal(errorFor("email"), null);
+});
+
+test("advancing is allowed once all required fields are valid", () => {
+  state.answers = {
+    nome: "Ana",
+    contacto_telefonico: "912345678",
+    email: "ana@example.com",
+    como_chegou: ["instagram"],
+    objetivo_treino: ["perda_peso"],
+  };
+  renderStep();
+  buttonByText("Seguinte").click();
+  assert.equal(title(), "Treino geral");
+  assert.equal(state.errors.size, 0);
 });
