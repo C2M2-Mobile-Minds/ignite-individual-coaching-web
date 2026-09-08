@@ -68,13 +68,13 @@ Condition: `objetivo_treino` includes `gestacao_posparto` **and** `fase === "pos
 |---|---|---|---|---|
 | `tipo_parto` | radio | yes | `normal`, `cesariana` | |
 | `complicacoes_parto` | text | yes | — | free text |
-| `acompanhamento_exercicio_gravidez` | radio | yes | `sim`, `nao` | exercise professional during pregnancy |
-| `fisio_pelvica_gravidez` | radio | yes | `sim`, `nao` | pelvic physiotherapy during pregnancy |
+| `acomp_exercicio_gravidez` | radio | yes | `sim`, `nao` | exercise professional during pregnancy (renamed from `acompanhamento_exercicio_gravidez` in #10 — one-off, step unshipped) |
+| `acomp_fisio_gravidez` | radio | yes | `sim`, `nao` | pelvic physiotherapy during pregnancy (renamed from `fisio_pelvica_gravidez` in #10 — one-off, step unshipped) |
 | `tempo_posparto` | text | yes | — | time since birth |
 | `primeira_consulta_posparto` | radio | yes | `sim`, `nao` | first post-partum obstetric appointment done |
 | `preferencia_local` | radio | yes | `crossfit_4475`, `templo_fitness` | |
 | `disponibilidade_horario` | text | yes | — | |
-| `aviso_contacto` | checkbox | yes | — | acknowledges the trainer will make contact |
+| `nota_contacto` | note | — | — | read-only closing note (`form.note.contacto_treinadora`); replaced the `aviso_contacto` checkbox for this step in #10 |
 
 ## Shared option sets
 
