@@ -7,7 +7,6 @@ const origFetch = globalThis.fetch;
 
 afterEach(() => {
   globalThis.fetch = origFetch;
-  delete globalThis.__MOCK_SUBMIT_FAIL;
 });
 
 test("POSTs the payload as JSON to the Netlify function and resolves its body", async () => {
@@ -31,10 +30,9 @@ test("throws when the function responds non-ok", async () => {
   await assert.rejects(submitForm({ nome: "Ana" }), /502|sheets_write_failed/);
 });
 
-test("__MOCK_SUBMIT_FAIL still forces the rejection path without a network call", async () => {
-  globalThis.__MOCK_SUBMIT_FAIL = true;
+test("rejects when fetch itself throws (network failure)", async () => {
   globalThis.fetch = async () => {
-    throw new Error("network should not be touched");
+    throw new TypeError("Failed to fetch");
   };
-  await assert.rejects(submitForm({ nome: "Ana" }));
+  await assert.rejects(submitForm({ nome: "Ana" }), /Failed to fetch/);
 });

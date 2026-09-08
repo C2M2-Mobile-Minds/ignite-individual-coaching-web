@@ -141,6 +141,16 @@ rendering and send live in `netlify/functions/lib/email.mjs`. The email is
 submission still returns **200**. The subject line is a placeholder pending
 approved copy.
 
+**Client-side wiring (issue #16):** the browser side of this flow — building the
+POST, showing a loading state (`form.nav.submitting` → "A enviar…" plus
+`aria-busy` on `#form-root` while in flight), and routing to the success or
+error/retry screen off the real response — lives in `js/submit.js` and
+`runSubmit` in `js/formEngine.js`. `timestamp` (`submitted_at`) and `flow` are
+derived server-side by design, so the client POSTs the flat `answers` object
+unmodified. This was largely delivered ahead of #16 by issues #11/#14/#15; #16
+added the visible loading affordance and removed the `__MOCK_SUBMIT_FAIL`
+development hook.
+
 > Issue #13 ("serverless function scaffold and environment config") was closed
 > as superseded — #14 delivered the handler, `netlify.toml` functions config,
 > and `.env.example` vars ahead of it, and replaced the planned mocked success

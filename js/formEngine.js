@@ -304,7 +304,8 @@ export function renderStep() {
   if (nextVisibleStep(answers, currentStepId)) {
     nav.append(navButton("form.nav.next", goNext));
   } else {
-    nav.append(navButton("form.nav.submit", goSubmit, state.submitting));
+    const submitKey = state.submitting ? "form.nav.submitting" : "form.nav.submit";
+    nav.append(navButton(submitKey, goSubmit, state.submitting));
   }
   root.append(nav);
 }
@@ -329,7 +330,7 @@ export function renderConfirmation(status) {
 
   if (status === "error") {
     const retry = navButton(
-      "form.confirmation.retry_button",
+      state.submitting ? "form.nav.submitting" : "form.confirmation.retry_button",
       () => runSubmit("error"),
       state.submitting,
     );
@@ -338,9 +339,10 @@ export function renderConfirmation(status) {
 }
 
 /**
- * Fire the (mocked) submit once, guarding against a concurrent request.
+ * Fire the submit once, guarding against a concurrent request.
  * `from` is the screen the call came from ("step" or "error"), re-rendered
- * with its button disabled for the duration of the request.
+ * with its button disabled and relabelled ("A enviar…") for the duration of
+ * the request; `#form-root` also carries `aria-busy` while in flight.
  */
 async function runSubmit(from) {
   if (state.submitting) return;
@@ -348,6 +350,7 @@ async function runSubmit(from) {
   // Re-render the originating screen so its button shows as disabled.
   if (from === "error") renderConfirmation("error");
   else renderStep();
+  document.getElementById("form-root").setAttribute("aria-busy", "true");
 
   let ok = false;
   try {
@@ -357,6 +360,7 @@ async function runSubmit(from) {
     ok = false;
   }
   state.submitting = false;
+  document.getElementById("form-root").removeAttribute("aria-busy");
   renderConfirmation(ok ? "success" : "error");
 }
 
