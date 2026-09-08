@@ -14,7 +14,7 @@ test("step order and ids match the schema contract", () => {
 });
 
 test("general-training branch: no gestacao_posparto goal", () => {
-  const answers = { objetivo_treino: ["perda_peso", "condicao_fisica"] };
+  const answers = { objetivo_treino: ["ganho_massa", "recomposicao"] };
   assert.equal(selectedGestacaoPosparto(answers), false);
   assert.deepEqual(visibleStepIds(answers), ["dados_basicos", "treino_geral"]);
 });
@@ -42,8 +42,8 @@ test("empty answers: defaults to the general-training branch", () => {
 
 test("field-level condition: como_chegou_outro appears only when 'outro' checked", () => {
   const fieldIds = (answers) => visibleFields(stepById.dados_basicos, answers).map((f) => f.id);
-  assert.ok(!fieldIds({ como_chegou: ["instagram"] }).includes("como_chegou_outro"));
-  assert.ok(fieldIds({ como_chegou: ["instagram", "outro"] }).includes("como_chegou_outro"));
+  assert.ok(!fieldIds({ como_chegou: ["redes_sociais"] }).includes("como_chegou_outro"));
+  assert.ok(fieldIds({ como_chegou: ["redes_sociais", "outro"] }).includes("como_chegou_outro"));
   assert.ok(!fieldIds({}).includes("como_chegou_outro"));
 });
 

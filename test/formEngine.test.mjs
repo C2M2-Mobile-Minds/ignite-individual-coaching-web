@@ -52,7 +52,7 @@ const buttonByText = (text) =>
 // --- Pure navigation --------------------------------------------------------
 
 test("forward through the general-training branch", () => {
-  state.answers = { objetivo_treino: ["perda_peso"] };
+  state.answers = { objetivo_treino: ["ganho_massa"] };
   assert.equal(nextVisibleStep(state.answers, "dados_basicos").id, "treino_geral");
   assert.equal(nextVisibleStep(state.answers, "treino_geral"), null);
 });
@@ -100,7 +100,7 @@ test("renders the first step's title and field controls", () => {
 });
 
 test("radio group renders one control per option, reflecting the stored answer", () => {
-  state.answers = { objetivo_treino: ["perda_peso"], onde_treina: "ginasio" };
+  state.answers = { objetivo_treino: ["ganho_massa"], onde_treina: "ginasio" };
   state.currentStepId = "treino_geral";
   renderStep();
   const radios = root().querySelectorAll('input[type="radio"][name="onde_treina"]');
@@ -149,8 +149,8 @@ test("validateStep flags a too-short phone number", () => {
     nome: "Ana",
     contacto_telefonico: "+351 123",
     email: "ana@example.com",
-    como_chegou: ["instagram"],
-    objetivo_treino: ["perda_peso"],
+    como_chegou: ["redes_sociais"],
+    objetivo_treino: ["ganho_massa"],
   };
   assert.deepEqual(validateStep(stepById("dados_basicos"), answers), [
     { id: "contacto_telefonico", messageKey: "validation.phone" },
@@ -171,13 +171,37 @@ test("field-level condition: como_chegou_outro appears only after 'outro' is che
   assert.deepEqual(state.answers.como_chegou, ["outro"]);
 });
 
+test("unchecking 'outro' hides the free-text input and clears its stored answer", () => {
+  renderStep();
+  const outro = () =>
+    [...root().querySelectorAll('input[name="como_chegou"]')].find((i) => i.value === "outro");
+
+  outro().checked = true;
+  outro().dispatchEvent(new dom.window.Event("change"));
+  const freeText = root().querySelector("input#como_chegou_outro");
+  freeText.value = "Um evento";
+  freeText.dispatchEvent(new dom.window.Event("input"));
+  assert.equal(state.answers.como_chegou_outro, "Um evento");
+
+  outro().checked = false;
+  outro().dispatchEvent(new dom.window.Event("change"));
+  assert.equal(root().querySelector("input#como_chegou_outro"), null);
+  assert.equal(state.answers.como_chegou_outro, undefined);
+});
+
+test("page 1 renders the merged option counts (7 como_chegou, 9 objetivo_treino)", () => {
+  renderStep();
+  assert.equal(root().querySelectorAll('input[type="checkbox"][name="como_chegou"]').length, 7);
+  assert.equal(root().querySelectorAll('input[type="checkbox"][name="objetivo_treino"]').length, 9);
+});
+
 test("clicking Seguinte advances to the next step with no reload", () => {
   state.answers = {
     nome: "Ana",
     contacto_telefonico: "912345678",
     email: "ana@example.com",
-    como_chegou: ["instagram"],
-    objetivo_treino: ["perda_peso"],
+    como_chegou: ["redes_sociais"],
+    objetivo_treino: ["ganho_massa"],
   };
   renderStep();
   assert.equal(title(), "Dados básicos");
@@ -187,7 +211,7 @@ test("clicking Seguinte advances to the next step with no reload", () => {
 });
 
 test("Voltar returns to the previous visible step, answers intact", () => {
-  state.answers = { nome: "Ana", objetivo_treino: ["perda_peso"] };
+  state.answers = { nome: "Ana", objetivo_treino: ["ganho_massa"] };
   state.currentStepId = "treino_geral";
   renderStep();
   buttonByText("Voltar").click();
@@ -228,8 +252,8 @@ test("validateStep flags a filled-but-malformed email", () => {
     nome: "Ana",
     contacto_telefonico: "912345678",
     email: "ana(at)example",
-    como_chegou: ["instagram"],
-    objetivo_treino: ["perda_peso"],
+    como_chegou: ["redes_sociais"],
+    objetivo_treino: ["ganho_massa"],
   };
   assert.deepEqual(validateStep(stepById("dados_basicos"), answers), [
     { id: "email", messageKey: "validation.email" },
@@ -246,8 +270,8 @@ test("validateStep passes once every visible required field is filled", () => {
     nome: "Ana",
     contacto_telefonico: "912345678",
     email: "ana@example.com",
-    como_chegou: ["instagram"],
-    objetivo_treino: ["perda_peso"],
+    como_chegou: ["redes_sociais"],
+    objetivo_treino: ["ganho_massa"],
   };
   assert.deepEqual(validateStep(stepById("dados_basicos"), state.answers), []);
 });
@@ -293,8 +317,8 @@ test("Seguinte with a malformed email shows the email error and blocks advance",
     nome: "Ana",
     contacto_telefonico: "912345678",
     email: "not-an-email",
-    como_chegou: ["instagram"],
-    objetivo_treino: ["perda_peso"],
+    como_chegou: ["redes_sociais"],
+    objetivo_treino: ["ganho_massa"],
   };
   renderStep();
   buttonByText("Seguinte").click();
@@ -307,8 +331,8 @@ test("fixing the email clears its error on input", () => {
     nome: "Ana",
     contacto_telefonico: "912345678",
     email: "bad",
-    como_chegou: ["instagram"],
-    objetivo_treino: ["perda_peso"],
+    como_chegou: ["redes_sociais"],
+    objetivo_treino: ["ganho_massa"],
   };
   renderStep();
   buttonByText("Seguinte").click();
@@ -324,8 +348,8 @@ test("advancing is allowed once all required fields are valid", () => {
     nome: "Ana",
     contacto_telefonico: "912345678",
     email: "ana@example.com",
-    como_chegou: ["instagram"],
-    objetivo_treino: ["perda_peso"],
+    como_chegou: ["redes_sociais"],
+    objetivo_treino: ["ganho_massa"],
   };
   renderStep();
   buttonByText("Seguinte").click();
