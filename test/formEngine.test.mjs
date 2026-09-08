@@ -138,6 +138,28 @@ test("treino_geral validation: 5 required errors when empty, none when filled", 
   assert.deepEqual(validateStep(step, filled), []);
 });
 
+test("fase_gestacao renders the single radio with resolved labels", () => {
+  state.answers = { objetivo_treino: ["gestacao_posparto"] };
+  state.currentStepId = "fase_gestacao";
+  renderStep();
+  assert.equal(title(), "Em que fase te encontras");
+  const radios = root().querySelectorAll('input[type="radio"][name="fase"]');
+  assert.equal(radios.length, 2);
+  assert.deepEqual([...radios].map((r) => r.value), ["gestacao", "posparto"]);
+  assert.ok(root().textContent.includes("Gestação"));
+  assert.ok(root().textContent.includes("Pós-parto"));
+  assert.ok(!root().textContent.includes("form.field."), "unresolved locale key rendered");
+});
+
+test("fase_gestacao validation: 1 required error when empty, none when filled", () => {
+  const step = stepById("fase_gestacao");
+  assert.deepEqual(
+    validateStep(step, {}).map((e) => e.messageKey),
+    ["validation.required"],
+  );
+  assert.deepEqual(validateStep(step, { fase: "gestacao" }), []);
+});
+
 test("single checkbox field (aviso_contacto) renders one control", () => {
   state.answers = { objetivo_treino: ["gestacao_posparto"], fase: "gestacao" };
   state.currentStepId = "gestacao";
