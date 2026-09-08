@@ -33,10 +33,10 @@ Condition: `objetivo_treino` does **not** include `gestacao_posparto`.
 | field id | type | required | option ids | notes |
 |---|---|---|---|---|
 | `onde_treina` | radio | yes | `casa`, `ginasio` | |
-| `maior_dificuldade` | text | yes | — | free text |
-| `rotina_treinos` | radio | yes | `2_3x`, `4_5x`, `5_mais` | sessions per week |
-| `orientacao_nutricionista` | radio | yes | `sim`, `nao` | |
-| `compromisso_online` | radio | yes | `sim`, `nao` | confidence/commitment with online coaching |
+| `dificuldade_atual` | text | yes | — | free text |
+| `frequencia_treino` | radio | yes | `2_3x`, `4_5x`, `5_mais` | sessions per week (option ids retained across the #7 rename) |
+| `orientacao_nutricional` | radio | yes | `sim`, `nao` | |
+| `comprometimento` | radio | yes | `sim`, `nao` | confidence/commitment with online coaching |
 
 ## Step: `fase_gestacao`
 
