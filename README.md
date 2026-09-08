@@ -117,6 +117,7 @@ sequenceDiagram
     W->>F: POST /.netlify/functions/submit — payload JSON (respostas)
     F->>F: Deriva o flow de objetivo_treino / fase
     F->>S: Escreve linha na tab correspondente (Geral / Gestação-Pós-parto)
+    F->>E: Envia email de notificação (best-effort, não bloqueia)
     F-->>W: 200 { ok, flow }  ·  502 em falha de escrita
     W-->>U: Ecrã de confirmação ou erro com retry
 ```
@@ -130,8 +131,15 @@ empty. Column order lives in `netlify/functions/lib/columns.mjs`, derived
 from `formSchema.js`. A failed Sheets write returns **502** and the browser
 shows the retry screen; the spreadsheet is the source of truth.
 
-**Deferred:** the notification email (`EMAIL_API_KEY` / `COMPANY_EMAIL_TO`)
-is a separate issue and does not gate the response.
+**Notification email (issue #15):** after the Sheets write, the function sends
+one email to `COMPANY_EMAIL_TO` via Resend. The template matches the flow
+(`Geral` / `Gestação/Pós-parto`) and lists only that branch's filled fields
+with their pt-PT question labels — labels are resolved server-side from
+`formSchema.js` + `locales/pt-PT.json` in `netlify/functions/lib/labels.mjs`;
+rendering and send live in `netlify/functions/lib/email.mjs`. The email is
+**best-effort**: a failure (or missing `EMAIL_*` config) is logged and the
+submission still returns **200**. The subject line is a placeholder pending
+approved copy.
 
 > Issue #13 ("serverless function scaffold and environment config") was closed
 > as superseded — #14 delivered the handler, `netlify.toml` functions config,
@@ -149,6 +157,19 @@ is a separate issue and does not gate the response.
 5. Set `GOOGLE_SHEETS_CLIENT_EMAIL`, `GOOGLE_SHEETS_PRIVATE_KEY` (the
    `\n`-escaped `private_key` from the JSON), and `GOOGLE_SHEETS_SPREADSHEET_ID`
    locally in `.env` and in **Netlify → Site settings → Environment variables**.
+
+### Email setup
+
+1. Create a **[Resend](https://resend.com)** account and an API key.
+2. Verify a sending domain (production). For local/test sends, Resend's
+   `onboarding@resend.dev` sender works without a domain.
+3. Set locally in `.env` and in **Netlify → Site settings → Environment
+   variables**:
+   - `EMAIL_API_KEY` — the Resend API key
+   - `COMPANY_EMAIL_TO` — `individualcoaching.fial@gmail.com`
+   - `EMAIL_FROM` — the verified sender address
+4. With any of the three unset, the function logs `[email] not configured,
+   skipping` and the submission still succeeds.
 
 ## CI/CD
 
@@ -188,6 +209,7 @@ GOOGLE_SHEETS_PRIVATE_KEY=
 GOOGLE_SHEETS_SPREADSHEET_ID=
 EMAIL_API_KEY=
 COMPANY_EMAIL_TO=
+EMAIL_FROM=
 ```
 
 ## Roadmap

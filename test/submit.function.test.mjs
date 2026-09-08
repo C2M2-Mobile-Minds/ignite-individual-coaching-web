@@ -13,12 +13,16 @@ const validAnswers = {
 
 function makeHandler() {
   const appended = [];
+  const emails = [];
   const handler = createHandler({
     appendRow: async (args) => {
       appended.push(args);
     },
+    sendNotification: async (args) => {
+      emails.push(args);
+    },
   });
-  return { handler, appended };
+  return { handler, appended, emails };
 }
 
 const post = (body) => ({ httpMethod: "POST", body: JSON.stringify(body) });
@@ -69,6 +73,49 @@ test("routes gestacao_posparto submissions to the other tab", async () => {
   assert.equal(res.statusCode, 200);
   assert.equal(JSON.parse(res.body).flow, "gestacao_posparto");
   assert.equal(appended[0].tab, "Gestação-Pós-parto");
+});
+
+test("sends one notification email after a successful write", async () => {
+  const { handler, emails } = makeHandler();
+  await handler(post(validAnswers));
+  assert.equal(emails.length, 1);
+  assert.equal(emails[0].flow, "geral");
+  // the enriched answers (with submitted_at) are handed to the email
+  assert.equal(emails[0].answers.nome, "Ana");
+  assert.match(emails[0].answers.submitted_at, /^\d{4}-\d{2}-\d{2}T/);
+});
+
+test("a failing notification email does not break a successful submission", async () => {
+  const appended = [];
+  const handler = createHandler({
+    appendRow: async (args) => {
+      appended.push(args);
+    },
+    sendNotification: async () => {
+      throw new Error("resend down");
+    },
+  });
+  const res = await handler(post(validAnswers));
+  assert.equal(res.statusCode, 200);
+  assert.equal(JSON.parse(res.body).ok, true);
+  assert.equal(appended.length, 1);
+});
+
+test("does not send an email when the Sheets write fails", async () => {
+  const emails = [];
+  const handler = createHandler({
+    appendRow: async () => {
+      const err = new Error("Sheets API POST 500");
+      err.stage = "sheets";
+      throw err;
+    },
+    sendNotification: async (args) => {
+      emails.push(args);
+    },
+  });
+  const res = await handler(post(validAnswers));
+  assert.equal(res.statusCode, 502);
+  assert.equal(emails.length, 0);
 });
 
 test("returns 502 sheets_write_failed when the Sheets write throws", async () => {

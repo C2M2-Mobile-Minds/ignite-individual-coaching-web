@@ -6,6 +6,7 @@
 // (Notification email is a separate issue and does not gate this response.)
 
 import { appendRow as realAppendRow } from "./lib/sheets.mjs";
+import { sendNotification as realSendNotification } from "./lib/email.mjs";
 import { flowFor, columnsFor, tabFor, rowFor, TIMESTAMP_COLUMN } from "./lib/columns.mjs";
 
 const REQUIRED_IDENTITY_FIELDS = ["nome", "email", "contacto_telefonico"];
@@ -16,7 +17,7 @@ const json = (statusCode, payload) => ({
   body: JSON.stringify(payload),
 });
 
-export function createHandler({ appendRow }) {
+export function createHandler({ appendRow, sendNotification = async () => {} }) {
   return async function handler(event) {
     if (event.httpMethod !== "POST") {
       return json(405, { ok: false, error: "method_not_allowed" });
@@ -57,8 +58,19 @@ export function createHandler({ appendRow }) {
       return json(500, { ok: false, error: "internal" });
     }
 
+    // Best-effort notification — never gates the response (Sheets is the
+    // source of truth; a broken email must not fail a submission).
+    try {
+      await sendNotification({ flow, answers: enriched });
+    } catch (err) {
+      console.error("[submit] notification email failed", err && err.message);
+    }
+
     return json(200, { ok: true, flow });
   };
 }
 
-export const handler = createHandler({ appendRow: realAppendRow });
+export const handler = createHandler({
+  appendRow: realAppendRow,
+  sendNotification: realSendNotification,
+});
