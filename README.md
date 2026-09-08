@@ -40,7 +40,7 @@ ignite-individual-coaching-web/
 │   └── main.css
 ├── js/
 │   ├── formSchema.js      # steps, fields, and branch conditions (data, not markup)
-│   ├── formEngine.js      # renders current step from schema, handles nav + validation
+│   ├── formEngine.js      # renders current step from schema, handles forward/back nav
 │   ├── i18n.js            # loads locale JSON, exposes t('key') helper
 │   └── submit.js          # POSTs final payload to the serverless function
 ├── locales/
