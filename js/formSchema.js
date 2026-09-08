@@ -29,9 +29,9 @@ const simNao = [
   { id: "nao", labelKey: "form.option.nao" },
 ];
 
-const preferenciaTreinoPresencialOptions = [
-  { id: "crossfit_4475", labelKey: "form.option.preferencia_treino_presencial.crossfit_4475" },
-  { id: "templo_fitness", labelKey: "form.option.preferencia_treino_presencial.templo_fitness" },
+const preferenciaLocalOptions = [
+  { id: "crossfit_4475", labelKey: "form.option.preferencia_local.crossfit_4475" },
+  { id: "templo_fitness", labelKey: "form.option.preferencia_local.templo_fitness" },
 ];
 
 export const steps = [
@@ -168,14 +168,14 @@ export const steps = [
       { id: "semanas_gravidez", type: "text", required: true, labelKey: "form.field.semanas_gravidez" },
       { id: "historial_risco", type: "text", required: true, labelKey: "form.field.historial_risco" },
       {
-        id: "preferencia_treino_presencial",
+        id: "preferencia_local",
         type: "radio",
         required: true,
-        labelKey: "form.field.preferencia_treino_presencial",
-        options: preferenciaTreinoPresencialOptions,
+        labelKey: "form.field.preferencia_local",
+        options: preferenciaLocalOptions,
       },
       { id: "disponibilidade_horario", type: "text", required: true, labelKey: "form.field.disponibilidade_horario" },
-      { id: "aviso_contacto", type: "checkbox", required: true, labelKey: "form.field.aviso_contacto" },
+      { id: "nota_contacto", type: "note", textKey: "form.note.contacto_treinadora" },
     ],
   },
 
@@ -218,11 +218,11 @@ export const steps = [
         options: simNao,
       },
       {
-        id: "preferencia_treino_presencial",
+        id: "preferencia_local",
         type: "radio",
         required: true,
-        labelKey: "form.field.preferencia_treino_presencial",
-        options: preferenciaTreinoPresencialOptions,
+        labelKey: "form.field.preferencia_local",
+        options: preferenciaLocalOptions,
       },
       { id: "disponibilidade_horario", type: "text", required: true, labelKey: "form.field.disponibilidade_horario" },
       { id: "aviso_contacto", type: "checkbox", required: true, labelKey: "form.field.aviso_contacto" },

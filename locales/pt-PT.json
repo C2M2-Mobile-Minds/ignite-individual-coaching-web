@@ -22,7 +22,7 @@
   "form.field.fisio_pelvica": "Tem acompanhamento por fisioterapia pélvica?",
   "form.field.semanas_gravidez": "Quantas semanas de gravidez?",
   "form.field.historial_risco": "Tem historial de risco segundo o/a obstetra?",
-  "form.field.preferencia_treino_presencial": "Preferência de treino presencial",
+  "form.field.preferencia_local": "Preferência de local de treino presencial",
   "form.field.disponibilidade_horario": "Disponibilidade de horário (2ª, 3ª, 4ª, 6ª)",
   "form.field.aviso_contacto": "Compreendo que serei contactada pela treinadora.",
   "form.field.tipo_parto": "Tipo de parto",
@@ -63,11 +63,13 @@
   "form.option.fase.gestacao": "Gestação",
   "form.option.fase.posparto": "Pós-parto",
 
-  "form.option.preferencia_treino_presencial.crossfit_4475": "CrossFit 4475",
-  "form.option.preferencia_treino_presencial.templo_fitness": "Templo Fitness Estúdio",
+  "form.option.preferencia_local.crossfit_4475": "CrossFit 4475",
+  "form.option.preferencia_local.templo_fitness": "Templo Fitness Estúdio",
 
   "form.option.tipo_parto.normal": "Normal",
   "form.option.tipo_parto.cesariana": "Cesariana",
+
+  "form.note.contacto_treinadora": "Será contactada por parte da treinadora, para uma conversa mais aprofundada e verificação da compatibilidade de horário.",
 
   "form.nav.next": "Seguinte",
   "form.nav.back": "Voltar",
