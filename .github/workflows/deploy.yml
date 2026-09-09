@@ -16,6 +16,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+      - name: Stamp static assets with a cache-busting version
+        run: node scripts/stamp-assets.mjs
       - name: Deploy to Netlify
         run: npx netlify-cli deploy --prod --dir=. --functions=netlify/functions
         env:
