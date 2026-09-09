@@ -612,7 +612,7 @@ test("a mocked successful submit shows the success screen with no retry", async 
   await settle();
   const confirmation = root().querySelector("p.confirmation");
   assert.ok(confirmation);
-  assert.ok(confirmation.textContent.startsWith("A nossa equipa será informada"));
+  assert.ok(confirmation.textContent.startsWith("Em breve serás contactado"));
   assert.equal(buttonByText("Tentar novamente"), undefined);
 });
 
@@ -629,7 +629,7 @@ test("a failed submit shows the error screen with a working retry", async () => 
   failSubmit = false;
   retry.click();
   await settle();
-  assert.ok(root().querySelector("p.confirmation").textContent.startsWith("A nossa equipa"));
+  assert.ok(root().querySelector("p.confirmation").textContent.startsWith("Em breve serás contactado"));
 });
 
 test("the submit button shows a loading state while the request is in flight", async () => {
@@ -650,10 +650,10 @@ test("the submit button shows a loading state while the request is in flight", a
   assert.ok(root().querySelector("p.confirmation"));
 });
 
-test("renderConfirmation('success') splits the copy on its line break", () => {
+test("renderConfirmation('success') renders the success copy", () => {
   renderConfirmation("success");
   const p = root().querySelector("p.confirmation");
-  assert.equal(p.querySelectorAll("br").length, 1);
+  assert.equal(p.querySelectorAll("br").length, 0);
   assert.ok(p.textContent.includes("Obrigado!"));
 });
 
@@ -673,7 +673,7 @@ const IDENTITY = {
 
 const clickAdvance = () => buttonByText("Seguinte").click();
 const submittedOk = () =>
-  root().querySelector("p.confirmation")?.textContent.startsWith("A nossa equipa");
+  root().querySelector("p.confirmation")?.textContent.startsWith("Em breve serás contactado");
 
 test("E2E: walk the geral branch button-by-button and submit", async () => {
   state.answers = {

@@ -31,7 +31,7 @@ Step 1 `dados_basicos` → step 2 `treino_geral` → submit.
       `dificuldade_atual` (text), `frequencia_treino` (2-3x / 4-5x / 5+),
       `orientacao_nutricional` (Sim/Não), `comprometimento` (Sim/Não).
 - [ ] Last step shows **"Enviar"**, not "Seguinte".
-- [ ] Submit → success screen ("A nossa equipa será informada…"), no retry button.
+- [ ] Submit → success screen ("Em breve serás contactado via WhatsApp…"), no retry button.
 - [ ] **Geral tab** gets one new row, columns in this order, values correct:
       `submitted_at, nome, contacto_telefonico, email, como_chegou, como_chegou_outro,
       objetivo_treino, onde_treina, dificuldade_atual, frequencia_treino,
