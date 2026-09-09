@@ -12,7 +12,7 @@ import {
 // --- flowFor --------------------------------------------------------------
 
 test("flowFor: geral when objetivo_treino lacks gestacao_posparto", () => {
-  assert.equal(flowFor({ objetivo_treino: ["perda_peso", "recomposicao"] }), "geral");
+  assert.equal(flowFor({ objetivo_treino: ["ganho_massa", "recomposicao"] }), "geral");
 });
 
 test("flowFor: geral when objetivo_treino missing entirely", () => {
@@ -22,7 +22,7 @@ test("flowFor: geral when objetivo_treino missing entirely", () => {
 test("flowFor: gestacao_posparto when goal picked, regardless of fase", () => {
   assert.equal(flowFor({ objetivo_treino: ["gestacao_posparto"] }), "gestacao_posparto");
   assert.equal(
-    flowFor({ objetivo_treino: ["perda_peso", "gestacao_posparto"], fase: "posparto" }),
+    flowFor({ objetivo_treino: ["ganho_massa", "gestacao_posparto"], fase: "posparto" }),
     "gestacao_posparto",
   );
 });
@@ -30,7 +30,7 @@ test("flowFor: gestacao_posparto when goal picked, regardless of fase", () => {
 // --- serializeCell ------------------------------------------------------------
 
 test("serializeCell: arrays join with comma-space", () => {
-  assert.equal(serializeCell(["instagram", "pesquisa"]), "instagram, pesquisa");
+  assert.equal(serializeCell(["redes_sociais", "fisioterapia"]), "redes_sociais, fisioterapia");
 });
 
 test("serializeCell: booleans render as Sim/Não", () => {
@@ -105,8 +105,8 @@ test("rowFor(geral): values in column order, serialized", () => {
     nome: "Ana",
     contacto_telefonico: "+351 912345678",
     email: "ana@example.com",
-    como_chegou: ["instagram", "pesquisa"],
-    objetivo_treino: ["perda_peso"],
+    como_chegou: ["redes_sociais", "fisioterapia"],
+    objetivo_treino: ["ganho_massa"],
     onde_treina: "casa",
     dificuldade_atual: "tempo",
     frequencia_treino: "2_3x",
@@ -118,9 +118,9 @@ test("rowFor(geral): values in column order, serialized", () => {
     "Ana",
     "+351 912345678",
     "ana@example.com",
-    "instagram, pesquisa",
+    "redes_sociais, fisioterapia",
     "", // como_chegou_outro absent
-    "perda_peso",
+    "ganho_massa",
     "casa",
     "tempo",
     "2_3x",

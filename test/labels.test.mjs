@@ -18,8 +18,8 @@ test("resolveValue: maps a single option id to its label", () => {
 
 test("resolveValue: maps a multi-select array to a joined label list", () => {
   assert.equal(
-    resolveValue("objetivo_treino", ["perda_peso", "saude_bem_estar"]),
-    "Perda de peso, Saúde e bem-estar",
+    resolveValue("objetivo_treino", ["ganho_massa", "saude_longevidade"]),
+    "Aumento de massa muscular, Saúde/longevidade/bem-estar",
   );
 });
 
@@ -49,8 +49,8 @@ test("notePairs: geral flow yields label/value pairs for filled fields only, in 
     nome: "Ana",
     contacto_telefonico: "+351 912345678",
     email: "ana@example.com",
-    como_chegou: ["instagram"],
-    objetivo_treino: ["perda_peso"],
+    como_chegou: ["redes_sociais"],
+    objetivo_treino: ["ganho_massa"],
     onde_treina: "casa",
     dificuldade_atual: "Falta de tempo",
     frequencia_treino: "2_3x",
@@ -70,8 +70,8 @@ test("notePairs: geral flow yields label/value pairs for filled fields only, in 
     { label: "Nome", value: "Ana" },
     { label: "Contacto telefónico", value: "+351 912345678" },
     { label: "E-mail", value: "ana@example.com" },
-    { label: "Como chegou até à Ignite?", value: "Instagram" },
-    { label: "Qual o seu objetivo de treino?", value: "Perda de peso" },
+    { label: "Como chegou até à Ignite?", value: "Redes sociais" },
+    { label: "Qual o seu objetivo de treino?", value: "Aumento de massa muscular" },
     { label: "Onde treinas?", value: "Casa" },
     { label: "Qual a maior dificuldade neste momento?", value: "Falta de tempo" },
     { label: "Como é a tua rotina de treinos", value: "2-3x/semana" },
@@ -92,7 +92,7 @@ test("notePairs: gestacao_posparto flow only references that branch's columns", 
     nome: "Rita",
     contacto_telefonico: "+351 900000000",
     email: "rita@example.com",
-    como_chegou: ["recomendacao"],
+    como_chegou: ["redes_sociais"],
     objetivo_treino: ["gestacao_posparto"],
     fase: "gestacao",
     fisio_pelvica: "sim",
@@ -106,7 +106,7 @@ test("notePairs: gestacao_posparto flow only references that branch's columns", 
   const labels = pairs.map((p) => p.label);
 
   assert.ok(labels.includes("Em que fase te encontras"));
-  assert.ok(labels.includes("Quantas semanas de gravidez?"));
+  assert.ok(labels.includes("De quantas semanas estás?"));
   // no general-branch-only field leaks in
   assert.ok(!labels.includes("Onde treinas?"));
   assert.equal(
