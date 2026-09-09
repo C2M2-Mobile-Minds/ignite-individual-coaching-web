@@ -71,10 +71,12 @@ flowchart TD
     B -- não --> C["Página 2: Sobre o treino<br/><i>Onde treina, dificuldade,<br/>rotina, nutrição</i>"]
     B -- sim --> D["Página 2: Em que fase?"]
 
+    C --> C2["Página 2b: Compromisso<br/><i>Confiança/compromisso a<br/>investir no acompanhamento</i>"]
+
     D -- gestação --> F["Página 3: Gestação<br/><i>Fisio pélvica, semanas,<br/>historial de risco...</i>"]
     D -- pós-parto --> G["Página 3: Pós-parto<br/><i>Tipo de parto, complicações,<br/>acompanhamento...</i>"]
 
-    C --> E(["Envio: email + sheet<br/><small>tab 'Geral'</small>"])
+    C2 --> E(["Envio: email + sheet<br/><small>tab 'Geral'</small>"])
     F --> H(["Envio: email + sheet<br/><small>tab 'Gestação/Pós-parto'</small>"])
     G --> H
 
@@ -86,7 +88,7 @@ flowchart TD
 
     class A start
     class B decision
-    class C general
+    class C,C2 general
     class D,F,G pregnancy
     class E,H finish
 ```
@@ -96,8 +98,9 @@ flowchart TD
 | Page | Fields |
 |---|---|
 | 1. Dados básicos | Nome (primeiro e último); contacto telefónico e e-mail; como chegou até à Ignite (checkbox + "outro" com texto livre); objetivo(s) de treino (checkbox, múltipla escolha) |
-| 2a. Sobre o treino | Onde treinas (casa/ginásio); qual a maior dificuldade neste momento (texto livre); como é a tua rotina de treinos (2-3x, 4-5x, 5+/semana); segues orientação alimentar de um nutricionista (sim/não); confiança/compromisso a investir no acompanhamento on-line (sim/não) |
-| 2b. Em que fase | Em que fase te encontras — gestação ou pós-parto (radio); encaminha para 3a ou 3b |
+| 2a. Sobre o treino | Onde treinas (casa/ginásio); qual a maior dificuldade neste momento (texto livre); como é a tua rotina de treinos (2-3x, 4-5x, 5+/semana); segues orientação alimentar de um nutricionista (sim/não) |
+| 2b. Compromisso (ramo geral) | Confiança/compromisso a investir no acompanhamento on-line (sim/não) — sozinho na própria página (issue #45) |
+| 2b. Em que fase (ramo gestação/pós-parto) | Em que fase te encontras — gestação ou pós-parto (radio); encaminha para 3a ou 3b |
 | 3a. Gestação | Acompanhamento por fisioterapia pélvica (sim/não); semanas de gravidez (texto); historial de risco segundo obstetra (texto livre); preferência de treino presencial (CrossFit 4475 / Templo Fitness Estúdio); disponibilidade para treino (texto livre); nota de fecho apenas de leitura sobre o contacto pela treinadora |
 | 3b. Pós-parto | Tipo de parto (normal/cesariana); complicações durante o parto (texto livre); acompanhada por profissional de exercício físico durante a gravidez (sim/não); acompanhada por fisioterapia pélvica durante a gravidez (sim/não); quanto tempo pós-parto (texto livre); primeira consulta pós-parto com a equipa de obstetrícia (sim/não); preferência de treino presencial; disponibilidade para treino; nota de fecho apenas de leitura sobre o contacto pela treinadora |
 

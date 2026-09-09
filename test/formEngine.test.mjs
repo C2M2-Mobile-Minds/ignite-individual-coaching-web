@@ -65,7 +65,8 @@ const buttonByText = (text) =>
 test("forward through the general-training branch", () => {
   state.answers = { objetivo_treino: ["ganho_massa"] };
   assert.equal(nextVisibleStep(state.answers, "dados_basicos").id, "treino_geral");
-  assert.equal(nextVisibleStep(state.answers, "treino_geral"), null);
+  assert.equal(nextVisibleStep(state.answers, "treino_geral").id, "comprometimento");
+  assert.equal(nextVisibleStep(state.answers, "comprometimento"), null);
 });
 
 test("forward through the gestação branch", () => {
@@ -112,10 +113,11 @@ test("renders the first step's title and field controls", () => {
 
 test("renders a progress indicator: step number, total, and fill width", () => {
   renderStep();
-  // With no goal picked yet the visible path is 2 steps (geral branch).
+  // With no goal picked yet the visible path is 3 steps (geral branch:
+  // dados_basicos -> treino_geral -> comprometimento).
   const label = root().querySelector(".progress .progress-label").textContent;
-  assert.equal(label, "Passo 1 de 2");
-  assert.equal(root().querySelector(".progress-fill").style.width, "50%");
+  assert.equal(label, "Passo 1 de 3");
+  assert.equal(root().querySelector(".progress-fill").style.width, "33%");
 });
 
 test("progress total and fill follow the visible branch", () => {
@@ -182,33 +184,47 @@ test("radio group renders one control per option, reflecting the stored answer",
   assert.equal(checked.value, "ginasio");
 });
 
-test("treino_geral renders all five fields with resolved (non-key) labels", () => {
+test("treino_geral renders all four fields with resolved (non-key) labels", () => {
   state.answers = { objetivo_treino: ["ganho_massa"] };
   state.currentStepId = "treino_geral";
   renderStep();
   assert.equal(title(), "SOBRE O TREINO");
-  for (const id of ["onde_treina", "dificuldade_atual", "frequencia_treino", "orientacao_nutricional", "comprometimento"]) {
+  for (const id of ["onde_treina", "dificuldade_atual", "frequencia_treino", "orientacao_nutricional"]) {
     assert.ok(root().querySelector(`#${id}, [name="${id}"]`), `no control rendered for ${id}`);
   }
+  assert.ok(!root().querySelector('[name="comprometimento"]'), "comprometimento moved to its own step");
   assert.equal(root().querySelector("input#dificuldade_atual").type, "text");
   assert.equal(root().querySelectorAll('input[type="radio"][name="frequencia_treino"]').length, 3);
   assert.ok(!root().textContent.includes("form.field."), "unresolved locale key rendered");
 });
 
-test("treino_geral validation: 5 required errors when empty, none when filled", () => {
+test("treino_geral validation: 4 required errors when empty, none when filled", () => {
   const step = stepById("treino_geral");
   assert.deepEqual(
     validateStep(step, {}).map((e) => e.messageKey),
-    Array(5).fill("validation.required"),
+    Array(4).fill("validation.required"),
   );
   const filled = {
     onde_treina: "casa",
     dificuldade_atual: "Falta de tempo",
     frequencia_treino: "2_3x",
     orientacao_nutricional: "sim",
-    comprometimento: "sim",
   };
   assert.deepEqual(validateStep(step, filled), []);
+});
+
+test("comprometimento step renders only its radio and validates required", () => {
+  state.answers = { objetivo_treino: ["ganho_massa"] };
+  state.currentStepId = "comprometimento";
+  renderStep();
+  assert.equal(title(), "COMPROMISSO");
+  assert.equal(root().querySelectorAll('input[type="radio"][name="comprometimento"]').length, 2);
+  const step = stepById("comprometimento");
+  assert.deepEqual(
+    validateStep(step, {}).map((e) => e.messageKey),
+    ["validation.required"],
+  );
+  assert.deepEqual(validateStep(step, { comprometimento: "sim" }), []);
 });
 
 test("fase_gestacao renders the single radio with resolved labels", () => {
@@ -572,7 +588,7 @@ test("advancing is allowed once all required fields are valid", () => {
 
 const settle = () => new Promise((r) => setTimeout(r, 5));
 
-// A fully valid last step (general-training branch ends on treino_geral).
+// A fully valid last step (general-training branch ends on comprometimento).
 const onFilledLastStep = () => {
   state.answers = {
     objetivo_treino: ["ganho_massa"],
@@ -582,7 +598,7 @@ const onFilledLastStep = () => {
     orientacao_nutricional: "sim",
     comprometimento: "sim",
   };
-  state.currentStepId = "treino_geral";
+  state.currentStepId = "comprometimento";
   renderStep();
 };
 
@@ -599,11 +615,11 @@ test("the last step offers a submit button, not 'Seguinte'", () => {
 
 test("submit blocked while a required field on the last step is empty", () => {
   state.answers = { objetivo_treino: ["ganho_massa"] };
-  state.currentStepId = "treino_geral";
+  state.currentStepId = "comprometimento";
   renderStep();
   buttonByText("Enviar").click();
-  assert.equal(title(), "SOBRE O TREINO");
-  assert.ok(errorFor("onde_treina"));
+  assert.equal(title(), "COMPROMISSO");
+  assert.ok(errorFor("comprometimento"));
 });
 
 test("a mocked successful submit shows the success screen with no retry", async () => {
@@ -689,6 +705,8 @@ test("E2E: walk the geral branch button-by-button and submit", async () => {
   assert.equal(title(), "Dados básicos");
   clickAdvance();
   assert.equal(title(), "SOBRE O TREINO");
+  clickAdvance();
+  assert.equal(title(), "COMPROMISSO");
   assert.equal(buttonByText("Seguinte"), undefined, "last step: no 'Seguinte'");
   buttonByText("Enviar").click();
   await settle();

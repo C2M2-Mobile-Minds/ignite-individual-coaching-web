@@ -37,6 +37,13 @@ Condition: `objetivo_treino` does **not** include `gestacao_posparto`.
 | `dificuldade_atual` | text | yes | — | free text |
 | `frequencia_treino` | radio | yes | `2_3x`, `4_5x`, `5_mais` | sessions per week (option ids retained across the #7 rename) |
 | `orientacao_nutricional` | radio | yes | `sim`, `nao` | |
+
+## Step: `comprometimento`
+
+Condition: same as `treino_geral` — `objetivo_treino` does **not** include `gestacao_posparto`. Own step (issue #45), placed immediately after `treino_geral`.
+
+| field id | type | required | option ids | notes |
+|---|---|---|---|---|
 | `comprometimento` | radio | yes | `sim`, `nao` | confidence/commitment with online coaching |
 
 ## Step: `fase_gestacao`
@@ -98,7 +105,7 @@ booleans render as `Sim` / `Não`. `note` fields (`nota_contacto`) are never
 written.
 
 - **Tab `Geral`** — flow `geral` (`objetivo_treino` excludes `gestacao_posparto`).
-  Columns: `submitted_at` + `dados_basicos` ids + `treino_geral` ids.
+  Columns: `submitted_at` + `dados_basicos` ids + `treino_geral` ids + `comprometimento`.
 - **Tab `Gestação-Pós-parto`** — flow `gestacao_posparto` (`objetivo_treino`
   includes `gestacao_posparto`, either `fase`). Columns: `submitted_at` +
   `dados_basicos` ids + `fase` + the union of `gestacao` and `posparto` ids

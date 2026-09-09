@@ -22,14 +22,17 @@ the live Sheet, the notification email).
 
 ## Branch 1 — Geral (general training)
 
-Step 1 `dados_basicos` → step 2 `treino_geral` → submit.
+Step 1 `dados_basicos` → step 2 `treino_geral` → step 3 `comprometimento` → submit.
 
 - [ ] Step 1: fill `nome`, `contacto_telefonico` (pick a country, type a local number),
       `email`; check one `como_chegou` option; check one `objetivo_treino` option
       that is **not** "Gestação e pós-parto". "Seguinte" advances.
-- [ ] Step 2 title "SOBRE O TREINO"; 5 controls: `onde_treina` (Casa/Ginásio),
+- [ ] Step 2 title "SOBRE O TREINO"; 4 controls: `onde_treina` (Casa/Ginásio),
       `dificuldade_atual` (text), `frequencia_treino` (2-3x / 4-5x / 5+),
-      `orientacao_nutricional` (Sim/Não), `comprometimento` (Sim/Não).
+      `orientacao_nutricional` (Sim/Não). "Seguinte" advances.
+- [ ] Step 3 title "COMPROMISSO"; single control `comprometimento` (Sim/Não) alone
+      on the page. "Voltar" returns to "SOBRE O TREINO" with answers intact.
+- [ ] Progress indicator reads "Passo 3 de 3" on the commitment step.
 - [ ] Last step shows **"Enviar"**, not "Seguinte".
 - [ ] Submit → success screen ("Em breve serás contactado via WhatsApp…"), no retry button.
 - [ ] **Geral tab** gets one new row, columns in this order, values correct:
@@ -111,7 +114,8 @@ Step 1 → `fase_gestacao` (fase = Pós-parto) → `posparto` → submit.
       the phone error.
 - [ ] `email`: a malformed address (no `@`, no domain dot) shows the email error;
       an empty email shows the "required" error, not the format one.
-- [ ] `treino_geral`: all 5 fields block when empty.
+- [ ] `treino_geral`: all 4 fields block when empty.
+- [ ] `comprometimento`: the lone field blocks when unpicked.
 - [ ] `fase_gestacao`: `fase` blocks when unpicked.
 - [ ] `gestacao`: all 5 inputs block when empty; the note never blocks.
 - [ ] `posparto`: all 8 inputs block when empty; the note never blocks.
