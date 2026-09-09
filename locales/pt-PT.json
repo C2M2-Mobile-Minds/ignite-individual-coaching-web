@@ -7,7 +7,8 @@
 
   "form.step.dados_basicos.title": "Dados básicos",
   "form.step.modalidade_treino.title": "Treino online ou presencial",
-  "form.step.treino_geral.title": "SOBRE O TREINO",
+  "form.step.treino_geral_online.title": "SOBRE O TREINO (ONLINE)",
+  "form.step.treino_geral_presencial.title": "SOBRE O TREINO (PRESENCIAL)",
   "form.step.comprometimento.title": "COMPROMISSO",
   "form.step.fase_gestacao.title": "Em que fase te encontras",
   "form.step.gestacao.title": "Gestação",

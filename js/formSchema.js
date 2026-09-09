@@ -115,7 +115,7 @@ export const steps = [
 
   {
     id: "treino_geral_online",
-    titleKey: "form.step.treino_geral.title",
+    titleKey: "form.step.treino_geral_online.title",
     // Online sub-branch — the original issue #7 question set, unchanged.
     // (Renamed from `treino_geral` in #50 — one-off, step unshipped.)
     condition: (answers) =>
@@ -155,7 +155,7 @@ export const steps = [
 
   {
     id: "treino_geral_presencial",
-    titleKey: "form.step.treino_geral.title",
+    titleKey: "form.step.treino_geral_presencial.title",
     // Presencial sub-branch — distinct, smaller question set (issue #50).
     condition: (answers) =>
       !selectedGestacaoPosparto(answers) && answers.modalidade_treino === "presencial",

@@ -220,7 +220,7 @@ test("treino_geral_online renders all four fields with resolved (non-key) labels
   state.answers = { objetivo_treino: ["ganho_massa"], modalidade_treino: "online" };
   state.currentStepId = "treino_geral_online";
   renderStep();
-  assert.equal(title(), "SOBRE O TREINO");
+  assert.equal(title(), "SOBRE O TREINO (ONLINE)");
   for (const id of ["onde_treina", "dificuldade_atual", "frequencia_treino", "orientacao_nutricional"]) {
     assert.ok(root().querySelector(`#${id}, [name="${id}"]`), `no control rendered for ${id}`);
   }
@@ -263,7 +263,7 @@ test("treino_geral_presencial renders its controls + read-only note, no unresolv
   state.answers = { objetivo_treino: ["ganho_massa"], modalidade_treino: "presencial" };
   state.currentStepId = "treino_geral_presencial";
   renderStep();
-  assert.equal(title(), "SOBRE O TREINO");
+  assert.equal(title(), "SOBRE O TREINO (PRESENCIAL)");
   assert.equal(root().querySelectorAll('input[type="radio"][name="frequencia_presencial"]').length, 2);
   assert.equal(root().querySelectorAll('input[type="radio"][name="localizacao_presencial"]').length, 2);
   assert.equal(root().querySelector("input#disponibilidade_presencial").type, "text");
@@ -791,7 +791,7 @@ test("E2E: walk the geral branch button-by-button and submit", async () => {
   clickAdvance();
   assert.equal(title(), "Treino online ou presencial");
   clickAdvance();
-  assert.equal(title(), "SOBRE O TREINO");
+  assert.equal(title(), "SOBRE O TREINO (ONLINE)");
   clickAdvance();
   assert.equal(title(), "COMPROMISSO");
   assert.equal(buttonByText("Seguinte"), undefined, "last step: no 'Seguinte'");
@@ -816,7 +816,7 @@ test("E2E: walk the geral presencial sub-branch button-by-button and submit", as
   clickAdvance();
   assert.equal(title(), "Treino online ou presencial");
   clickAdvance();
-  assert.equal(title(), "SOBRE O TREINO");
+  assert.equal(title(), "SOBRE O TREINO (PRESENCIAL)");
   assert.ok(root().querySelector("p.note"), "presencial step renders the closing note");
   assert.ok(!root().querySelector('[name="onde_treina"]'), "no online-only field");
   clickAdvance();
