@@ -2,7 +2,8 @@
 //
 // Names are inline Portuguese for now; the full locale pass (issue #6) can move
 // them to `locales/<locale>.json` under a `country.<code>` key without touching
-// callers. `code` is the ISO 3166-1 alpha-2 code, kept only as a stable key.
+// callers. `code` is the ISO 3166-1 alpha-2 code — a stable key, also used to
+// resolve the flag SVG at `img/flags/<code lowercased>.svg`.
 
 export const DEFAULT_DIAL_CODE = "+351"; // Portugal
 

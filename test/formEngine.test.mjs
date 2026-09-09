@@ -110,6 +110,54 @@ test("renders the first step's title and field controls", () => {
   assert.ok(buttonByText("Seguinte"));
 });
 
+test("renders a progress indicator: step number, total, and fill width", () => {
+  renderStep();
+  // With no goal picked yet the visible path is 2 steps (geral branch).
+  const label = root().querySelector(".progress .progress-label").textContent;
+  assert.equal(label, "Passo 1 de 2");
+  assert.equal(root().querySelector(".progress-fill").style.width, "50%");
+});
+
+test("progress total and fill follow the visible branch", () => {
+  // gestação branch: dados_basicos -> fase_gestacao -> gestacao = 3 steps
+  state.answers = { objetivo_treino: ["gestacao_posparto"], fase: "gestacao" };
+  state.currentStepId = "gestacao";
+  renderStep();
+  assert.equal(root().querySelector(".progress-label").textContent, "Passo 3 de 3");
+  assert.equal(root().querySelector(".progress-fill").style.width, "100%");
+});
+
+test("#form-root gets .step-enter only when the step changes", () => {
+  // Prime from a known step so the first assertion doesn't depend on
+  // whatever step a previous test last rendered.
+  state.currentStepId = "dados_basicos";
+  renderStep();
+
+  state.answers = { objetivo_treino: ["gestacao_posparto"] };
+  state.currentStepId = "fase_gestacao";
+  renderStep(); // step changed -> animate
+  assert.ok(root().classList.contains("step-enter"));
+
+  renderStep(); // same step (e.g. after a radio toggle) -> no entrance replay
+  assert.ok(!root().classList.contains("step-enter"));
+
+  state.currentStepId = "dados_basicos";
+  renderStep(); // step changed again -> animate
+  assert.ok(root().classList.contains("step-enter"));
+});
+
+test("radio/checkbox options render as .option-button rows with a check mark", () => {
+  state.answers = { objetivo_treino: ["ganho_massa"], onde_treina: "ginasio" };
+  state.currentStepId = "treino_geral";
+  renderStep();
+  const rows = root().querySelectorAll('fieldset.field label.option-button');
+  assert.ok(rows.length >= 2);
+  for (const row of rows) {
+    assert.ok(row.querySelector("input"), "option row wraps its native input");
+    assert.ok(row.querySelector(".option-mark"), "option row has a check mark");
+  }
+});
+
 test("radio group renders one control per option, reflecting the stored answer", () => {
   state.answers = { objetivo_treino: ["ganho_massa"], onde_treina: "ginasio" };
   state.currentStepId = "treino_geral";
@@ -252,14 +300,27 @@ test("gestacao validation: 5 required errors when empty, none when filled; note 
   assert.deepEqual(validateStep(step, filled), []);
 });
 
-test("tel field renders a country <select> and a number input", () => {
+test("tel field renders a custom country picker and a number input", () => {
   renderStep();
-  const select = root().querySelector('select[name="contacto_telefonico_country"]');
+  const picker = root().querySelector(".country-select");
   const input = root().querySelector("input#contacto_telefonico");
-  assert.ok(select);
+  assert.ok(picker);
   assert.equal(input.type, "tel");
-  assert.ok(select.querySelectorAll("option").length >= 27);
-  assert.equal(select.value, "+351"); // Portugal default
+
+  const options = picker.querySelectorAll('[role="option"]');
+  assert.ok(options.length >= 27);
+
+  const toggle = picker.querySelector(".country-select__toggle");
+  assert.equal(toggle.type, "button");
+  assert.ok(toggle.textContent.includes("+351")); // Portugal default on the toggle
+  assert.equal(
+    picker.querySelector('[role="option"][aria-selected="true"]').dataset.dial,
+    "+351",
+  );
+
+  const flag = toggle.querySelector("img.flag");
+  assert.ok(flag.getAttribute("src").endsWith("/pt.svg"));
+  assert.equal(flag.getAttribute("alt"), ""); // decorative
 });
 
 test("typing a number stores the combined dial code + number", () => {
@@ -270,13 +331,14 @@ test("typing a number stores the combined dial code + number", () => {
   assert.equal(state.answers.contacto_telefonico, "+351 912345678");
 });
 
-test("changing the country updates the stored prefix", () => {
+test("picking a country updates the stored prefix", () => {
   state.answers = { contacto_telefonico: "+351 912345678" };
   renderStep();
-  const select = root().querySelector('select[name="contacto_telefonico_country"]');
-  select.value = "+33";
-  select.dispatchEvent(new dom.window.Event("change"));
+  const picker = root().querySelector(".country-select");
+  const fr = [...picker.querySelectorAll('[role="option"]')].find((li) => li.dataset.dial === "+33");
+  fr.click();
   assert.equal(state.answers.contacto_telefonico, "+33 912345678");
+  assert.equal(picker.querySelector('[role="option"][aria-selected="true"]').dataset.dial, "+33");
 });
 
 test("validateStep flags a too-short phone number", () => {

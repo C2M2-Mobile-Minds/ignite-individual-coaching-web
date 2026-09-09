@@ -163,29 +163,170 @@ function el(tag, props = {}, children = []) {
   return node;
 }
 
+const countryByDial = (dial) =>
+  EEA_COUNTRIES.find((c) => c.dialCode === dial) ??
+  EEA_COUNTRIES.find((c) => c.dialCode === DEFAULT_DIAL_CODE);
+
+const flagImg = (country) =>
+  el("img", {
+    className: "flag",
+    src: `img/flags/${country.code.toLowerCase()}.svg`,
+    alt: "",
+    width: 20,
+    height: 15,
+    loading: "lazy",
+  });
+
+/**
+ * A custom country picker for the `tel` field: a toggle button showing the
+ * selected flag + dial code, and an ARIA listbox of every EEA country. Native
+ * <select> can't render flag images, hence the hand-rolled widget. `onSelect`
+ * receives the chosen dial code string.
+ */
+function buildCountrySelect(selectedDial, onSelect) {
+  const wrap = el("div", { className: "country-select" });
+  const toggle = el("button", { type: "button", className: "country-select__toggle" });
+  toggle.setAttribute("aria-haspopup", "listbox");
+  toggle.setAttribute("aria-expanded", "false");
+
+  const list = el("ul", { className: "country-select__list", hidden: true });
+  list.setAttribute("role", "listbox");
+  list.tabIndex = -1;
+
+  let current = countryByDial(selectedDial).dialCode;
+  let open = false;
+  let activeIndex = 0;
+
+  const options = EEA_COUNTRIES.map((c) => {
+    const li = el("li", { className: "country-select__option", id: `country-opt-${c.code}` }, [
+      flagImg(c),
+      el("span", { className: "country-select__name", textContent: `${c.name} (${c.dialCode})` }),
+    ]);
+    li.setAttribute("role", "option");
+    li.dataset.dial = c.dialCode;
+    li.addEventListener("click", () => choose(c.dialCode));
+    li.addEventListener("mousedown", (e) => e.preventDefault()); // keep focus in the list
+    return li;
+  });
+  list.append(...options);
+
+  const renderToggle = () => {
+    const c = countryByDial(current);
+    toggle.replaceChildren(
+      flagImg(c),
+      el("span", { className: "country-select__dial", textContent: c.dialCode }),
+      el("span", { className: "country-select__caret", textContent: "▾" }),
+    );
+    toggle.setAttribute("aria-label", `${t("form.field.contacto_telefonico")}: ${c.name} (${c.dialCode})`);
+  };
+
+  const syncSelected = () => {
+    options.forEach((li) => li.setAttribute("aria-selected", String(li.dataset.dial === current)));
+  };
+
+  const updateActive = () => {
+    options.forEach((li, i) => li.classList.toggle("is-active", i === activeIndex));
+    const li = options[activeIndex];
+    if (li) {
+      list.setAttribute("aria-activedescendant", li.id);
+      li.scrollIntoView?.({ block: "nearest" });
+    }
+  };
+
+  const onDocPointer = (e) => {
+    if (!wrap.contains(e.target)) setOpen(false);
+  };
+
+  function setOpen(next) {
+    if (next === open) return;
+    open = next;
+    list.hidden = !next;
+    wrap.classList.toggle("is-open", next);
+    toggle.setAttribute("aria-expanded", String(next));
+    if (next) {
+      activeIndex = Math.max(0, options.findIndex((li) => li.dataset.dial === current));
+      updateActive();
+      list.focus();
+      document.addEventListener("click", onDocPointer);
+    } else {
+      document.removeEventListener("click", onDocPointer);
+    }
+  }
+
+  function choose(dial) {
+    current = countryByDial(dial).dialCode;
+    renderToggle();
+    syncSelected();
+    setOpen(false);
+    toggle.focus();
+    onSelect(current);
+  }
+
+  toggle.addEventListener("click", () => setOpen(!open));
+
+  list.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      activeIndex = Math.min(activeIndex + 1, options.length - 1);
+      updateActive();
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      activeIndex = Math.max(activeIndex - 1, 0);
+      updateActive();
+    } else if (e.key === "Home") {
+      e.preventDefault();
+      activeIndex = 0;
+      updateActive();
+    } else if (e.key === "End") {
+      e.preventDefault();
+      activeIndex = options.length - 1;
+      updateActive();
+    } else if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      choose(options[activeIndex].dataset.dial);
+    } else if (e.key === "Escape") {
+      e.preventDefault();
+      setOpen(false);
+      toggle.focus();
+    } else if (/^[a-z]$/i.test(e.key)) {
+      const key = e.key.toLowerCase();
+      const from = activeIndex + 1;
+      const match =
+        options.slice(from).findIndex((li) => li.textContent.trim().toLowerCase().startsWith(key)) + from;
+      const found =
+        match >= from
+          ? match
+          : options.findIndex((li) => li.textContent.trim().toLowerCase().startsWith(key));
+      if (found >= 0) {
+        activeIndex = found;
+        updateActive();
+      }
+    }
+  });
+
+  renderToggle();
+  syncSelected();
+  wrap.append(toggle, list);
+  return wrap;
+}
+
 /** Build the DOM for a single field, wired to update `state.answers`. */
 export function renderField(field) {
   const { id, type } = field;
 
   if (type === "tel") {
     const { dialCode, local } = parsePhone(state.answers[id]);
-    const select = el("select", { name: `${id}_country` });
-    for (const c of EEA_COUNTRIES) {
-      select.append(
-        el("option", {
-          value: c.dialCode,
-          textContent: `${c.name} (${c.dialCode})`,
-          selected: c.dialCode === dialCode,
-        }),
-      );
-    }
+    let currentDial = dialCode;
     const input = el("input", { type: "tel", id, name: id, value: local });
-    const sync = () => setText(id, combinePhone(select.value, input.value));
-    select.addEventListener("change", sync);
+    const sync = () => setText(id, combinePhone(currentDial, input.value));
+    const countrySelect = buildCountrySelect(dialCode, (dial) => {
+      currentDial = dial;
+      sync();
+    });
     input.addEventListener("input", sync);
     return el("label", { className: "field", htmlFor: id }, [
       t(field.labelKey),
-      el("span", { className: "tel-group" }, [select, input]),
+      el("span", { className: "tel-group" }, [countrySelect, input]),
     ]);
   }
 
@@ -222,7 +363,13 @@ export function renderField(field) {
           renderStep();
         }
       });
-      fieldset.append(el("label", {}, [input, t(opt.labelKey)]));
+      fieldset.append(
+        el("label", { className: "option-button" }, [
+          input,
+          el("span", { className: "option-text", textContent: t(opt.labelKey) }),
+          el("span", { className: "option-mark", textContent: "✓" }),
+        ]),
+      );
     }
     return fieldset;
   }
@@ -243,7 +390,13 @@ export function renderField(field) {
         toggleCheckboxOption(id, opt.id, input.checked);
         renderStep();
       });
-      fieldset.append(el("label", {}, [input, t(opt.labelKey)]));
+      fieldset.append(
+        el("label", { className: "option-button" }, [
+          input,
+          el("span", { className: "option-text", textContent: t(opt.labelKey) }),
+          el("span", { className: "option-mark", textContent: "✓" }),
+        ]),
+      );
     }
     return fieldset;
   }
@@ -271,6 +424,11 @@ function navButton(labelKey, onClick, disabled = false) {
   return button;
 }
 
+// Which step the last renderStep() painted — used to play the entrance
+// animation only on an actual step change, not on intra-step re-renders
+// (radio / checkbox toggles re-render the whole step).
+let lastRenderedStepId = null;
+
 /** Clear #form-root and render the current step: title, fields, nav row. */
 export function renderStep() {
   const root = document.getElementById("form-root");
@@ -278,6 +436,23 @@ export function renderStep() {
 
   const { answers, currentStepId } = state;
   const step = steps.find((s) => s.id === currentStepId);
+
+  root.classList.toggle("step-enter", currentStepId !== lastRenderedStepId);
+  lastRenderedStepId = currentStepId;
+
+  const totalSteps = visibleSteps(answers).length;
+  const stepNumber = currentStepIndex(answers, currentStepId) + 1;
+  const fill = el("span", { className: "progress-fill" });
+  fill.style.width = `${Math.round((stepNumber / totalSteps) * 100)}%`;
+  root.append(
+    el("div", { className: "progress" }, [
+      el("span", {
+        className: "progress-label",
+        textContent: `${t("form.progress.step")} ${stepNumber} ${t("form.progress.of")} ${totalSteps}`,
+      }),
+      el("div", { className: "progress-track" }, [fill]),
+    ]),
+  );
 
   root.append(el("h1", { textContent: t(step.titleKey) }));
 
@@ -318,6 +493,8 @@ export function renderStep() {
 export function renderConfirmation(status) {
   const root = document.getElementById("form-root");
   root.replaceChildren();
+  root.classList.add("step-enter"); // the terminal screen always animates in
+  lastRenderedStepId = null;
 
   const key = status === "success" ? "form.confirmation.success" : "form.confirmation.error";
   const message = el("p", { className: "confirmation" });
