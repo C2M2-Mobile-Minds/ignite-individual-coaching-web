@@ -186,7 +186,7 @@ test("treino_geral renders all five fields with resolved (non-key) labels", () =
   state.answers = { objetivo_treino: ["ganho_massa"] };
   state.currentStepId = "treino_geral";
   renderStep();
-  assert.equal(title(), "Treino geral");
+  assert.equal(title(), "SOBRE O TREINO");
   for (const id of ["onde_treina", "dificuldade_atual", "frequencia_treino", "orientacao_nutricional", "comprometimento"]) {
     assert.ok(root().querySelector(`#${id}, [name="${id}"]`), `no control rendered for ${id}`);
   }
@@ -417,7 +417,7 @@ test("clicking Seguinte advances to the next step with no reload", () => {
   renderStep();
   assert.equal(title(), "Dados básicos");
   buttonByText("Seguinte").click();
-  assert.equal(title(), "Treino geral");
+  assert.equal(title(), "SOBRE O TREINO");
   assert.equal(state.currentStepId, "treino_geral");
 });
 
@@ -564,7 +564,7 @@ test("advancing is allowed once all required fields are valid", () => {
   };
   renderStep();
   buttonByText("Seguinte").click();
-  assert.equal(title(), "Treino geral");
+  assert.equal(title(), "SOBRE O TREINO");
   assert.equal(state.errors.size, 0);
 });
 
@@ -602,7 +602,7 @@ test("submit blocked while a required field on the last step is empty", () => {
   state.currentStepId = "treino_geral";
   renderStep();
   buttonByText("Enviar").click();
-  assert.equal(title(), "Treino geral");
+  assert.equal(title(), "SOBRE O TREINO");
   assert.ok(errorFor("onde_treina"));
 });
 
@@ -688,7 +688,7 @@ test("E2E: walk the geral branch button-by-button and submit", async () => {
   renderStep();
   assert.equal(title(), "Dados básicos");
   clickAdvance();
-  assert.equal(title(), "Treino geral");
+  assert.equal(title(), "SOBRE O TREINO");
   assert.equal(buttonByText("Seguinte"), undefined, "last step: no 'Seguinte'");
   buttonByText("Enviar").click();
   await settle();
