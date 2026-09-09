@@ -21,6 +21,14 @@
   --green-bright: #6aaa55;
   --green-hover: #5a8a4a;
 
+  /* Themed accent — seeded to the green brand, overridden per objetivo_treino
+     at runtime by js/theme.js (issue #48). Repoint accent-coloured rules at
+     these, not --green*. */
+  --accent: var(--green);
+  --accent-bright: var(--green-bright);
+  --accent-hover: var(--green-hover);
+  --accent-soft: rgba(74, 120, 58, 0.16);
+
   --hairline: rgba(255, 255, 255, 0.07);
   --border: rgba(255, 255, 255, 0.16);
 
@@ -150,7 +158,7 @@ label,
   font-weight: 500;
   letter-spacing: 0.25em;
   text-transform: uppercase;
-  color: var(--green-bright);
+  color: var(--accent-bright);
 }
 
 .progress-track {
@@ -163,7 +171,7 @@ label,
 .progress-fill {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, var(--green), var(--green-bright));
+  background: linear-gradient(90deg, var(--accent), var(--accent-bright));
   transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -212,7 +220,7 @@ label.field {
   font-weight: 500;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--green-bright);
+  color: var(--accent-bright);
 }
 
 fieldset.field legend {
@@ -223,7 +231,7 @@ fieldset.field legend {
   font-weight: 500;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--green-bright);
+  color: var(--accent-bright);
 }
 
 .field > input[type="text"],
@@ -249,13 +257,13 @@ input:focus-visible,
 select:focus-visible,
 button:focus-visible {
   outline: none;
-  border-color: var(--green-bright);
+  border-color: var(--accent-bright);
   background: var(--surface-2);
   box-shadow: 0 0 0 3px rgba(74, 120, 58, 0.24);
 }
 
 button:focus-visible {
-  outline: 2px solid var(--green-bright);
+  outline: 2px solid var(--accent-bright);
   outline-offset: 2px;
 }
 
@@ -347,7 +355,7 @@ button:focus-visible {
 
 .country-select__option.is-active,
 .country-select__option:hover {
-  background: var(--green-bright, #e8f3ec);
+  background: var(--accent-bright);
 }
 
 .country-select__option[aria-selected="true"] {
@@ -391,8 +399,8 @@ label.option-button {
 
 fieldset.field label:hover,
 label.option-button:hover {
-  border-color: var(--green);
-  background: rgba(74, 120, 58, 0.08);
+  border-color: var(--accent);
+  background: var(--accent-soft);
   color: var(--text);
 }
 
@@ -410,8 +418,8 @@ label.option-button input {
 /* Selected state — driven by the (hidden) checked input. */
 fieldset.field label:has(input:checked),
 label.option-button:has(input:checked) {
-  border-color: var(--green);
-  background: rgba(74, 120, 58, 0.16);
+  border-color: var(--accent);
+  background: var(--accent-soft);
   color: var(--text);
   box-shadow: inset 0 0 0 1px rgba(74, 120, 58, 0.2), 0 0 12px rgba(74, 120, 58, 0.12);
 }
@@ -431,8 +439,8 @@ label.option-button:has(input:checked) {
 
 fieldset.field label:has(input:checked) .option-mark,
 label.option-button:has(input:checked) .option-mark {
-  border-color: var(--green);
-  background: var(--green);
+  border-color: var(--accent);
+  background: var(--accent);
   color: #fff;
 }
 
@@ -453,7 +461,7 @@ label.field > input[type="checkbox"] {
   width: 18px;
   height: 18px;
   opacity: 1;
-  accent-color: var(--green);
+  accent-color: var(--accent);
 }
 
 /* --- Note panel -------------------------------------------------------------- */
@@ -461,8 +469,8 @@ label.field > input[type="checkbox"] {
 .note {
   margin-block: 1.5rem;
   padding: 16px 18px;
-  border-left: 3px solid var(--green);
-  background: rgba(74, 120, 58, 0.1);
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
   font-size: 0.95rem;
   color: var(--text-dim);
 }
@@ -500,7 +508,7 @@ label.field > input[type="checkbox"] {
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: #fff;
-  background: var(--green);
+  background: var(--accent);
   border: none;
   border-radius: 0;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
@@ -509,7 +517,7 @@ label.field > input[type="checkbox"] {
 }
 
 .nav button:hover:not([disabled]) {
-  background: var(--green-hover);
+  background: var(--accent-hover);
   box-shadow: 0 12px 30px rgba(74, 120, 58, 0.35);
 }
 
@@ -580,7 +588,7 @@ label.field > input[type="checkbox"] {
   font-size: 1.5rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--green-bright);
+  color: var(--accent-bright);
 }
 
 .landing-message {
@@ -603,7 +611,7 @@ label.field > input[type="checkbox"] {
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: #fff;
-  background: var(--green);
+  background: var(--accent);
   border: none;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
   cursor: pointer;
@@ -611,7 +619,7 @@ label.field > input[type="checkbox"] {
 }
 
 .landing-cta:hover {
-  background: var(--green-hover);
+  background: var(--accent-hover);
   box-shadow: 0 12px 30px rgba(74, 120, 58, 0.35);
 }
 

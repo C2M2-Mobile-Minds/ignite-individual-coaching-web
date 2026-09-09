@@ -36,6 +36,11 @@ Step 1 `dados_basicos` → step 2 `treino_geral` → step 3 `comprometimento` �
 - [ ] Step 1: fill `nome`, `contacto_telefonico` (pick a country, type a local number),
       `email`; check one `como_chegou` option; check one `objetivo_treino` option
       that is **not** "Gestação e pós-parto". "Seguinte" advances.
+- [ ] **Theming**: checking each `objetivo_treino` option shifts the page accent
+      (progress bar, field labels, option highlight, nav button) live. Checking a
+      second objetivo keeps the accent on the **first** one in list order.
+      Unchecking every objetivo reverts to the default green. Accent persists
+      across "Seguinte" / "Voltar".
 - [ ] Step 2 title "SOBRE O TREINO"; 4 controls: `onde_treina` (Casa/Ginásio),
       `dificuldade_atual` (text), `frequencia_treino` (2-3x / 4-5x / 5+),
       `orientacao_nutricional` (Sim/Não). "Seguinte" advances.

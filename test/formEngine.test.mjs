@@ -45,6 +45,7 @@ const {
 
 const { steps } = await import("../js/formSchema.js");
 const { t } = await import("../js/i18n.js");
+const { DEFAULT_THEME, THEME_BY_OBJETIVO } = await import("../js/theme.js");
 const stepById = (id) => steps.find((s) => s.id === id);
 
 before(async () => {
@@ -885,4 +886,26 @@ test("como_chegou_outro is required once 'outro' is checked", () => {
   ]);
   answers.como_chegou_outro = "Um evento no ginásio";
   assert.deepEqual(validateStep(step, answers), []);
+});
+
+// --- Objetivo-driven theming (issue #48) -----------------------------------
+
+test("renderStep applies the accent theme for the selected objetivo", () => {
+  state.answers = { objetivo_treino: ["forca_atletismo"] };
+  renderStep();
+  assert.equal(
+    document.documentElement.style.getPropertyValue("--accent"),
+    THEME_BY_OBJETIVO.forca_atletismo.accent,
+  );
+});
+
+test("clearing the objetivo selection reverts to the default theme", () => {
+  state.answers = { objetivo_treino: ["forca_atletismo"] };
+  renderStep();
+  state.answers = { objetivo_treino: [] };
+  renderStep();
+  assert.equal(
+    document.documentElement.style.getPropertyValue("--accent"),
+    DEFAULT_THEME.accent,
+  );
 });
