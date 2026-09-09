@@ -146,6 +146,20 @@ test("#form-root gets .step-enter only when the step changes", () => {
   assert.ok(root().classList.contains("step-enter"));
 });
 
+test("#form-root drops .step-enter once the entrance animation ends", () => {
+  // While the class lingers, `animation: fadeUp` stays declared on every field
+  // and makes each its own stacking context in Chrome — trapping the country
+  // dropdown behind later fields. It must clear on animationend.
+  state.currentStepId = "treino_geral";
+  renderStep();
+  state.currentStepId = "dados_basicos";
+  renderStep();
+  assert.ok(root().classList.contains("step-enter"));
+
+  root().dispatchEvent(new window.Event("animationend"));
+  assert.ok(!root().classList.contains("step-enter"));
+});
+
 test("radio/checkbox options render as .option-button rows with a check mark", () => {
   state.answers = { objetivo_treino: ["ganho_massa"], onde_treina: "ginasio" };
   state.currentStepId = "treino_geral";
