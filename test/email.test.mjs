@@ -17,7 +17,7 @@ function fakeDeps(responses, overrides = {}) {
   };
   return {
     calls,
-    deps: { apiKey: "re_test", to: "company@example.com", from: "no-reply@ignite.pt", fetchImpl, ...overrides },
+    deps: { apiKey: "re_test", to: "company@example.com", from: "no-reply@ignite.pt", context: "production", fetchImpl, ...overrides },
   };
 }
 
@@ -117,4 +117,21 @@ test("sendNotification: skips silently when not configured", async () => {
 
   assert.equal(result, undefined);
   assert.equal(calls.length, 0);
+});
+
+test("sendNotification: skips outside the production context", async () => {
+  const { calls, deps } = fakeDeps([], { context: "dev" });
+
+  const result = await sendNotification({ flow: "geral", answers: geralAnswers }, deps);
+
+  assert.equal(result, undefined);
+  assert.equal(calls.length, 0);
+});
+
+test("sendNotification: EMAIL_FORCE overrides a non-production context", async () => {
+  const { calls, deps } = fakeDeps([{ json: { id: "abc" } }], { context: "dev", force: true });
+
+  await sendNotification({ flow: "geral", answers: geralAnswers }, deps);
+
+  assert.equal(calls.length, 1);
 });
