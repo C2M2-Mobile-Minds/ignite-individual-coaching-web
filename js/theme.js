@@ -19,6 +19,9 @@ const GESTACAO_POSPARTO = "gestacao_posparto";
 /** Neutral/default theme — the existing green brand accent, black ground. */
 export const DEFAULT_THEME = {
   bg: "#000",
+  // Lower stop of the page background gradient (top stop is always #000, under
+  // the always-black header). Equal to `bg` here so the default stays flat black.
+  bgAccent: "#000",
   accent: "#4a783a",
   accentBright: "#6aaa55",
   accentHover: "#5a8a4a",
@@ -33,6 +36,7 @@ export const DEFAULT_THEME = {
 export const THEME_BY_OBJETIVO = {
   [GESTACAO_POSPARTO]: {
     bg: "#140b11",
+    bgAccent: "#3a1530",
     accent: "#9a3f6b",
     accentBright: "#cc6499",
     accentHover: "#b04f80",
@@ -61,6 +65,7 @@ export function themeForAnswers(answers) {
 export function applyTheme(answers, root = document.documentElement) {
   const theme = themeForAnswers(answers);
   root.style.setProperty("--bg", theme.bg);
+  root.style.setProperty("--bg-accent", theme.bgAccent);
   root.style.setProperty("--accent", theme.accent);
   root.style.setProperty("--accent-bright", theme.accentBright);
   root.style.setProperty("--accent-hover", theme.accentHover);

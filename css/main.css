@@ -28,6 +28,9 @@
   --accent-bright: var(--green-bright);
   --accent-hover: var(--green-hover);
   --accent-soft: rgba(74, 120, 58, 0.16);
+  /* Lower stop of the page background gradient; top stop is always #000 so the
+     black header blends in. Equal to #000 by default (flat black). */
+  --bg-accent: #000;
 
   --hairline: rgba(255, 255, 255, 0.07);
   --border: rgba(255, 255, 255, 0.16);
@@ -46,13 +49,21 @@
 html,
 body {
   margin: 0;
-  background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-  /* --bg is re-themed per objetivo on steps after dados_basicos (js/theme.js) */
+}
+
+/* Page ground: black at the very top (under the always-black header), easing
+   into the themed --bg-accent lower down. --bg / --bg-accent are re-themed per
+   objetivo on steps after dados_basicos (js/theme.js); by default both are
+   black, so this is a flat black page. */
+body {
+  background-color: var(--bg);
+  background-image: linear-gradient(180deg, #000 0, var(--bg-accent) 360px);
+  background-repeat: no-repeat;
   transition: background-color 0.35s ease;
 }
 
@@ -106,13 +117,16 @@ label,
     max(16px, env(safe-area-inset-left));
 }
 
+/* The logo PNG has a solid black backdrop, so the header stays black even when
+   the page is themed — the background gradient starts from #000 to meet it. */
 .page-header {
   padding: 28px 0 4px;
+  background: #000;
 }
 
 .logo-frame {
   display: inline-flex;
-  background: var(--bg);
+  background: #000;
 }
 
 .logo-frame img {

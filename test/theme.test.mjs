@@ -32,6 +32,7 @@ test("applyTheme: writes the full custom-property set onto the given root", () =
 
   applyTheme({ objetivo_treino: ["gestacao_posparto"] }, root);
   assert.equal(props["--bg"], THEME_BY_OBJETIVO.gestacao_posparto.bg);
+  assert.equal(props["--bg-accent"], THEME_BY_OBJETIVO.gestacao_posparto.bgAccent);
   assert.equal(props["--accent"], THEME_BY_OBJETIVO.gestacao_posparto.accent);
   assert.equal(props["--accent-bright"], THEME_BY_OBJETIVO.gestacao_posparto.accentBright);
   assert.equal(props["--accent-hover"], THEME_BY_OBJETIVO.gestacao_posparto.accentHover);
