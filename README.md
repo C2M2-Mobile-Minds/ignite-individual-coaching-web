@@ -39,6 +39,7 @@ ignite-individual-coaching-web/
 ├── css/
 │   └── main.css
 ├── js/
+│   ├── landing.js         # neutral pre-form intro screen (outside the schema)
 │   ├── formSchema.js      # steps, fields, and branch conditions (data, not markup)
 │   ├── formEngine.js      # renders current step from schema, handles forward/back nav + validation
 │   ├── countries.js       # EU/EEA dial codes + parse/combine helpers for the phone field
@@ -61,6 +62,8 @@ ignite-individual-coaching-web/
 ```
 
 ## Form flow
+
+Before the form, a neutral landing screen (`js/landing.js`, copy under `landing.*` in `pt-PT.json`) shows a centered logotype, the intro message, and a "Começar" CTA. It collects no answers, so it lives outside `formSchema.js`; clicking the CTA swaps it for Página 1 with no page reload. The header logo is hidden until then.
 
 The form is schema-driven: each step is a data object with an optional `condition` function that decides whether it's shown, based on answers collected so far. The schema below mirrors this flowchart exactly — there is no separate page per branch, just conditional steps evaluated at runtime.
 

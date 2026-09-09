@@ -15,6 +15,7 @@ import { loadLocale, t } from "./i18n.js";
 import { steps, visibleSteps, visibleFields } from "./formSchema.js";
 import { EEA_COUNTRIES, DEFAULT_DIAL_CODE, parsePhone, combinePhone } from "./countries.js";
 import { submitForm } from "./submit.js";
+import { renderLanding } from "./landing.js";
 
 /** The single source of truth for what the user has entered and where they are. */
 export const state = {
@@ -593,9 +594,16 @@ export function goBack() {
   }
 }
 
-/** Load the locale, set the document title, and render the first step. */
+/** Reveal the header logo and render the first form step (landing CTA target). */
+export function startForm() {
+  document.querySelector(".page-header")?.removeAttribute("hidden");
+  renderStep();
+}
+
+/** Load the locale, set the document title, and show the landing screen. */
 export async function init() {
   await loadLocale("pt-PT");
   document.title = t("app.title");
-  renderStep();
+  document.querySelector(".page-header")?.setAttribute("hidden", "");
+  renderLanding(startForm);
 }

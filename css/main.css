@@ -555,6 +555,70 @@ label.field > input[type="checkbox"] {
   color: var(--text);
 }
 
+/* --- Landing screen ---------------------------------------------------------
+   Neutral pre-form intro (issue #47). Colours/fonts use the existing tokens as
+   placeholders — swap for the client's final palette when delivered. */
+
+.landing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.5rem;
+  padding: 2rem 0 1rem;
+}
+
+.landing-logo {
+  width: 200px;
+  max-width: 70%;
+  height: auto;
+}
+
+.landing-tagline {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--green-bright);
+}
+
+.landing-message {
+  margin: 0;
+  max-width: 42ch;
+  font-family: var(--font-cond);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+  color: var(--text-dim);
+}
+
+.landing-cta {
+  margin-top: 0.5rem;
+  min-height: 52px;
+  padding: 16px 40px;
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--green);
+  border: none;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+}
+
+.landing-cta:hover {
+  background: var(--green-hover);
+  box-shadow: 0 12px 30px rgba(74, 120, 58, 0.35);
+}
+
+.landing-cta:active {
+  transform: scale(0.98);
+}
+
 /* --- Scale up from the phone baseline ------------------------------------- */
 
 /* Large phone / small tablet: step type and control padding back up. */
@@ -589,6 +653,19 @@ label.field > input[type="checkbox"] {
   .confirmation {
     margin: 3rem 0 2rem;
     font-size: 1.15rem;
+  }
+  .landing-logo {
+    width: 260px;
+  }
+  .landing-tagline {
+    font-size: 1.9rem;
+  }
+  .landing-message {
+    font-size: 1.15rem;
+  }
+  .landing-cta {
+    min-height: 56px;
+    font-size: 13px;
   }
 }
 
