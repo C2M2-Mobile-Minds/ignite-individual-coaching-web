@@ -424,6 +424,11 @@ function navButton(labelKey, onClick, disabled = false) {
   return button;
 }
 
+// Which step the last renderStep() painted — used to play the entrance
+// animation only on an actual step change, not on intra-step re-renders
+// (radio / checkbox toggles re-render the whole step).
+let lastRenderedStepId = null;
+
 /** Clear #form-root and render the current step: title, fields, nav row. */
 export function renderStep() {
   const root = document.getElementById("form-root");
@@ -431,6 +436,9 @@ export function renderStep() {
 
   const { answers, currentStepId } = state;
   const step = steps.find((s) => s.id === currentStepId);
+
+  root.classList.toggle("step-enter", currentStepId !== lastRenderedStepId);
+  lastRenderedStepId = currentStepId;
 
   const totalSteps = visibleSteps(answers).length;
   const stepNumber = currentStepIndex(answers, currentStepId) + 1;
@@ -485,6 +493,8 @@ export function renderStep() {
 export function renderConfirmation(status) {
   const root = document.getElementById("form-root");
   root.replaceChildren();
+  root.classList.add("step-enter"); // the terminal screen always animates in
+  lastRenderedStepId = null;
 
   const key = status === "success" ? "form.confirmation.success" : "form.confirmation.error";
   const message = el("p", { className: "confirmation" });

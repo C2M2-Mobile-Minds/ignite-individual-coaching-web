@@ -108,8 +108,10 @@ label,
   padding: 8px 0 0;
 }
 
-/* Replay a subtle entrance on every re-render (step change). */
-#form-root > * {
+/* Entrance animation — only when the step actually changes (renderStep adds
+   .step-enter). Intra-step re-renders (radio / checkbox toggles) skip it so
+   the page doesn't blink on every click. */
+#form-root.step-enter > * {
   animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
@@ -125,7 +127,7 @@ label,
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #form-root > * {
+  #form-root.step-enter > * {
     animation: none;
   }
 }

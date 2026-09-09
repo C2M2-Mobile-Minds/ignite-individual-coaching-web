@@ -127,6 +127,25 @@ test("progress total and fill follow the visible branch", () => {
   assert.equal(root().querySelector(".progress-fill").style.width, "100%");
 });
 
+test("#form-root gets .step-enter only when the step changes", () => {
+  // Prime from a known step so the first assertion doesn't depend on
+  // whatever step a previous test last rendered.
+  state.currentStepId = "dados_basicos";
+  renderStep();
+
+  state.answers = { objetivo_treino: ["gestacao_posparto"] };
+  state.currentStepId = "fase_gestacao";
+  renderStep(); // step changed -> animate
+  assert.ok(root().classList.contains("step-enter"));
+
+  renderStep(); // same step (e.g. after a radio toggle) -> no entrance replay
+  assert.ok(!root().classList.contains("step-enter"));
+
+  state.currentStepId = "dados_basicos";
+  renderStep(); // step changed again -> animate
+  assert.ok(root().classList.contains("step-enter"));
+});
+
 test("radio/checkbox options render as .option-button rows with a check mark", () => {
   state.answers = { objetivo_treino: ["ganho_massa"], onde_treina: "ginasio" };
   state.currentStepId = "treino_geral";
