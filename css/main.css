@@ -62,7 +62,7 @@ body {
    black, so this is a flat black page. */
 body {
   background-color: var(--bg);
-  background-image: linear-gradient(180deg, #000 0, var(--bg-accent) 360px);
+  background-image: linear-gradient(180deg, #000 0, #000 140px, var(--bg-accent) 720px);
   background-repeat: no-repeat;
   transition: background-color 0.35s ease;
 }
