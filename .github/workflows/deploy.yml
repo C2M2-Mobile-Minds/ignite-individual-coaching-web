@@ -1,9 +1,10 @@
 name: Deploy
 
+# Manual only. Trigger from the Actions tab ("Run workflow") after merging to main.
+# Netlify's own Git auto-publish is disabled (see netlify.toml `ignore`) so merges
+# to main no longer burn Netlify build/deploy quota automatically.
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   deploy:
