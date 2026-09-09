@@ -7,7 +7,7 @@ const validAnswers = {
   nome: "Ana",
   email: "ana@example.com",
   contacto_telefonico: "+351 912345678",
-  objetivo_treino: ["perda_peso"],
+  objetivo_treino: ["ganho_massa"],
   onde_treina: "casa",
 };
 

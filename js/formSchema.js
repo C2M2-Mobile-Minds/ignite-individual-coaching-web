@@ -50,9 +50,6 @@ export const steps = [
         required: true,
         labelKey: "form.field.como_chegou",
         options: [
-          { id: "instagram", labelKey: "form.option.como_chegou.instagram" },
-          { id: "recomendacao", labelKey: "form.option.como_chegou.recomendacao" },
-          { id: "pesquisa", labelKey: "form.option.como_chegou.pesquisa" },
           { id: "redes_sociais", labelKey: "form.option.como_chegou.redes_sociais" },
           { id: "fisioterapia", labelKey: "form.option.como_chegou.fisioterapia" },
           { id: "amigos_familiares", labelKey: "form.option.como_chegou.amigos_familiares" },
@@ -75,10 +72,7 @@ export const steps = [
         required: true,
         labelKey: "form.field.objetivo_treino",
         options: [
-          { id: "perda_peso", labelKey: "form.option.objetivo_treino.perda_peso" },
           { id: "ganho_massa", labelKey: "form.option.objetivo_treino.ganho_massa" },
-          { id: "condicao_fisica", labelKey: "form.option.objetivo_treino.condicao_fisica" },
-          { id: "saude_bem_estar", labelKey: "form.option.objetivo_treino.saude_bem_estar" },
           { id: "recomposicao", labelKey: "form.option.objetivo_treino.recomposicao" },
           { id: "saude_longevidade", labelKey: "form.option.objetivo_treino.saude_longevidade" },
           { id: "reforco_modalidade", labelKey: "form.option.objetivo_treino.reforco_modalidade" },

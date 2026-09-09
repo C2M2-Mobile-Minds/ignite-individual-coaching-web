@@ -25,8 +25,8 @@ const geralAnswers = {
   nome: "Ana Silva",
   contacto_telefonico: "+351 912345678",
   email: "ana@example.com",
-  como_chegou: ["instagram"],
-  objetivo_treino: ["perda_peso"],
+  como_chegou: ["redes_sociais"],
+  objetivo_treino: ["ganho_massa"],
   onde_treina: "casa",
   dificuldade_atual: "Falta de tempo",
   frequencia_treino: "2_3x",
@@ -39,7 +39,7 @@ const gestacaoAnswers = {
   nome: "Rita Costa",
   contacto_telefonico: "+351 900000000",
   email: "rita@example.com",
-  como_chegou: ["recomendacao"],
+  como_chegou: ["redes_sociais"],
   objetivo_treino: ["gestacao_posparto"],
   fase: "gestacao",
   fisio_pelvica: "sim",
@@ -58,7 +58,7 @@ test("renderEmail: geral template shows only general-branch questions", () => {
   assert.match(html, /Casa/);
   assert.match(text, /Onde treinas\?/);
   // gestação-only field must not appear
-  assert.doesNotMatch(html, /Quantas semanas de gravidez/);
+  assert.doesNotMatch(html, /De quantas semanas estás/);
 });
 
 test("renderEmail: gestacao_posparto template shows that branch's questions and resolved values", () => {
@@ -67,7 +67,7 @@ test("renderEmail: gestacao_posparto template shows that branch's questions and 
   assert.match(subject, /Gestação/);
   assert.match(html, /Em que fase te encontras/);
   assert.match(html, /Gestação/);
-  assert.match(html, /Quantas semanas de gravidez/);
+  assert.match(html, /De quantas semanas estás/);
   assert.doesNotMatch(html, /Onde treinas\?/);
 });
 

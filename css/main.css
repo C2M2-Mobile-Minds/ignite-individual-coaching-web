@@ -282,6 +282,12 @@ button:focus-visible {
   letter-spacing: normal;
 }
 
+/* While open, lift the whole picker above the form fields that follow it in
+   the DOM (email, etc.) so the dropdown paints on top, not behind them. */
+.country-select.is-open {
+  z-index: 30;
+}
+
 .country-select__toggle {
   display: flex;
   align-items: center;
