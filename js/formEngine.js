@@ -16,6 +16,7 @@ import { steps, visibleSteps, visibleFields } from "./formSchema.js";
 import { EEA_COUNTRIES, DEFAULT_DIAL_CODE, parsePhone, combinePhone } from "./countries.js";
 import { submitForm } from "./submit.js";
 import { renderLanding } from "./landing.js";
+import { applyTheme } from "./theme.js";
 
 /** The single source of truth for what the user has entered and where they are. */
 export const state = {
@@ -318,8 +319,14 @@ export function renderField(field) {
   if (type === "tel") {
     const { dialCode, local } = parsePhone(state.answers[id]);
     let currentDial = dialCode;
-    const input = el("input", { type: "tel", id, name: id, value: local });
-    const sync = () => setText(id, combinePhone(currentDial, input.value));
+    const input = el("input", { type: "tel", id, name: id, value: local, inputMode: "numeric" });
+    input.setAttribute("pattern", "[0-9]*");
+    // Local part is digits only — strip anything else as it's typed / pasted.
+    const sync = () => {
+      const digits = input.value.replace(/\D/g, "");
+      if (input.value !== digits) input.value = digits;
+      setText(id, combinePhone(currentDial, digits));
+    };
     const countrySelect = buildCountrySelect(dialCode, (dial) => {
       currentDial = dial;
       sync();
@@ -448,6 +455,8 @@ function clearEntranceAnimation(root) {
 export function renderStep() {
   const root = document.getElementById("form-root");
   root.replaceChildren();
+  // Theme the steps AFTER dados_basicos; landing + dados_basicos stay neutral.
+  applyTheme(state.currentStepId === "dados_basicos" ? {} : state.answers);
 
   const { answers, currentStepId } = state;
   const step = steps.find((s) => s.id === currentStepId);
@@ -509,6 +518,7 @@ export function renderStep() {
 export function renderConfirmation(status) {
   const root = document.getElementById("form-root");
   root.replaceChildren();
+  applyTheme(state.answers); // keep the terminal screen on-theme
   root.classList.add("step-enter"); // the terminal screen always animates in
   clearEntranceAnimation(root);
   lastRenderedStepId = null;
@@ -604,6 +614,7 @@ export function startForm() {
 export async function init() {
   await loadLocale("pt-PT");
   document.title = t("app.title");
+  applyTheme({}); // explicit neutral reset (matters on re-init, e.g. in tests)
   document.querySelector(".page-header")?.setAttribute("hidden", "");
   renderLanding(startForm);
 }

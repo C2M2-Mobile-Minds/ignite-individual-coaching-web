@@ -36,6 +36,15 @@ Step 1 `dados_basicos` → step 2 `treino_geral` → step 3 `comprometimento` �
 - [ ] Step 1: fill `nome`, `contacto_telefonico` (pick a country, type a local number),
       `email`; check one `como_chegou` option; check one `objetivo_treino` option
       that is **not** "Gestação e pós-parto". "Seguinte" advances.
+- [ ] **Theming**: Página 1 (`dados_basicos`) always stays neutral (black ground,
+      green accent) regardless of `objetivo_treino` selection.
+- [ ] **Theming**: selecting only non-"Gestação e pós-parto" objectives (one or
+      several) leaves every later step on the default theme too.
+- [ ] **Theming**: when `objetivo_treino` **includes "Gestação e pós-parto"**,
+      the steps after Página 1 (fase / gestação / pós-parto) and the confirmation
+      screen switch to the gestação palette — background + accent (progress bar,
+      labels, option highlight, nav button, hover states). Going "Voltar" to
+      Página 1 shows neutral again.
 - [ ] Step 2 title "SOBRE O TREINO"; 4 controls: `onde_treina` (Casa/Ginásio),
       `dificuldade_atual` (text), `frequencia_treino` (2-3x / 4-5x / 5+),
       `orientacao_nutricional` (Sim/Não). "Seguinte" advances.

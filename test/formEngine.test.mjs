@@ -45,6 +45,7 @@ const {
 
 const { steps } = await import("../js/formSchema.js");
 const { t } = await import("../js/i18n.js");
+const { DEFAULT_THEME, THEME_BY_OBJETIVO } = await import("../js/theme.js");
 const stepById = (id) => steps.find((s) => s.id === id);
 
 before(async () => {
@@ -388,6 +389,15 @@ test("typing a number stores the combined dial code + number", () => {
   const input = root().querySelector("input#contacto_telefonico");
   input.value = "912345678";
   input.dispatchEvent(new dom.window.Event("input"));
+  assert.equal(state.answers.contacto_telefonico, "+351 912345678");
+});
+
+test("non-digits typed into the phone field are stripped", () => {
+  renderStep();
+  const input = root().querySelector("input#contacto_telefonico");
+  input.value = "912 345-678abc";
+  input.dispatchEvent(new dom.window.Event("input"));
+  assert.equal(input.value, "912345678");
   assert.equal(state.answers.contacto_telefonico, "+351 912345678");
 });
 
@@ -885,4 +895,46 @@ test("como_chegou_outro is required once 'outro' is checked", () => {
   ]);
   answers.como_chegou_outro = "Um evento no ginásio";
   assert.deepEqual(validateStep(step, answers), []);
+});
+
+// --- Objetivo-driven theming (issue #48) -----------------------------------
+
+test("steps after dados_basicos get the gestacao_posparto accent + bg", () => {
+  state.answers = { objetivo_treino: ["gestacao_posparto"], fase: "gestacao" };
+  state.currentStepId = "gestacao";
+  renderStep();
+  const root = document.documentElement.style;
+  assert.equal(root.getPropertyValue("--accent"), THEME_BY_OBJETIVO.gestacao_posparto.accent);
+  assert.equal(root.getPropertyValue("--bg"), THEME_BY_OBJETIVO.gestacao_posparto.bg);
+});
+
+test("dados_basicos itself stays on the default theme even with gestacao_posparto picked", () => {
+  state.answers = { objetivo_treino: ["gestacao_posparto"] };
+  state.currentStepId = "dados_basicos";
+  renderStep();
+  const root = document.documentElement.style;
+  assert.equal(root.getPropertyValue("--accent"), DEFAULT_THEME.accent);
+  assert.equal(root.getPropertyValue("--bg"), DEFAULT_THEME.bg);
+});
+
+test("a themed step with other objectives (no gestacao_posparto) stays default", () => {
+  state.answers = { objetivo_treino: ["ganho_massa", "forca_atletismo"], onde_treina: "casa" };
+  state.currentStepId = "treino_geral";
+  renderStep();
+  const root = document.documentElement.style;
+  assert.equal(root.getPropertyValue("--accent"), DEFAULT_THEME.accent);
+  assert.equal(root.getPropertyValue("--bg"), DEFAULT_THEME.bg);
+});
+
+test("clearing gestacao_posparto reverts a themed step to the default", () => {
+  state.currentStepId = "gestacao";
+  state.answers = { objetivo_treino: ["gestacao_posparto"], fase: "gestacao" };
+  renderStep();
+  state.currentStepId = "treino_geral";
+  state.answers = { objetivo_treino: ["ganho_massa"] };
+  renderStep();
+  assert.equal(
+    document.documentElement.style.getPropertyValue("--accent"),
+    DEFAULT_THEME.accent,
+  );
 });
