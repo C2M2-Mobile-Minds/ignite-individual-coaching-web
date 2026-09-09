@@ -23,6 +23,11 @@ export function defaultDeps() {
     apiKey: process.env.EMAIL_API_KEY,
     to: process.env.COMPANY_EMAIL_TO,
     from: process.env.EMAIL_FROM,
+    // Netlify sets CONTEXT automatically (production on prod deploys,
+    // deploy-preview / branch-deploy / dev elsewhere). EMAIL_FORCE=1 sends a
+    // real email outside production for deliberate manual testing.
+    context: process.env.CONTEXT,
+    force: process.env.EMAIL_FORCE === "1",
     fetchImpl: fetch,
   };
 }
@@ -78,14 +83,19 @@ export function renderEmail({ flow, answers }) {
 }
 
 /**
- * Send the notification email. Resolves without sending when EMAIL_API_KEY /
+ * Send the notification email. Resolves without sending outside the Netlify
+ * production context (unless EMAIL_FORCE=1), or when EMAIL_API_KEY /
  * COMPANY_EMAIL_TO / EMAIL_FROM are not all set. Throws an `email`-stage error
  * on a non-2xx provider response.
  * @param {{ flow: string, answers: object }} args
- * @param {object} [deps] - { apiKey, to, from, fetchImpl }
+ * @param {object} [deps] - { apiKey, to, from, context, force, fetchImpl }
  */
 export async function sendNotification({ flow, answers }, deps = defaultDeps()) {
-  const { apiKey, to, from, fetchImpl } = deps;
+  const { apiKey, to, from, context, force, fetchImpl } = deps;
+  if (context !== "production" && !force) {
+    console.warn("[email] non-production context, skipping notification");
+    return;
+  }
   if (!apiKey || !to || !from) {
     console.warn("[email] not configured, skipping notification");
     return;

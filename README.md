@@ -181,6 +181,10 @@ development hook.
    - `EMAIL_FROM` — the verified sender address
 4. With any of the three unset, the function logs `[email] not configured,
    skipping` and the submission still succeeds.
+5. A real email sends **only in the Netlify `production` context**. Outside it
+   (deploy previews, branch deploys, `netlify dev`, direct invocation) the
+   function logs `[email] non-production context, skipping notification`. Set
+   `EMAIL_FORCE=1` to force a real send outside production for manual testing.
 
 ## CI/CD
 
