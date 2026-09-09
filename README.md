@@ -192,7 +192,11 @@ GitHub Actions (`.github/workflows/`):
 
 - **`ci.yml`** — on every PR and non-`main` push: `npm ci` + `npm test`.
 - **`deploy.yml`** — on push to `main`: tests, then
-  `netlify-cli deploy --prod`.
+  `node scripts/stamp-assets.mjs` (appends `?v=<commit sha>` to the CSS link and
+  the JS module graph so each deploy busts client caches), then
+  `netlify-cli deploy --prod`. `_headers` gives the stamped `/css/*` and `/js/*`
+  a one-year `immutable` cache while `index.html` stays `must-revalidate`.
+  The stamp runs only in CI — it rewrites the checked-out tree, nothing committed.
 
 `npm test` (node:test + jsdom) covers the schema branch predicates, the engine's
 navigation / validation / submit, full button-by-button walks of all three
