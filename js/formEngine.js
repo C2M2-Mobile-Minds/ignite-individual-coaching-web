@@ -429,6 +429,20 @@ function navButton(labelKey, onClick, disabled = false) {
 // (radio / checkbox toggles re-render the whole step).
 let lastRenderedStepId = null;
 
+// Drop `.step-enter` once the entrance animation has played. While the class
+// is on #form-root, `#form-root.step-enter > *` keeps `animation: fadeUp`
+// *declared* on every field, and a still-declared transform animation makes
+// each field its own stacking context / composited layer in Chrome — which
+// traps the country dropdown behind the fields that follow it, regardless of
+// z-index. Removing the class after the run clears that.
+function clearEntranceAnimation(root) {
+  root.addEventListener(
+    "animationend",
+    () => root.classList.remove("step-enter"),
+    { once: true },
+  );
+}
+
 /** Clear #form-root and render the current step: title, fields, nav row. */
 export function renderStep() {
   const root = document.getElementById("form-root");
@@ -438,6 +452,7 @@ export function renderStep() {
   const step = steps.find((s) => s.id === currentStepId);
 
   root.classList.toggle("step-enter", currentStepId !== lastRenderedStepId);
+  if (root.classList.contains("step-enter")) clearEntranceAnimation(root);
   lastRenderedStepId = currentStepId;
 
   const totalSteps = visibleSteps(answers).length;
@@ -494,6 +509,7 @@ export function renderConfirmation(status) {
   const root = document.getElementById("form-root");
   root.replaceChildren();
   root.classList.add("step-enter"); // the terminal screen always animates in
+  clearEntranceAnimation(root);
   lastRenderedStepId = null;
 
   const key = status === "success" ? "form.confirmation.success" : "form.confirmation.error";
