@@ -27,7 +27,7 @@ Step 1 `dados_basicos` → step 2 `treino_geral` → submit.
 - [ ] Step 1: fill `nome`, `contacto_telefonico` (pick a country, type a local number),
       `email`; check one `como_chegou` option; check one `objetivo_treino` option
       that is **not** "Gestação e pós-parto". "Seguinte" advances.
-- [ ] Step 2 title "Treino geral"; 5 controls: `onde_treina` (Casa/Ginásio),
+- [ ] Step 2 title "SOBRE O TREINO"; 5 controls: `onde_treina` (Casa/Ginásio),
       `dificuldade_atual` (text), `frequencia_treino` (2-3x / 4-5x / 5+),
       `orientacao_nutricional` (Sim/Não), `comprometimento` (Sim/Não).
 - [ ] Last step shows **"Enviar"**, not "Seguinte".
@@ -46,7 +46,7 @@ Step 1 `dados_basicos` → step 2 `treino_geral` → submit.
 Step 1 → `fase_gestacao` (fase = Gestação) → `gestacao` → submit.
 
 - [ ] Step 1: same as above but check **"Gestação e pós-parto"** in `objetivo_treino`.
-      "Seguinte" now goes to "Em que fase te encontras", **not** "Treino geral".
+      "Seguinte" now goes to "Em que fase te encontras", **not** "SOBRE O TREINO".
 - [ ] `fase_gestacao`: 2-option radio (Gestação / Pós-parto). Pick **Gestação**.
 - [ ] `gestacao` step: `fisio_pelvica` (Sim/Não), `semanas_gravidez` (text),
       `historial_risco` (text), `preferencia_local` (CrossFit 4475 / Templo Fitness),
@@ -93,7 +93,7 @@ Step 1 → `fase_gestacao` (fase = Pós-parto) → `posparto` → submit.
       `fase_gestacao`, pick a `fase`, go **Voltar** to step 1, **uncheck**
       "Gestação e pós-parto". Because `objetivo_treino` is now empty and required,
       "Seguinte" is blocked with an error until you pick another goal. After picking
-      one, "Seguinte" goes to **Treino geral** — the gestação steps are gone.
+      one, "Seguinte" goes to **SOBRE O TREINO** — the gestação steps are gone.
 - [ ] The resulting **Geral** row has no stale gestação data (`fase`, `semanas_gravidez`
       etc. are simply not columns on that tab).
 - [ ] On `fase_gestacao`, flip Gestação ↔ Pós-parto: the following step swaps between
