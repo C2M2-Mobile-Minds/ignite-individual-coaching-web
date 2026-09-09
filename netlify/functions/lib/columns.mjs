@@ -19,7 +19,9 @@ const BASE_COLUMNS = [TIMESTAMP_COLUMN, ...stepFieldIds("dados_basicos")];
 
 export const GERAL_COLUMNS = [
   ...BASE_COLUMNS,
-  ...stepFieldIds("treino_geral"),
+  ...stepFieldIds("modalidade_treino"),
+  ...stepFieldIds("treino_geral_online"),
+  ...stepFieldIds("treino_geral_presencial"),
   ...stepFieldIds("comprometimento"),
 ];
 
