@@ -890,17 +890,17 @@ test("como_chegou_outro is required once 'outro' is checked", () => {
 
 // --- Objetivo-driven theming (issue #48) -----------------------------------
 
-test("steps after dados_basicos get the accent + bg for the selected objetivo", () => {
-  state.answers = { objetivo_treino: ["forca_atletismo"] };
-  state.currentStepId = "treino_geral";
+test("steps after dados_basicos get the gestacao_posparto accent + bg", () => {
+  state.answers = { objetivo_treino: ["gestacao_posparto"], fase: "gestacao" };
+  state.currentStepId = "gestacao";
   renderStep();
   const root = document.documentElement.style;
-  assert.equal(root.getPropertyValue("--accent"), THEME_BY_OBJETIVO.forca_atletismo.accent);
-  assert.equal(root.getPropertyValue("--bg"), THEME_BY_OBJETIVO.forca_atletismo.bg);
+  assert.equal(root.getPropertyValue("--accent"), THEME_BY_OBJETIVO.gestacao_posparto.accent);
+  assert.equal(root.getPropertyValue("--bg"), THEME_BY_OBJETIVO.gestacao_posparto.bg);
 });
 
-test("dados_basicos itself stays on the default theme even with an objetivo picked", () => {
-  state.answers = { objetivo_treino: ["forca_atletismo"] };
+test("dados_basicos itself stays on the default theme even with gestacao_posparto picked", () => {
+  state.answers = { objetivo_treino: ["gestacao_posparto"] };
   state.currentStepId = "dados_basicos";
   renderStep();
   const root = document.documentElement.style;
@@ -908,11 +908,21 @@ test("dados_basicos itself stays on the default theme even with an objetivo pick
   assert.equal(root.getPropertyValue("--bg"), DEFAULT_THEME.bg);
 });
 
-test("clearing the objetivo selection reverts a themed step to the default", () => {
+test("a themed step with other objectives (no gestacao_posparto) stays default", () => {
+  state.answers = { objetivo_treino: ["ganho_massa", "forca_atletismo"], onde_treina: "casa" };
   state.currentStepId = "treino_geral";
-  state.answers = { objetivo_treino: ["forca_atletismo"] };
   renderStep();
-  state.answers = { objetivo_treino: [] };
+  const root = document.documentElement.style;
+  assert.equal(root.getPropertyValue("--accent"), DEFAULT_THEME.accent);
+  assert.equal(root.getPropertyValue("--bg"), DEFAULT_THEME.bg);
+});
+
+test("clearing gestacao_posparto reverts a themed step to the default", () => {
+  state.currentStepId = "gestacao";
+  state.answers = { objetivo_treino: ["gestacao_posparto"], fase: "gestacao" };
+  renderStep();
+  state.currentStepId = "treino_geral";
+  state.answers = { objetivo_treino: ["ganho_massa"] };
   renderStep();
   assert.equal(
     document.documentElement.style.getPropertyValue("--accent"),

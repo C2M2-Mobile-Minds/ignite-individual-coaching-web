@@ -1,54 +1,43 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import {
-  DEFAULT_THEME,
-  THEME_BY_OBJETIVO,
-  OBJETIVO_ORDER,
-  themeForAnswers,
-  applyTheme,
-} from "../js/theme.js";
-import { steps } from "../js/formSchema.js";
+import { DEFAULT_THEME, THEME_BY_OBJETIVO, themeForAnswers, applyTheme } from "../js/theme.js";
 
-test("OBJETIVO_ORDER matches the schema's objetivo_treino option ids", () => {
-  const schemaIds = steps
-    .find((s) => s.id === "dados_basicos")
-    .fields.find((f) => f.id === "objetivo_treino")
-    .options.map((o) => o.id);
-  assert.deepEqual(OBJETIVO_ORDER, schemaIds);
+test("only gestacao_posparto has a themed palette", () => {
+  assert.deepEqual(Object.keys(THEME_BY_OBJETIVO), ["gestacao_posparto"]);
 });
 
-test("themeForAnswers: a single known objetivo returns its theme", () => {
-  assert.equal(themeForAnswers({ objetivo_treino: ["forca_atletismo"] }), THEME_BY_OBJETIVO.forca_atletismo);
+test("themeForAnswers: gestacao_posparto selected -> its theme", () => {
+  assert.equal(
+    themeForAnswers({ objetivo_treino: ["gestacao_posparto"] }),
+    THEME_BY_OBJETIVO.gestacao_posparto,
+  );
+  // still themed when combined with other objectives
+  assert.equal(
+    themeForAnswers({ objetivo_treino: ["ganho_massa", "gestacao_posparto"] }),
+    THEME_BY_OBJETIVO.gestacao_posparto,
+  );
 });
 
-test("themeForAnswers: no / empty / missing objetivo returns DEFAULT_THEME", () => {
-  assert.equal(themeForAnswers({}), DEFAULT_THEME);
+test("themeForAnswers: any other / no selection -> DEFAULT_THEME", () => {
+  assert.equal(themeForAnswers({ objetivo_treino: ["ganho_massa", "forca_atletismo"] }), DEFAULT_THEME);
   assert.equal(themeForAnswers({ objetivo_treino: [] }), DEFAULT_THEME);
+  assert.equal(themeForAnswers({}), DEFAULT_THEME);
   assert.equal(themeForAnswers(undefined), DEFAULT_THEME);
 });
 
-test("themeForAnswers: an unknown id returns DEFAULT_THEME", () => {
-  assert.equal(themeForAnswers({ objetivo_treino: ["not_a_real_id"] }), DEFAULT_THEME);
-});
-
-test("themeForAnswers: multiple selected -> first in schema order, not insertion order", () => {
-  // reforco_modalidade comes before forca_atletismo in the schema
-  const answers = { objetivo_treino: ["forca_atletismo", "reforco_modalidade"] };
-  assert.equal(themeForAnswers(answers), THEME_BY_OBJETIVO.reforco_modalidade);
-});
-
 test("applyTheme: writes the full custom-property set onto the given root", () => {
-  const root = { style: new Map([["setProperty", null]]) };
   const props = {};
-  root.style = { setProperty: (k, v) => (props[k] = v) };
+  const root = { style: { setProperty: (k, v) => (props[k] = v) } };
 
-  applyTheme({ objetivo_treino: ["recomposicao"] }, root);
-  assert.equal(props["--accent"], THEME_BY_OBJETIVO.recomposicao.accent);
-  assert.equal(props["--accent-bright"], THEME_BY_OBJETIVO.recomposicao.accentBright);
-  assert.equal(props["--accent-hover"], THEME_BY_OBJETIVO.recomposicao.accentHover);
-  assert.equal(props["--accent-soft"], THEME_BY_OBJETIVO.recomposicao.accentSoft);
+  applyTheme({ objetivo_treino: ["gestacao_posparto"] }, root);
+  assert.equal(props["--bg"], THEME_BY_OBJETIVO.gestacao_posparto.bg);
+  assert.equal(props["--accent"], THEME_BY_OBJETIVO.gestacao_posparto.accent);
+  assert.equal(props["--accent-bright"], THEME_BY_OBJETIVO.gestacao_posparto.accentBright);
+  assert.equal(props["--accent-hover"], THEME_BY_OBJETIVO.gestacao_posparto.accentHover);
+  assert.equal(props["--accent-soft"], THEME_BY_OBJETIVO.gestacao_posparto.accentSoft);
 
   applyTheme({}, root);
+  assert.equal(props["--bg"], DEFAULT_THEME.bg);
   assert.equal(props["--accent"], DEFAULT_THEME.accent);
 });

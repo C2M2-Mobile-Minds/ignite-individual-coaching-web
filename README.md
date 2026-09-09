@@ -44,7 +44,7 @@ ignite-individual-coaching-web/
 │   ├── formEngine.js      # renders current step from schema, handles forward/back nav + validation
 │   ├── countries.js       # EU/EEA dial codes + parse/combine helpers for the phone field
 │   ├── i18n.js            # loads locale JSON, exposes t('key') helper
-│   ├── theme.js           # bg + accent palette per objetivo_treino + applyTheme (CSS custom props)
+│   ├── theme.js           # gestacao_posparto palette (bg + accent) + applyTheme (CSS custom props)
 │   └── submit.js          # POSTs final payload to the serverless function
 ├── locales/
 │   └── pt-PT.json
@@ -66,7 +66,7 @@ ignite-individual-coaching-web/
 
 Before the form, a neutral landing screen (`js/landing.js`, copy under `landing.*` in `pt-PT.json`) shows a centered logotype, the intro message, and a "Começar" CTA. It collects no answers, so it lives outside `formSchema.js`; clicking the CTA swaps it for Página 1 with no page reload. The header logo is hidden until then.
 
-From the step **after** `dados_basicos` onward (and the confirmation screen), the page is themed by the training objective picked on Página 1 (`objetivo_treino`): `js/theme.js` holds one config object mapping each option id to a palette — background plus accent — and `applyTheme` writes it onto `:root` as CSS custom properties (`--bg`, `--accent`, `--accent-bright`, `--accent-hover`, `--accent-soft`). The landing screen and `dados_basicos` itself always render neutral (default green / black). Multiple objectives selected → the first in schema order wins (interim rule, pending client confirmation); none selected → the default. Palettes are placeholders until the client delivers finals — only `theme.js` changes then.
+From the step **after** `dados_basicos` onward (and the confirmation screen), the page takes a distinct palette **only when `objetivo_treino` includes "Gestação e pós-parto"** — any other objective selection (single or multiple) keeps the default. `js/theme.js` holds the config (`THEME_BY_OBJETIVO`, currently just the `gestacao_posparto` entry) and `applyTheme` writes the palette — background plus accent — onto `:root` as CSS custom properties (`--bg`, `--accent`, `--accent-bright`, `--accent-hover`, `--accent-soft`). The landing screen and `dados_basicos` itself always render neutral (default green / black). Palettes are placeholders until the client delivers finals — only `theme.js` changes then (add more option-id entries there to theme other objectives).
 
 The form is schema-driven: each step is a data object with an optional `condition` function that decides whether it's shown, based on answers collected so far. The schema below mirrors this flowchart exactly — there is no separate page per branch, just conditional steps evaluated at runtime.
 
