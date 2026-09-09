@@ -1,57 +1,183 @@
-/* Styles for the multi-step form. Clean minimal baseline — no brand identity yet. */
+/* Ignite Individual Coaching — dark brand reskin.
+   Design system lifted from the reference site (c2m2-mobile-minds.github.io/ignite):
+   black ground, green accent, Bebas Neue / Barlow / Barlow Condensed, zero radius.
+
+   Mobile-first: base rules target a 360px phone. Two up-queries scale it —
+   `min-width: 600px` (large phone / small tablet: type + control sizing step up)
+   and `min-width: 900px` (desktop: roomier page gutters, larger logo/header).
+   There are deliberately no max-width queries. */
 
 :root {
-  --border: #c4c4c4;
-  --border-focus: #1a1a1a;
-  --error: #b3261e;
-  --button-bg: #1a1a1a;
-  --button-bg-hover: #333;
-  --text: #1a1a1a;
+  color-scheme: dark;
+
+  --bg: #000;
+  --surface: #121212;
+  --surface-2: #151515;
+  --text: #f2f2f0;
+  --text-dim: #b0b0b0;
+  --text-faint: #555;
+
+  --green: #4a783a;
+  --green-bright: #6aaa55;
+  --green-hover: #5a8a4a;
+
+  --hairline: rgba(255, 255, 255, 0.07);
+  --border: rgba(255, 255, 255, 0.16);
+
+  --error: #ff6b6b;
+
+  --font-body: Barlow, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-cond: "Barlow Condensed", var(--font-body);
+  --font-display: "Bebas Neue", var(--font-cond);
 }
 
 * {
   box-sizing: border-box;
 }
 
+html,
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
   color: var(--text);
+  font-family: var(--font-body);
   line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+html {
+  min-height: 100%;
+  min-height: 100dvh;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100%;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: rgba(74, 120, 58, 0.4);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* Suppress the grey flash on tap; every interactive control has its own
+   :hover / :active / :checked feedback. */
+button,
+input,
+label,
+.country-select__option {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* --- Layout ---------------------------------------------------------------- */
+
+.page {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 max(16px, env(safe-area-inset-right)) calc(18px + env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
+}
+
+.page-header {
+  padding: 28px 0 4px;
+}
+
+.logo-frame {
+  display: inline-flex;
+  background: var(--bg);
+}
+
+.logo-frame img {
+  display: block;
+  width: 180px;
+  height: auto;
 }
 
 #form-root {
-  max-width: 34rem;
-  margin: 2rem auto;
-  padding: 0 1rem;
+  padding: 8px 0 0;
 }
 
-#form-root h1 {
-  font-size: 1.5rem;
-  margin: 0 0 1.5rem;
+/* Replay a subtle entrance on every re-render (step change). */
+#form-root > * {
+  animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #form-root > * {
+    animation: none;
+  }
+}
+
+/* --- Progress ------------------------------------------------------------- */
+
+.progress {
+  margin: 8px 0 28px;
+}
+
+.progress-label {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--font-cond);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--green-bright);
+}
+
+.progress-track {
+  width: 100%;
+  height: 2px;
+  background: var(--hairline);
+  overflow: hidden;
+}
+
+.progress-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--green), var(--green-bright));
+  transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* --- Headings ------------------------------------------------------------- */
+
+#form-root h1 {
+  margin: 0 0 1.5rem;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 2rem;
+  line-height: 1.05;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* --- Text / email / tel fields ------------------------------------------ */
 
 .field {
   display: block;
-  margin-block: 1.25rem;
-}
-
-.field > input[type="text"],
-.field > input[type="email"] {
-  display: block;
-  width: 100%;
-  margin-top: 0.35rem;
-  padding: 0.55rem 0.7rem;
-  font: inherit;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-}
-
-input:focus-visible,
-select:focus-visible,
-button:focus-visible {
-  outline: 2px solid var(--border-focus);
-  outline-offset: 1px;
+  margin-block: 1.5rem;
 }
 
 fieldset.field {
@@ -60,58 +186,291 @@ fieldset.field {
   margin-inline: 0;
 }
 
-fieldset.field legend {
-  padding: 0;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
+.field > input[type="text"],
+.field > input[type="email"],
+fieldset.field legend,
+.field > .tel-group {
+  /* shared vertical rhythm handled per-rule below */
 }
 
-fieldset.field label {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  margin-block: 0.3rem;
+fieldset.field legend,
+.field > input[type="text"] + .error,
+label.field > span:first-child:not(.tel-group) {
+  display: block;
 }
+
+/* the plain label text that precedes text inputs */
+label.field {
+  font-family: var(--font-cond);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--green-bright);
+}
+
+fieldset.field legend {
+  padding: 0;
+  margin-bottom: 0.75rem;
+  font-family: var(--font-cond);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--green-bright);
+}
+
+.field > input[type="text"],
+.field > input[type="email"] {
+  display: block;
+  width: 100%;
+  margin-top: 0.5rem;
+  padding: 14px;
+  font-family: var(--font-body);
+  font-size: 16px; /* >=16px so iOS Safari doesn't zoom on focus */
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.field > input::placeholder {
+  color: var(--text-faint);
+}
+
+input:focus-visible,
+select:focus-visible,
+button:focus-visible {
+  outline: none;
+  border-color: var(--green-bright);
+  background: var(--surface-2);
+  box-shadow: 0 0 0 3px rgba(74, 120, 58, 0.24);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--green-bright);
+  outline-offset: 2px;
+}
+
+/* --- Phone group ------------------------------------------------------------ */
 
 .tel-group {
   display: flex;
   gap: 0.5rem;
-  margin-top: 0.35rem;
+  margin-top: 0.5rem;
+  align-items: stretch;
 }
 
-.tel-group select {
-  font: inherit;
-  padding: 0.55rem 0.4rem;
+.flag {
+  display: block;
+  width: 20px;
+  height: 15px;
+  object-fit: cover;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  flex: none;
+}
+
+/* Custom country picker (replaces a native <select> so flag images can show) */
+.country-select {
+  position: relative;
+  flex: none;
+  /* opt out of the uppercase / wide-tracking label styling it sits inside */
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.country-select__toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 100%;
+  min-height: 48px;
+  padding: 14px 10px;
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 0;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.country-select__caret {
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+.country-select__list {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 2px);
+  left: 0;
+  width: max-content;
+  min-width: 0;
+  max-width: calc(100vw - 32px); /* never past the viewport gutters on a phone */
+  max-height: min(60vh, 320px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+}
+
+.country-select__option {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 12px 14px; /* ~48px row — comfortable touch target */
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.country-select__option.is-active,
+.country-select__option:hover {
+  background: var(--green-bright, #e8f3ec);
+}
+
+.country-select__option[aria-selected="true"] {
+  font-weight: 600;
 }
 
 .tel-group input[type="tel"] {
   flex: 1;
-  padding: 0.55rem 0.7rem;
-  font: inherit;
+  min-width: 0; /* let it shrink inside the flex row on narrow screens */
+  padding: 14px;
+  font-family: var(--font-body);
+  font-size: 16px;
+  color: var(--text);
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 6px;
+  border-radius: 0;
 }
 
-.note {
-  margin-block: 1.25rem;
-  padding: 0.75rem 1rem;
-  border-left: 3px solid var(--border);
-  background: #f4f4f4;
-  font-size: 0.95rem;
+/* --- Option buttons (radio / checkbox groups) ------------------------------ */
+
+fieldset.field label,
+label.option-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  width: 100%;
+  margin: 8px 0 0;
+  padding: 14px 16px;
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  text-transform: none;
+  color: #d8d8d8;
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
 }
+
+fieldset.field label:hover,
+label.option-button:hover {
+  border-color: var(--green);
+  background: rgba(74, 120, 58, 0.08);
+  color: var(--text);
+}
+
+/* Hide the native control; the label row is the visible target. */
+fieldset.field label input[type="radio"],
+fieldset.field label input[type="checkbox"],
+label.option-button input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Selected state — driven by the (hidden) checked input. */
+fieldset.field label:has(input:checked),
+label.option-button:has(input:checked) {
+  border-color: var(--green);
+  background: rgba(74, 120, 58, 0.16);
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px rgba(74, 120, 58, 0.2), 0 0 12px rgba(74, 120, 58, 0.12);
+}
+
+/* The check mark box on the right of each option row. */
+.option-mark {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  line-height: 1;
+  color: transparent;
+  border: 1px solid var(--hairline);
+}
+
+fieldset.field label:has(input:checked) .option-mark,
+label.option-button:has(input:checked) .option-mark {
+  border-color: var(--green);
+  background: var(--green);
+  color: #fff;
+}
+
+/* --- Bare (single) checkbox — keep it obvious it's a toggle ------------- */
+
+label.field:has(> input[type="checkbox"]:only-of-type) {
+  flex-direction: row;
+  justify-content: flex-start;
+  text-transform: none;
+  letter-spacing: normal;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--text-dim);
+}
+
+label.field > input[type="checkbox"] {
+  position: static;
+  width: 18px;
+  height: 18px;
+  opacity: 1;
+  accent-color: var(--green);
+}
+
+/* --- Note panel -------------------------------------------------------------- */
+
+.note {
+  margin-block: 1.5rem;
+  padding: 16px 18px;
+  border-left: 3px solid var(--green);
+  background: rgba(74, 120, 58, 0.1);
+  font-size: 0.95rem;
+  color: var(--text-dim);
+}
+
+/* --- Errors -------------------------------------------------------------- */
 
 .error {
   display: block;
-  margin-top: 0.25rem;
+  margin-top: 0.4rem;
   color: var(--error);
-  font-size: 0.875rem;
+  font-family: var(--font-cond);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
 }
 
 [aria-invalid="true"] {
   border-color: var(--error) !important;
 }
+
+/* --- Nav buttons -------------------------------------------------------------- */
 
 .nav {
   display: flex;
@@ -120,17 +479,46 @@ fieldset.field label {
 }
 
 .nav button {
-  padding: 0.6rem 1.4rem;
-  font: inherit;
+  flex: 1;
+  min-height: 52px;
+  padding: 16px 18px;
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
   color: #fff;
-  background: var(--button-bg);
+  background: var(--green);
   border: none;
-  border-radius: 6px;
+  border-radius: 0;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
   cursor: pointer;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
 }
 
-.nav button:hover {
-  background: var(--button-bg-hover);
+.nav button:hover:not([disabled]) {
+  background: var(--green-hover);
+  box-shadow: 0 12px 30px rgba(74, 120, 58, 0.35);
+}
+
+.nav button:active:not([disabled]) {
+  transform: scale(0.98);
+}
+
+/* "Voltar" is the first button when present — render it as a ghost/secondary. */
+.nav button:first-child:not(:only-child) {
+  flex: 0 0 auto;
+  min-width: 96px;
+  color: var(--text-dim);
+  background: none;
+  border: 1px solid var(--hairline);
+  box-shadow: none;
+}
+
+.nav button:first-child:not(:only-child):hover:not([disabled]) {
+  color: #fff;
+  border-color: rgba(74, 120, 58, 0.35);
+  background: none;
 }
 
 .nav button[disabled] {
@@ -143,8 +531,64 @@ fieldset.field label {
   pointer-events: none;
 }
 
+/* --- Confirmation / error screen ---------------------------------------- */
+
 .confirmation {
-  margin: 3rem 0 2rem;
-  font-size: 1.1rem;
+  margin: 2.5rem 0 1.5rem;
+  font-family: var(--font-cond);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  letter-spacing: 0.04em;
   text-align: center;
+  color: var(--text);
+}
+
+/* --- Scale up from the phone baseline ------------------------------------- */
+
+/* Large phone / small tablet: step type and control padding back up. */
+@media (min-width: 600px) {
+  #form-root h1 {
+    font-size: 2.4rem;
+  }
+  .field > input[type="text"],
+  .field > input[type="email"],
+  .tel-group input[type="tel"],
+  .country-select__toggle,
+  fieldset.field label,
+  label.option-button {
+    padding: 16px 18px;
+    font-size: 15px;
+  }
+  .country-select__toggle {
+    padding-inline: 10px;
+  }
+  .country-select__list {
+    min-width: 260px;
+    max-width: 340px;
+  }
+  .nav {
+    margin-top: 2.5rem;
+  }
+  .nav button {
+    min-height: 56px;
+    padding: 18px 22px;
+    font-size: 13px;
+  }
+  .confirmation {
+    margin: 3rem 0 2rem;
+    font-size: 1.15rem;
+  }
+}
+
+/* Desktop: roomier gutters, larger brand mark and header. */
+@media (min-width: 900px) {
+  .page {
+    padding: 0 24px 32px;
+  }
+  .page-header {
+    padding: 40px 0 8px;
+  }
+  .logo-frame img {
+    width: 240px;
+  }
 }

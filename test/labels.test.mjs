@@ -67,7 +67,7 @@ test("notePairs: geral flow yields label/value pairs for filled fields only, in 
   assert.ok(!pairs.some((p) => p.label === resolveField("como_chegou_outro")));
 
   assert.deepEqual(pairs, [
-    { label: "Nome (primeiro e último)", value: "Ana" },
+    { label: "Nome", value: "Ana" },
     { label: "Contacto telefónico", value: "+351 912345678" },
     { label: "E-mail", value: "ana@example.com" },
     { label: "Como chegou até à Ignite?", value: "Instagram" },

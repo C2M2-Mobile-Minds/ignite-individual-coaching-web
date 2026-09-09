@@ -7,7 +7,7 @@
   "form.step.gestacao.title": "Gestação",
   "form.step.posparto.title": "Pós-parto",
 
-  "form.field.nome": "Nome (primeiro e último)",
+  "form.field.nome": "Nome",
   "form.field.contacto_telefonico": "Contacto telefónico",
   "form.field.email": "E-mail",
   "form.field.como_chegou": "Como chegou até à Ignite?",
@@ -69,6 +69,9 @@
   "form.option.tipo_parto.cesariana": "Cesariana",
 
   "form.note.contacto_treinadora": "Será contactada por parte da treinadora, para uma conversa mais aprofundada e verificação da compatibilidade de horário.",
+
+  "form.progress.step": "Passo",
+  "form.progress.of": "de",
 
   "form.nav.next": "Seguinte",
   "form.nav.back": "Voltar",
