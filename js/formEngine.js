@@ -319,8 +319,14 @@ export function renderField(field) {
   if (type === "tel") {
     const { dialCode, local } = parsePhone(state.answers[id]);
     let currentDial = dialCode;
-    const input = el("input", { type: "tel", id, name: id, value: local });
-    const sync = () => setText(id, combinePhone(currentDial, input.value));
+    const input = el("input", { type: "tel", id, name: id, value: local, inputMode: "numeric" });
+    input.setAttribute("pattern", "[0-9]*");
+    // Local part is digits only — strip anything else as it's typed / pasted.
+    const sync = () => {
+      const digits = input.value.replace(/\D/g, "");
+      if (input.value !== digits) input.value = digits;
+      setText(id, combinePhone(currentDial, digits));
+    };
     const countrySelect = buildCountrySelect(dialCode, (dial) => {
       currentDial = dial;
       sync();

@@ -392,6 +392,15 @@ test("typing a number stores the combined dial code + number", () => {
   assert.equal(state.answers.contacto_telefonico, "+351 912345678");
 });
 
+test("non-digits typed into the phone field are stripped", () => {
+  renderStep();
+  const input = root().querySelector("input#contacto_telefonico");
+  input.value = "912 345-678abc";
+  input.dispatchEvent(new dom.window.Event("input"));
+  assert.equal(input.value, "912345678");
+  assert.equal(state.answers.contacto_telefonico, "+351 912345678");
+});
+
 test("picking a country updates the stored prefix", () => {
   state.answers = { contacto_telefonico: "+351 912345678" };
   renderStep();
