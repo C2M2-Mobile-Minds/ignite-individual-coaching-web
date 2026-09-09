@@ -890,16 +890,26 @@ test("como_chegou_outro is required once 'outro' is checked", () => {
 
 // --- Objetivo-driven theming (issue #48) -----------------------------------
 
-test("renderStep applies the accent theme for the selected objetivo", () => {
+test("steps after dados_basicos get the accent + bg for the selected objetivo", () => {
   state.answers = { objetivo_treino: ["forca_atletismo"] };
+  state.currentStepId = "treino_geral";
   renderStep();
-  assert.equal(
-    document.documentElement.style.getPropertyValue("--accent"),
-    THEME_BY_OBJETIVO.forca_atletismo.accent,
-  );
+  const root = document.documentElement.style;
+  assert.equal(root.getPropertyValue("--accent"), THEME_BY_OBJETIVO.forca_atletismo.accent);
+  assert.equal(root.getPropertyValue("--bg"), THEME_BY_OBJETIVO.forca_atletismo.bg);
 });
 
-test("clearing the objetivo selection reverts to the default theme", () => {
+test("dados_basicos itself stays on the default theme even with an objetivo picked", () => {
+  state.answers = { objetivo_treino: ["forca_atletismo"] };
+  state.currentStepId = "dados_basicos";
+  renderStep();
+  const root = document.documentElement.style;
+  assert.equal(root.getPropertyValue("--accent"), DEFAULT_THEME.accent);
+  assert.equal(root.getPropertyValue("--bg"), DEFAULT_THEME.bg);
+});
+
+test("clearing the objetivo selection reverts a themed step to the default", () => {
+  state.currentStepId = "treino_geral";
   state.answers = { objetivo_treino: ["forca_atletismo"] };
   renderStep();
   state.answers = { objetivo_treino: [] };

@@ -449,7 +449,8 @@ function clearEntranceAnimation(root) {
 export function renderStep() {
   const root = document.getElementById("form-root");
   root.replaceChildren();
-  applyTheme(state.answers); // accent follows the selected objetivo_treino
+  // Theme the steps AFTER dados_basicos; landing + dados_basicos stay neutral.
+  applyTheme(state.currentStepId === "dados_basicos" ? {} : state.answers);
 
   const { answers, currentStepId } = state;
   const step = steps.find((s) => s.id === currentStepId);
