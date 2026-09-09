@@ -118,6 +118,16 @@ export const steps = [
         labelKey: "form.field.orientacao_nutricional",
         options: simNao,
       },
+    ],
+  },
+
+  {
+    id: "comprometimento",
+    titleKey: "form.step.comprometimento.title",
+    // Own step in the general-training branch (issue #45) — same condition as
+    // treino_geral so it appears/disappears with that branch.
+    condition: (answers) => !selectedGestacaoPosparto(answers),
+    fields: [
       {
         id: "comprometimento",
         type: "radio",

@@ -17,7 +17,11 @@ export const TIMESTAMP_COLUMN = "submitted_at";
 
 const BASE_COLUMNS = [TIMESTAMP_COLUMN, ...stepFieldIds("dados_basicos")];
 
-export const GERAL_COLUMNS = [...BASE_COLUMNS, ...stepFieldIds("treino_geral")];
+export const GERAL_COLUMNS = [
+  ...BASE_COLUMNS,
+  ...stepFieldIds("treino_geral"),
+  ...stepFieldIds("comprometimento"),
+];
 
 const gestacaoBranchIds = [
   ...stepFieldIds("fase_gestacao"),

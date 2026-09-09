@@ -15,22 +15,32 @@ const visibleStepIds = (answers) => visibleSteps(answers).map((s) => s.id);
 test("step order and ids match the schema contract", () => {
   assert.deepEqual(
     steps.map((s) => s.id),
-    ["dados_basicos", "treino_geral", "fase_gestacao", "gestacao", "posparto"],
+    ["dados_basicos", "treino_geral", "comprometimento", "fase_gestacao", "gestacao", "posparto"],
   );
 });
 
 test("general-training branch: no gestacao_posparto goal", () => {
   const answers = { objetivo_treino: ["ganho_massa", "recomposicao"] };
   assert.equal(selectedGestacaoPosparto(answers), false);
-  assert.deepEqual(visibleStepIds(answers), ["dados_basicos", "treino_geral"]);
+  assert.deepEqual(visibleStepIds(answers), ["dados_basicos", "treino_geral", "comprometimento"]);
 });
 
 test("treino_geral step exposes the issue #7 field ids in order", () => {
   const answers = { objetivo_treino: ["ganho_massa"] };
   assert.deepEqual(
     visibleFields(stepById.treino_geral, answers).map((f) => f.id),
-    ["onde_treina", "dificuldade_atual", "frequencia_treino", "orientacao_nutricional", "comprometimento"],
+    ["onde_treina", "dificuldade_atual", "frequencia_treino", "orientacao_nutricional"],
   );
+});
+
+test("comprometimento is its own step in the general branch (issue #45)", () => {
+  const answers = { objetivo_treino: ["ganho_massa"] };
+  assert.deepEqual(
+    visibleFields(stepById.comprometimento, answers).map((f) => f.id),
+    ["comprometimento"],
+  );
+  assert.ok(locale[stepById.comprometimento.titleKey], "missing step title key");
+  assert.ok(locale[stepById.comprometimento.fields[0].labelKey], "missing field key");
 });
 
 test("every treino_geral labelKey (field + option) resolves in pt-PT.json", () => {
@@ -126,7 +136,7 @@ test("fase not yet answered: splitter shown, neither leaf shown", () => {
 
 test("empty answers: defaults to the general-training branch", () => {
   // No gestacao_posparto goal selected => general branch is the default path.
-  assert.deepEqual(visibleStepIds({}), ["dados_basicos", "treino_geral"]);
+  assert.deepEqual(visibleStepIds({}), ["dados_basicos", "treino_geral", "comprometimento"]);
 });
 
 test("field-level condition: como_chegou_outro appears only when 'outro' checked", () => {
