@@ -1,6 +1,10 @@
 {
   "app.title": "Ignite Individual Coaching",
 
+  "landing.message": "Se chegaste até à Ignite é porque queres investir em ti. Descobre como é que um plano de ação estruturado e acompanhado vai potenciar o alcance dos teus objetivos.",
+  "landing.tagline": "Ignite your true potential",
+  "landing.cta": "Começar",
+
   "form.step.dados_basicos.title": "Dados básicos",
   "form.step.treino_geral.title": "SOBRE O TREINO",
   "form.step.comprometimento.title": "COMPROMISSO",

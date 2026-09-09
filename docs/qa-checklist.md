@@ -20,6 +20,15 @@ the live Sheet, the notification email).
 > A plain static server (`python -m http.server`) will load the form but the
 > submit call 404s — use `netlify dev` for anything that submits.
 
+## Landing screen (all branches)
+
+- [ ] Visiting the site shows the landing screen first, **not** Página 1.
+- [ ] Centered logotype; the header logo above the form is hidden here.
+- [ ] Intro message and tagline ("Ignite your true potential") render exactly as
+      approved; no raw `landing.*` keys visible.
+- [ ] Clicking **"Começar"** transitions to Página 1 `dados_basicos` with no page
+      reload; the header logo appears.
+
 ## Branch 1 — Geral (general training)
 
 Step 1 `dados_basicos` → step 2 `treino_geral` → step 3 `comprometimento` → submit.

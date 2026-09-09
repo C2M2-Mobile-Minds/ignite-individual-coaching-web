@@ -31,6 +31,7 @@ global.fetch = async (url) => {
 const {
   state,
   init,
+  startForm,
   renderStep,
   renderField,
   renderConfirmation,
@@ -43,10 +44,39 @@ const {
 } = await import("../js/formEngine.js");
 
 const { steps } = await import("../js/formSchema.js");
+const { t } = await import("../js/i18n.js");
 const stepById = (id) => steps.find((s) => s.id === id);
 
 before(async () => {
-  await init(); // loads the locale so t() resolves real strings
+  await init(); // loads the locale so t() resolves real strings + shows landing
+
+  // The landing screen is covered by its own block below; the rest of the suite
+  // drives the form directly, so advance past it here.
+  document.body.innerHTML = '<header class="page-header" hidden></header><div id="form-root"></div>';
+});
+
+test("landing: init() shows the landing screen, not the form", async () => {
+  document.body.innerHTML = '<header class="page-header" hidden></header><div id="form-root"></div>';
+  await init();
+  const r = document.getElementById("form-root");
+  assert.equal(r.querySelector(".landing-message").textContent, t("landing.message"));
+  assert.equal(r.querySelector(".landing-tagline").textContent, t("landing.tagline"));
+  assert.equal(r.querySelector(".landing-cta").textContent, t("landing.cta"));
+  assert.equal(r.querySelector("h1"), null); // no step title
+  assert.equal(r.querySelector("input"), null); // no form controls
+  assert.equal(document.querySelector(".page-header").hasAttribute("hidden"), true);
+});
+
+test("landing: clicking the CTA starts the form and reveals the header", async () => {
+  document.body.innerHTML = '<header class="page-header" hidden></header><div id="form-root"></div>';
+  await init();
+  const cta = document.getElementById("form-root").querySelector(".landing-cta");
+  assert.equal(cta.type, "button"); // no page reload
+  cta.click();
+  const r = document.getElementById("form-root");
+  assert.equal(r.querySelector("h1").textContent, t("form.step.dados_basicos.title"));
+  assert.ok(r.querySelector("#nome"));
+  assert.equal(document.querySelector(".page-header").hasAttribute("hidden"), false);
 });
 
 beforeEach(() => {
