@@ -1,5 +1,7 @@
 # Ignite Individual Coaching — Web Form
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/1092f0c7-9eb2-40e5-b964-9808c5341365/deploy-status)](https://app.netlify.com/projects/ignite-coaching/deploys)
+
 Multi-step web form for Ignite Individual Coaching's lead intake, accessed via a link in the company's Instagram profile. Collects user answers, branches into different question sets depending on the user's training goal, and submits responses to both a company email and a Google Sheet.
 
 ## Status
