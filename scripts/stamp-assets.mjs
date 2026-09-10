@@ -15,9 +15,47 @@ import { execSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
-const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+// --- Pure helpers (no I/O — unit-tested in test/stamp-assets.test.mjs) --------
 
-function hash() {
+// Append (or replace) `?v=<v>` on a relative asset specifier.
+export function stamp(spec, v) {
+  return `${spec.replace(/\?v=[^"'\s]*/, "")}?v=${v}`;
+}
+
+// Stamp the CSS link + module entry point in index.html source.
+// Returns `{ text, count }`; an absent pattern is left as-is (not counted).
+export function stampIndexHtml(src, v) {
+  let count = 0;
+  const text = src
+    .replace(/href="(css\/main\.css(?:\?v=[^"]*)?)"/, (_m, p) => (count++, `href="${stamp(p, v)}"`))
+    .replace(
+      /from "(\.\/js\/formEngine\.js(?:\?v=[^"]*)?)"/,
+      (_m, p) => (count++, `from "${stamp(p, v)}"`),
+    );
+  return { text, count };
+}
+
+// Stamp every relative local module import (static + dynamic) in a JS source.
+// Generic: picks up new files and new imports automatically, so the same module
+// is never imported under both a stamped and an unstamped specifier.
+// Returns `{ text, count }`.
+export function stampJsModule(src, v) {
+  let count = 0;
+  const text = src
+    .replace(
+      /from "(\.\/[\w-]+\.js)(?:\?v=[^"]*)?"/g,
+      (_m, p) => (count++, `from "${stamp(p, v)}"`),
+    )
+    .replace(
+      /import\("(\.\/[\w-]+\.js)(?:\?v=[^"]*)?"\)/g,
+      (_m, p) => (count++, `import("${stamp(p, v)}")`),
+    );
+  return { text, count };
+}
+
+// --- CLI (in-place rewrite of the working copy) ------------------------------
+
+function hash(root) {
   try {
     return execSync("git rev-parse --short HEAD", { cwd: root }).toString().trim();
   } catch {
@@ -25,67 +63,34 @@ function hash() {
   }
 }
 
-const V = hash();
-let totalStamped = 0;
+function main() {
+  const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+  const v = hash(root);
+  let total = 0;
 
-// Append (or replace) `?v=<hash>` on a relative asset specifier.
-function stamp(spec) {
-  return `${spec.replace(/\?v=[^"'\s]*/, "")}?v=${V}`;
-}
+  const indexPath = join(root, "index.html");
+  const { text: html, count: htmlCount } = stampIndexHtml(readFileSync(indexPath, "utf8"), v);
+  if (htmlCount) writeFileSync(indexPath, html);
+  else console.warn("stamp-assets: no known refs found in index.html");
+  total += htmlCount;
+  console.log(`stamped index.html: ${htmlCount} ref(s) @ ${v}`);
 
-// Stamp `index.html` — the CSS link and the module entry point. A missing
-// pattern warns and is skipped rather than throwing.
-function patchIndexHtml() {
-  const rel = "index.html";
-  const file = join(root, rel);
-  let src = readFileSync(file, "utf8");
-  const patterns = [
-    [/href="(css\/main\.css(?:\?v=[^"]*)?)"/, (_m, p) => `href="${stamp(p)}"`],
-    [/from "(\.\/js\/formEngine\.js(?:\?v=[^"]*)?)"/, (_m, p) => `from "${stamp(p)}"`],
-  ];
-  let count = 0;
-  for (const [find, build] of patterns) {
-    if (!find.test(src)) {
-      console.warn(`stamp-assets: pattern not found in ${rel}: ${find}`);
-      continue;
-    }
-    src = src.replace(find, build);
-    count += 1;
-  }
-  if (count) writeFileSync(file, src);
-  totalStamped += count;
-  console.log(`stamped ${rel}: ${count} ref(s) @ ${V}`);
-}
-
-// Stamp every relative local module import in every js/*.js file. Generic —
-// picks up new files and new imports automatically, so the same module is never
-// imported under both a stamped and an unstamped specifier.
-function patchJsModules() {
   const jsDir = join(root, "js");
-  const importRe = /from "(\.\/[\w-]+\.js)(?:\?v=[^"]*)?"/g;
-  const dynImportRe = /import\("(\.\/[\w-]+\.js)(?:\?v=[^"]*)?"\)/g;
-
   for (const name of readdirSync(jsDir)) {
     if (!name.endsWith(".js")) continue;
-    const rel = `js/${name}`;
     const file = join(jsDir, name);
-    const src = readFileSync(file, "utf8");
-    let count = 0;
-    const next = src
-      .replace(importRe, (_m, p) => (count++, `from "${stamp(p)}"`))
-      .replace(dynImportRe, (_m, p) => (count++, `import("${stamp(p)}")`));
+    const { text, count } = stampJsModule(readFileSync(file, "utf8"), v);
     if (!count) {
-      console.warn(`stamp-assets: no relative imports in ${rel} — left unstamped`);
+      console.warn(`stamp-assets: no relative imports in js/${name} — left unstamped`);
       continue;
     }
-    writeFileSync(file, next);
-    totalStamped += count;
-    console.log(`stamped ${rel}: ${count} import(s) @ ${V}`);
+    writeFileSync(file, text);
+    total += count;
+    console.log(`stamped js/${name}: ${count} import(s) @ ${v}`);
   }
+
+  console.log(`stamp-assets: ${total} ref(s) stamped @ ${v}`);
+  if (total === 0) console.warn("stamp-assets: nothing was stamped — check patterns");
 }
 
-patchIndexHtml();
-patchJsModules();
-
-console.log(`stamp-assets: ${totalStamped} ref(s) stamped @ ${V}`);
-if (totalStamped === 0) console.warn("stamp-assets: nothing was stamped — check patterns");
+if (process.argv[1] === fileURLToPath(import.meta.url)) main();
