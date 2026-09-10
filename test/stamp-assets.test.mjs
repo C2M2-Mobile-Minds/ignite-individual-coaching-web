@@ -35,6 +35,29 @@ test("stampJsModule: a file with no relative imports is a no-op", () => {
   assert.deepEqual(stampJsModule(src, "v3"), { text: src, count: 0 });
 });
 
+test("fallback: stampIndexHtml on source missing both patterns is a no-op, no throw", () => {
+  const src = "<!doctype html><html><head></head><body>no assets here</body></html>";
+  let result;
+  assert.doesNotThrow(() => {
+    result = stampIndexHtml(src, "v9");
+  });
+  assert.deepEqual(result, { text: src, count: 0 });
+});
+
+test("fallback: stampIndexHtml stamps what it finds and skips what's absent", () => {
+  const src = '<link rel="stylesheet" href="css/main.css" />\n<p>no script tag</p>';
+  const { text, count } = stampIndexHtml(src, "v10");
+  assert.equal(count, 1); // css stamped, missing entry-point import just skipped
+  assert.match(text, /href="css\/main\.css\?v=v10"/);
+});
+
+test("fallback: stampJsModule never throws on odd input", () => {
+  for (const src of ["", "// comment only", "import.meta.url", 'from "not-a-path"']) {
+    assert.doesNotThrow(() => stampJsModule(src, "v11"));
+    assert.equal(stampJsModule(src, "v11").count, 0);
+  }
+});
+
 test("stampIndexHtml: stamps the css link and the module entry point", () => {
   const src = readFileSync(new URL("../index.html", import.meta.url), "utf8");
   const { text, count } = stampIndexHtml(src, "deadbee");
