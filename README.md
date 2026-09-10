@@ -72,51 +72,59 @@ The form is schema-driven: each step is a data object with an optional `conditio
 
 ```mermaid
 flowchart TD
-    A(["Página 1: Dados básicos<br/>Nome, contacto e objetivos"]) --> B{"Selecionou gestação<br/>ou pós-parto?"}
+    L(["Página inicial (landing)<br/><small>design a definir</small>"]) --> A(["Página 1: Dados básicos<br/>Nome, contacto e objetivos"])
+    A --> B{"Selecionou gestação<br/>ou pós-parto?"}
 
     B -- não --> M{"Treino online<br/>ou presencial?"}
+    M -- online --> C1["Página 2: Sobre o treino (online)<br/><i>Onde treina, dificuldade,<br/>rotina, nutrição</i>"]
+    M -- presencial --> C2["Página 2: Sobre o treino (presencial)<br/><i>Frequência, localização,<br/>disponibilidade</i>"]
+    C1 --> C3["Página 3: Comprometimento<br/><i>Confiança e compromisso<br/>com o acompanhamento</i>"]
+    C2 --> C3
     B -- sim --> D["Página 2: Em que fase?"]
-
-    M -- online --> C["Página 2b: Sobre o treino (online)<br/><i>Onde treina, dificuldade,<br/>rotina, nutrição</i>"]
-    M -- presencial --> CP["Página 2b: Sobre o treino (presencial)<br/><i>Frequência, localização,<br/>disponibilidade + nota</i>"]
-
-    C --> C2["Página 2c: Compromisso<br/><i>Confiança/compromisso a<br/>investir no acompanhamento</i>"]
-    CP --> C2
 
     D -- gestação --> F["Página 3: Gestação<br/><i>Fisio pélvica, semanas,<br/>historial de risco...</i>"]
     D -- pós-parto --> G["Página 3: Pós-parto<br/><i>Tipo de parto, complicações,<br/>acompanhamento...</i>"]
 
-    C2 --> E(["Envio: email + sheet<br/><small>tab 'Geral'</small>"])
+    C3 --> E(["Envio: email + sheet<br/><small>tab 'Geral'</small>"])
     F --> H(["Envio: email + sheet<br/><small>tab 'Gestação/Pós-parto'</small>"])
     G --> H
 
+    E --> K(["Confirmação<br/><small>contacto via WhatsApp</small>"])
+    H --> K
+
+    classDef landing fill:#F1EFE8,stroke:#5F5E5A,stroke-width:1.5px,color:#2C2C2A
     classDef start fill:#E1F5EE,stroke:#0F6E56,stroke-width:1.5px,color:#04342C
     classDef decision fill:#EEEDFE,stroke:#534AB7,stroke-width:1.5px,color:#26215C
     classDef general fill:#E6F1FB,stroke:#185FA5,stroke-width:1.5px,color:#042C53
     classDef pregnancy fill:#FAECE7,stroke:#993C1D,stroke-width:1.5px,color:#4A1B0C
     classDef finish fill:#EAF3DE,stroke:#3B6D11,stroke-width:1.5px,color:#173404
 
+    class L landing
     class A start
     class B,M decision
-    class C,CP,C2 general
+    class C1,C2,C3 general
     class D,F,G pregnancy
     class E,H finish
+    class K start
 ```
 
 ### Question set by page
 
 | Page | Fields |
 |---|---|
+| 0. Página inicial (landing) | Sem campos — página de introdução neutra com CTA para iniciar. Design a definir pelo cliente. |
 | 1. Dados básicos | Nome (primeiro e último); contacto telefónico e e-mail; como chegou até à Ignite (checkbox + "outro" com texto livre); objetivo(s) de treino (checkbox, múltipla escolha) |
-| 2. Treino online ou presencial (ramo geral) | Online ou presencial (radio); encaminha para 2b online ou 2b presencial (issue #50) |
-| 2b. Sobre o treino — online | Onde treinas (casa/ginásio); qual a maior dificuldade neste momento (texto livre); como é a tua rotina de treinos (2-3x, 4-5x, 5+/semana); segues orientação alimentar de um nutricionista (sim/não) |
-| 2b. Sobre o treino — presencial | Frequência de treino desejada (1x/2x semana); localização preferencial (CrossFit 4475 / Templo Fitness Estúdio); disponibilidade de treino (texto livre); nota de fecho apenas de leitura sobre o contacto pela equipa |
-| 2c. Compromisso (ramo geral) | Confiança/compromisso a investir no acompanhamento on-line (sim/não) — sozinho na própria página (issue #45); ambos os sub-ramos convergem aqui |
-| 2b. Em que fase (ramo gestação/pós-parto) | Em que fase te encontras — gestação ou pós-parto (radio); encaminha para 3a ou 3b |
-| 3a. Gestação | Acompanhamento por fisioterapia pélvica (sim/não); semanas de gravidez (texto); historial de risco segundo obstetra (texto livre); preferência de treino presencial (CrossFit 4475 / Templo Fitness Estúdio); disponibilidade para treino (texto livre); nota de fecho apenas de leitura sobre o contacto pela treinadora |
-| 3b. Pós-parto | Tipo de parto (normal/cesariana); complicações durante o parto (texto livre); acompanhada por profissional de exercício físico durante a gravidez (sim/não); acompanhada por fisioterapia pélvica durante a gravidez (sim/não); quanto tempo pós-parto (texto livre); primeira consulta pós-parto com a equipa de obstetrícia (sim/não); preferência de treino presencial; disponibilidade para treino; nota de fecho apenas de leitura sobre o contacto pela treinadora |
+| 1b. Online ou presencial | Treino online ou presencial (checkbox) — determina qual lista de perguntas é apresentada a seguir |
+| 2a-i. Sobre o treino (online) | Onde treina (casa/ginásio); maior dificuldade atual (texto livre); rotina de treinos (2-3x, 4-5x, 5+/semana); orientação alimentar por nutricionista (sim/não) — inalterado em relação à versão original |
+| 2a-ii. Sobre o treino (presencial) | Frequência de treino desejada (1x/semana ou 2x/semana); localização preferencial (CrossFit 4475 ou Templo Fitness Estúdio); disponibilidade de treino (2 horários possíveis, dias 2ª/3ª/4ª/6ª — texto livre); aviso de que será contactado(a) por um elemento da equipa |
+| 3a. Comprometimento | Confiança/compromisso com acompanhamento online (sim/não) — página isolada, para dar tempo de reflexão antes de responder |
+| 2b. Em que fase | Gestação ou pós-parto (checkbox) |
+| 3b. Gestação | Acompanhamento por fisioterapia pélvica (sim/não); semanas de gravidez (texto); historial de risco segundo obstetra (texto livre); preferência de treino presencial (CrossFit 4475 / Templo Fitness Estúdio); disponibilidade de horário (2ª, 3ª, 4ª, 6ª — texto livre); aviso de contacto pela treinadora |
+| 3c. Pós-parto | Tipo de parto (normal/cesariana); complicações no parto (texto livre); acompanhamento por profissional de exercício físico na gravidez (sim/não); acompanhamento por fisioterapia pélvica na gravidez (sim/não); tempo pós-parto (texto livre); primeira consulta pós-parto com obstetrícia (sim/não); preferência de treino presencial; disponibilidade de horário; aviso de contacto pela treinadora |
 
-Each field has a stable ID (e.g. `nome`, `objetivo_treino`, `fase`, `semanas_gravidez`) used consistently across the form schema, the locale file, the submitted payload, and the spreadsheet columns — only the *display label* changes per locale, never the ID. The full field-ID list (types, options, branch conditions) is documented in [`docs/field-ids.md`](docs/field-ids.md).
+Each field has a stable ID (e.g. `nome`, `objetivo_treino`, `fase`, `semanas_gravidez`) used consistently across the form schema, the locale file, the submitted payload, and the spreadsheet columns — only the *display label* changes per locale, never the ID.
+
+> **Pending client input:** the landing page design and a dynamic per-objective color theme (accent colors changing based on the `objetivo_treino` selection) are approved directions but awaiting final assets (palettes, fonts, imagery) from the client. See issues #23 and #24.
 
 ## Submission flow
 
@@ -130,13 +138,14 @@ sequenceDiagram
 
     U->>W: Preenche formulário (respostas por página)
     W->>W: Valida respostas obrigatórias por página
-    W->>F: POST /.netlify/functions/submit — payload JSON (respostas)
-    F->>F: Deriva o flow de objetivo_treino / fase
+    W->>F: POST payload JSON (flow + respostas)
     F->>S: Escreve linha na tab correspondente (Geral / Gestação-Pós-parto)
-    F->>E: Envia email de notificação (best-effort, não bloqueia)
-    F-->>W: 200 { ok, flow }  ·  502 em falha de escrita
+    F->>E: Envia email com template correspondente ao flow
+    F-->>W: Resposta de sucesso/erro
     W-->>U: Ecrã de confirmação ou erro com retry
 ```
+
+The spreadsheet write is treated as the source of truth (retried/alerted on failure); the email is a notification and can fail without blocking the submission.
 
 **Implemented (issue #14):** the browser POSTs the flat `answers` object to
 `/.netlify/functions/submit`. The function derives the flow itself
