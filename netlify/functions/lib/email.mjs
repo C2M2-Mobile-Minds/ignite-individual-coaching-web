@@ -1,7 +1,7 @@
 // Notification email for the company, one per submission.
 //
 // Best-effort: submit.mjs calls this after the Sheets write and only logs on
-// failure — a broken email never fails a submission (README: Sheets is the
+// failure - a broken email never fails a submission (README: Sheets is the
 // source of truth). Provider is Resend (POST https://api.resend.com/emails,
 // Bearer EMAIL_API_KEY). Env:
 //   EMAIL_API_KEY      Resend API key
@@ -17,7 +17,7 @@ const FLOW_TITLES = {
   gestacao_posparto: "Gestação/Pós-parto",
 };
 
-/** Build the default deps from environment — overridable in tests. */
+/** Build the default deps from environment - overridable in tests. */
 export function defaultDeps() {
   return {
     apiKey: process.env.EMAIL_API_KEY,
@@ -53,7 +53,7 @@ function escapeHtml(value) {
  */
 export function renderEmail({ flow, answers }) {
   const title = FLOW_TITLES[flow] || flow;
-  const subject = `Nova inscrição — ${title}`;
+  const subject = `Nova inscrição: ${title}`;
   const pairs = notePairs(flow, answers);
   const submittedAt = answers.submitted_at || "";
 
@@ -67,13 +67,13 @@ export function renderEmail({ flow, answers }) {
     .join("");
 
   const html = `<div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#222">
-<h2 style="margin:0 0 4px">Nova inscrição — ${escapeHtml(title)}</h2>
+<h2 style="margin:0 0 4px">Nova inscrição: ${escapeHtml(title)}</h2>
 <p style="margin:0 0 16px;color:#777">Recebida em ${escapeHtml(submittedAt)}</p>
 <table style="border-collapse:collapse">${rows}</table>
 </div>`;
 
   const textLines = [
-    `Nova inscrição — ${title}`,
+    `Nova inscrição: ${title}`,
     `Recebida em ${submittedAt}`,
     "",
     ...pairs.map((p) => `${p.label}: ${p.value}`),
