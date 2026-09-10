@@ -21,6 +21,17 @@
   --green-bright: #6aaa55;
   --green-hover: #5a8a4a;
 
+  /* Themed accent — seeded to the green brand, overridden per objetivo_treino
+     at runtime by js/theme.js (issue #48). Repoint accent-coloured rules at
+     these, not --green*. */
+  --accent: var(--green);
+  --accent-bright: var(--green-bright);
+  --accent-hover: var(--green-hover);
+  --accent-soft: rgba(74, 120, 58, 0.16);
+  /* Lower stop of the page background gradient; top stop is always #000 so the
+     black header blends in. Equal to #000 by default (flat black). */
+  --bg-accent: #000;
+
   --hairline: rgba(255, 255, 255, 0.07);
   --border: rgba(255, 255, 255, 0.16);
 
@@ -38,12 +49,29 @@
 html,
 body {
   margin: 0;
-  background: var(--bg);
   color: var(--text);
   font-family: var(--font-body);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* Page ground: black at the very top (under the always-black header), easing
+   into the themed --bg-accent lower down. --bg / --bg-accent are re-themed per
+   objetivo on steps after dados_basicos (js/theme.js); by default both are
+   black, so this is a flat black page. */
+body {
+  background-color: var(--bg);
+  background-image: linear-gradient(180deg, #000 0, #000 140px, var(--bg-accent) 720px);
+  background-repeat: no-repeat;
+  transition: background-color 0.35s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html,
+  body {
+    transition: none;
+  }
 }
 
 html {
@@ -89,13 +117,16 @@ label,
     max(16px, env(safe-area-inset-left));
 }
 
+/* The logo PNG has a solid black backdrop, so the header stays black even when
+   the page is themed — the background gradient starts from #000 to meet it. */
 .page-header {
   padding: 28px 0 4px;
+  background: #000;
 }
 
 .logo-frame {
   display: inline-flex;
-  background: var(--bg);
+  background: #000;
 }
 
 .logo-frame img {
@@ -150,7 +181,7 @@ label,
   font-weight: 500;
   letter-spacing: 0.25em;
   text-transform: uppercase;
-  color: var(--green-bright);
+  color: var(--accent-bright);
 }
 
 .progress-track {
@@ -163,7 +194,7 @@ label,
 .progress-fill {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, var(--green), var(--green-bright));
+  background: linear-gradient(90deg, var(--accent), var(--accent-bright));
   transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -212,7 +243,7 @@ label.field {
   font-weight: 500;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--green-bright);
+  color: var(--accent-bright);
 }
 
 fieldset.field legend {
@@ -223,7 +254,7 @@ fieldset.field legend {
   font-weight: 500;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--green-bright);
+  color: var(--accent-bright);
 }
 
 .field > input[type="text"],
@@ -249,13 +280,13 @@ input:focus-visible,
 select:focus-visible,
 button:focus-visible {
   outline: none;
-  border-color: var(--green-bright);
+  border-color: var(--accent-bright);
   background: var(--surface-2);
   box-shadow: 0 0 0 3px rgba(74, 120, 58, 0.24);
 }
 
 button:focus-visible {
-  outline: 2px solid var(--green-bright);
+  outline: 2px solid var(--accent-bright);
   outline-offset: 2px;
 }
 
@@ -347,7 +378,7 @@ button:focus-visible {
 
 .country-select__option.is-active,
 .country-select__option:hover {
-  background: var(--green-bright, #e8f3ec);
+  background: var(--accent-bright);
 }
 
 .country-select__option[aria-selected="true"] {
@@ -391,8 +422,8 @@ label.option-button {
 
 fieldset.field label:hover,
 label.option-button:hover {
-  border-color: var(--green);
-  background: rgba(74, 120, 58, 0.08);
+  border-color: var(--accent);
+  background: var(--accent-soft);
   color: var(--text);
 }
 
@@ -410,8 +441,8 @@ label.option-button input {
 /* Selected state — driven by the (hidden) checked input. */
 fieldset.field label:has(input:checked),
 label.option-button:has(input:checked) {
-  border-color: var(--green);
-  background: rgba(74, 120, 58, 0.16);
+  border-color: var(--accent);
+  background: var(--accent-soft);
   color: var(--text);
   box-shadow: inset 0 0 0 1px rgba(74, 120, 58, 0.2), 0 0 12px rgba(74, 120, 58, 0.12);
 }
@@ -431,8 +462,8 @@ label.option-button:has(input:checked) {
 
 fieldset.field label:has(input:checked) .option-mark,
 label.option-button:has(input:checked) .option-mark {
-  border-color: var(--green);
-  background: var(--green);
+  border-color: var(--accent);
+  background: var(--accent);
   color: #fff;
 }
 
@@ -453,7 +484,7 @@ label.field > input[type="checkbox"] {
   width: 18px;
   height: 18px;
   opacity: 1;
-  accent-color: var(--green);
+  accent-color: var(--accent);
 }
 
 /* --- Note panel -------------------------------------------------------------- */
@@ -461,8 +492,8 @@ label.field > input[type="checkbox"] {
 .note {
   margin-block: 1.5rem;
   padding: 16px 18px;
-  border-left: 3px solid var(--green);
-  background: rgba(74, 120, 58, 0.1);
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
   font-size: 0.95rem;
   color: var(--text-dim);
 }
@@ -500,7 +531,7 @@ label.field > input[type="checkbox"] {
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: #fff;
-  background: var(--green);
+  background: var(--accent);
   border: none;
   border-radius: 0;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
@@ -509,7 +540,7 @@ label.field > input[type="checkbox"] {
 }
 
 .nav button:hover:not([disabled]) {
-  background: var(--green-hover);
+  background: var(--accent-hover);
   box-shadow: 0 12px 30px rgba(74, 120, 58, 0.35);
 }
 
@@ -555,6 +586,70 @@ label.field > input[type="checkbox"] {
   color: var(--text);
 }
 
+/* --- Landing screen ---------------------------------------------------------
+   Neutral pre-form intro (issue #47). Colours/fonts use the existing tokens as
+   placeholders — swap for the client's final palette when delivered. */
+
+.landing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.5rem;
+  padding: 2rem 0 1rem;
+}
+
+.landing-logo {
+  width: 200px;
+  max-width: 70%;
+  height: auto;
+}
+
+.landing-tagline {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-bright);
+}
+
+.landing-message {
+  margin: 0;
+  max-width: 42ch;
+  font-family: var(--font-cond);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+  color: var(--text-dim);
+}
+
+.landing-cta {
+  margin-top: 0.5rem;
+  min-height: 52px;
+  padding: 16px 40px;
+  font-family: var(--font-cond);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+}
+
+.landing-cta:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 12px 30px rgba(74, 120, 58, 0.35);
+}
+
+.landing-cta:active {
+  transform: scale(0.98);
+}
+
 /* --- Scale up from the phone baseline ------------------------------------- */
 
 /* Large phone / small tablet: step type and control padding back up. */
@@ -589,6 +684,19 @@ label.field > input[type="checkbox"] {
   .confirmation {
     margin: 3rem 0 2rem;
     font-size: 1.15rem;
+  }
+  .landing-logo {
+    width: 260px;
+  }
+  .landing-tagline {
+    font-size: 1.9rem;
+  }
+  .landing-message {
+    font-size: 1.15rem;
+  }
+  .landing-cta {
+    min-height: 56px;
+    font-size: 13px;
   }
 }
 

@@ -31,6 +31,7 @@ global.fetch = async (url) => {
 const {
   state,
   init,
+  startForm,
   renderStep,
   renderField,
   renderConfirmation,
@@ -43,10 +44,40 @@ const {
 } = await import("../js/formEngine.js");
 
 const { steps } = await import("../js/formSchema.js");
+const { t } = await import("../js/i18n.js");
+const { DEFAULT_THEME, THEME_BY_OBJETIVO } = await import("../js/theme.js");
 const stepById = (id) => steps.find((s) => s.id === id);
 
 before(async () => {
-  await init(); // loads the locale so t() resolves real strings
+  await init(); // loads the locale so t() resolves real strings + shows landing
+
+  // The landing screen is covered by its own block below; the rest of the suite
+  // drives the form directly, so advance past it here.
+  document.body.innerHTML = '<header class="page-header" hidden></header><div id="form-root"></div>';
+});
+
+test("landing: init() shows the landing screen, not the form", async () => {
+  document.body.innerHTML = '<header class="page-header" hidden></header><div id="form-root"></div>';
+  await init();
+  const r = document.getElementById("form-root");
+  assert.equal(r.querySelector(".landing-message").textContent, t("landing.message"));
+  assert.equal(r.querySelector(".landing-tagline").textContent, t("landing.tagline"));
+  assert.equal(r.querySelector(".landing-cta").textContent, t("landing.cta"));
+  assert.equal(r.querySelector("h1"), null); // no step title
+  assert.equal(r.querySelector("input"), null); // no form controls
+  assert.equal(document.querySelector(".page-header").hasAttribute("hidden"), true);
+});
+
+test("landing: clicking the CTA starts the form and reveals the header", async () => {
+  document.body.innerHTML = '<header class="page-header" hidden></header><div id="form-root"></div>';
+  await init();
+  const cta = document.getElementById("form-root").querySelector(".landing-cta");
+  assert.equal(cta.type, "button"); // no page reload
+  cta.click();
+  const r = document.getElementById("form-root");
+  assert.equal(r.querySelector("h1").textContent, t("form.step.dados_basicos.title"));
+  assert.ok(r.querySelector("#nome"));
+  assert.equal(document.querySelector(".page-header").hasAttribute("hidden"), false);
 });
 
 beforeEach(() => {
@@ -63,9 +94,11 @@ const buttonByText = (text) =>
 // --- Pure navigation --------------------------------------------------------
 
 test("forward through the general-training branch", () => {
-  state.answers = { objetivo_treino: ["ganho_massa"] };
-  assert.equal(nextVisibleStep(state.answers, "dados_basicos").id, "treino_geral");
-  assert.equal(nextVisibleStep(state.answers, "treino_geral"), null);
+  state.answers = { objetivo_treino: ["ganho_massa"], modalidade_treino: "online" };
+  assert.equal(nextVisibleStep(state.answers, "dados_basicos").id, "modalidade_treino");
+  assert.equal(nextVisibleStep(state.answers, "modalidade_treino").id, "treino_geral_online");
+  assert.equal(nextVisibleStep(state.answers, "treino_geral_online").id, "comprometimento");
+  assert.equal(nextVisibleStep(state.answers, "comprometimento"), null);
 });
 
 test("forward through the gestação branch", () => {
@@ -84,10 +117,10 @@ test("prevVisibleStep on the first step is null", () => {
   assert.equal(prevVisibleStep({}, "dados_basicos"), null);
 });
 
-test("changing objetivo away from gestação reroutes forward to treino_geral", () => {
+test("changing objetivo away from gestação reroutes forward to modalidade_treino", () => {
   // User walked into the gestação branch, went back, and cleared the goal.
   state.answers = { objetivo_treino: [] };
-  assert.equal(nextVisibleStep(state.answers, "dados_basicos").id, "treino_geral");
+  assert.equal(nextVisibleStep(state.answers, "dados_basicos").id, "modalidade_treino");
 });
 
 test("currentStepIndex clamps when the step is no longer visible", () => {
@@ -112,10 +145,11 @@ test("renders the first step's title and field controls", () => {
 
 test("renders a progress indicator: step number, total, and fill width", () => {
   renderStep();
-  // With no goal picked yet the visible path is 2 steps (geral branch).
+  // With no goal picked yet the visible path is 3 steps (geral branch:
+  // dados_basicos -> modalidade_treino -> comprometimento).
   const label = root().querySelector(".progress .progress-label").textContent;
-  assert.equal(label, "Passo 1 de 2");
-  assert.equal(root().querySelector(".progress-fill").style.width, "50%");
+  assert.equal(label, "Passo 1 de 3");
+  assert.equal(root().querySelector(".progress-fill").style.width, "33%");
 });
 
 test("progress total and fill follow the visible branch", () => {
@@ -150,7 +184,7 @@ test("#form-root drops .step-enter once the entrance animation ends", () => {
   // While the class lingers, `animation: fadeUp` stays declared on every field
   // and makes each its own stacking context in Chrome — trapping the country
   // dropdown behind later fields. It must clear on animationend.
-  state.currentStepId = "treino_geral";
+  state.currentStepId = "treino_geral_online";
   renderStep();
   state.currentStepId = "dados_basicos";
   renderStep();
@@ -161,8 +195,8 @@ test("#form-root drops .step-enter once the entrance animation ends", () => {
 });
 
 test("radio/checkbox options render as .option-button rows with a check mark", () => {
-  state.answers = { objetivo_treino: ["ganho_massa"], onde_treina: "ginasio" };
-  state.currentStepId = "treino_geral";
+  state.answers = { objetivo_treino: ["ganho_massa"], modalidade_treino: "online", onde_treina: "ginasio" };
+  state.currentStepId = "treino_geral_online";
   renderStep();
   const rows = root().querySelectorAll('fieldset.field label.option-button');
   assert.ok(rows.length >= 2);
@@ -173,8 +207,8 @@ test("radio/checkbox options render as .option-button rows with a check mark", (
 });
 
 test("radio group renders one control per option, reflecting the stored answer", () => {
-  state.answers = { objetivo_treino: ["ganho_massa"], onde_treina: "ginasio" };
-  state.currentStepId = "treino_geral";
+  state.answers = { objetivo_treino: ["ganho_massa"], modalidade_treino: "online", onde_treina: "ginasio" };
+  state.currentStepId = "treino_geral_online";
   renderStep();
   const radios = root().querySelectorAll('input[type="radio"][name="onde_treina"]');
   assert.equal(radios.length, 2);
@@ -182,33 +216,89 @@ test("radio group renders one control per option, reflecting the stored answer",
   assert.equal(checked.value, "ginasio");
 });
 
-test("treino_geral renders all five fields with resolved (non-key) labels", () => {
-  state.answers = { objetivo_treino: ["ganho_massa"] };
-  state.currentStepId = "treino_geral";
+test("treino_geral_online renders all four fields with resolved (non-key) labels", () => {
+  state.answers = { objetivo_treino: ["ganho_massa"], modalidade_treino: "online" };
+  state.currentStepId = "treino_geral_online";
   renderStep();
-  assert.equal(title(), "Treino geral");
-  for (const id of ["onde_treina", "dificuldade_atual", "frequencia_treino", "orientacao_nutricional", "comprometimento"]) {
+  assert.equal(title(), "SOBRE O TREINO (ONLINE)");
+  for (const id of ["onde_treina", "dificuldade_atual", "frequencia_treino", "orientacao_nutricional"]) {
     assert.ok(root().querySelector(`#${id}, [name="${id}"]`), `no control rendered for ${id}`);
   }
+  assert.ok(!root().querySelector('[name="comprometimento"]'), "comprometimento moved to its own step");
   assert.equal(root().querySelector("input#dificuldade_atual").type, "text");
   assert.equal(root().querySelectorAll('input[type="radio"][name="frequencia_treino"]').length, 3);
   assert.ok(!root().textContent.includes("form.field."), "unresolved locale key rendered");
 });
 
-test("treino_geral validation: 5 required errors when empty, none when filled", () => {
-  const step = stepById("treino_geral");
+test("treino_geral_online validation: 4 required errors when empty, none when filled", () => {
+  const step = stepById("treino_geral_online");
   assert.deepEqual(
     validateStep(step, {}).map((e) => e.messageKey),
-    Array(5).fill("validation.required"),
+    Array(4).fill("validation.required"),
   );
   const filled = {
     onde_treina: "casa",
     dificuldade_atual: "Falta de tempo",
     frequencia_treino: "2_3x",
     orientacao_nutricional: "sim",
-    comprometimento: "sim",
   };
   assert.deepEqual(validateStep(step, filled), []);
+});
+
+test("treino_geral_presencial validation: 3 required errors when empty, none when filled", () => {
+  const step = stepById("treino_geral_presencial");
+  assert.deepEqual(
+    validateStep(step, {}).map((e) => e.messageKey),
+    Array(3).fill("validation.required"),
+  );
+  const filled = {
+    frequencia_presencial: "1x",
+    localizacao_presencial: "crossfit_4475",
+    disponibilidade_presencial: "Segunda 18h, quarta 19h",
+  };
+  assert.deepEqual(validateStep(step, filled), []);
+});
+
+test("treino_geral_presencial renders its controls + read-only note, no unresolved keys", () => {
+  state.answers = { objetivo_treino: ["ganho_massa"], modalidade_treino: "presencial" };
+  state.currentStepId = "treino_geral_presencial";
+  renderStep();
+  assert.equal(title(), "SOBRE O TREINO (PRESENCIAL)");
+  assert.equal(root().querySelectorAll('input[type="radio"][name="frequencia_presencial"]').length, 2);
+  assert.equal(root().querySelectorAll('input[type="radio"][name="localizacao_presencial"]').length, 2);
+  assert.equal(root().querySelector("input#disponibilidade_presencial").type, "text");
+  assert.ok(root().querySelector("p.note"), "closing note rendered");
+  assert.ok(!root().querySelector('[name="onde_treina"]'), "no online-only field");
+  assert.ok(!root().textContent.includes("form.field."), "unresolved locale key rendered");
+  assert.ok(!root().textContent.includes("form.note."), "unresolved note key rendered");
+});
+
+test("modalidade_treino step renders the online/presencial radio and validates required", () => {
+  state.answers = { objetivo_treino: ["ganho_massa"] };
+  state.currentStepId = "modalidade_treino";
+  renderStep();
+  assert.equal(title(), "Treino online ou presencial");
+  assert.equal(root().querySelectorAll('input[type="radio"][name="modalidade_treino"]').length, 2);
+  const step = stepById("modalidade_treino");
+  assert.deepEqual(
+    validateStep(step, {}).map((e) => e.messageKey),
+    ["validation.required"],
+  );
+  assert.deepEqual(validateStep(step, { modalidade_treino: "online" }), []);
+});
+
+test("comprometimento step renders only its radio and validates required", () => {
+  state.answers = { objetivo_treino: ["ganho_massa"] };
+  state.currentStepId = "comprometimento";
+  renderStep();
+  assert.equal(title(), "COMPROMISSO");
+  assert.equal(root().querySelectorAll('input[type="radio"][name="comprometimento"]').length, 2);
+  const step = stepById("comprometimento");
+  assert.deepEqual(
+    validateStep(step, {}).map((e) => e.messageKey),
+    ["validation.required"],
+  );
+  assert.deepEqual(validateStep(step, { comprometimento: "sim" }), []);
 });
 
 test("fase_gestacao renders the single radio with resolved labels", () => {
@@ -345,6 +435,15 @@ test("typing a number stores the combined dial code + number", () => {
   assert.equal(state.answers.contacto_telefonico, "+351 912345678");
 });
 
+test("non-digits typed into the phone field are stripped", () => {
+  renderStep();
+  const input = root().querySelector("input#contacto_telefonico");
+  input.value = "912 345-678abc";
+  input.dispatchEvent(new dom.window.Event("input"));
+  assert.equal(input.value, "912345678");
+  assert.equal(state.answers.contacto_telefonico, "+351 912345678");
+});
+
 test("picking a country updates the stored prefix", () => {
   state.answers = { contacto_telefonico: "+351 912345678" };
   renderStep();
@@ -417,13 +516,13 @@ test("clicking Seguinte advances to the next step with no reload", () => {
   renderStep();
   assert.equal(title(), "Dados básicos");
   buttonByText("Seguinte").click();
-  assert.equal(title(), "Treino geral");
-  assert.equal(state.currentStepId, "treino_geral");
+  assert.equal(title(), "Treino online ou presencial");
+  assert.equal(state.currentStepId, "modalidade_treino");
 });
 
 test("Voltar returns to the previous visible step, answers intact", () => {
   state.answers = { nome: "Ana", objetivo_treino: ["ganho_massa"] };
-  state.currentStepId = "treino_geral";
+  state.currentStepId = "modalidade_treino";
   renderStep();
   buttonByText("Voltar").click();
   assert.equal(title(), "Dados básicos");
@@ -564,7 +663,7 @@ test("advancing is allowed once all required fields are valid", () => {
   };
   renderStep();
   buttonByText("Seguinte").click();
-  assert.equal(title(), "Treino geral");
+  assert.equal(title(), "Treino online ou presencial");
   assert.equal(state.errors.size, 0);
 });
 
@@ -572,17 +671,18 @@ test("advancing is allowed once all required fields are valid", () => {
 
 const settle = () => new Promise((r) => setTimeout(r, 5));
 
-// A fully valid last step (general-training branch ends on treino_geral).
+// A fully valid last step (general-training branch ends on comprometimento).
 const onFilledLastStep = () => {
   state.answers = {
     objetivo_treino: ["ganho_massa"],
+    modalidade_treino: "online",
     onde_treina: "casa",
     dificuldade_atual: "Falta de tempo",
     frequencia_treino: "2_3x",
     orientacao_nutricional: "sim",
     comprometimento: "sim",
   };
-  state.currentStepId = "treino_geral";
+  state.currentStepId = "comprometimento";
   renderStep();
 };
 
@@ -599,11 +699,11 @@ test("the last step offers a submit button, not 'Seguinte'", () => {
 
 test("submit blocked while a required field on the last step is empty", () => {
   state.answers = { objetivo_treino: ["ganho_massa"] };
-  state.currentStepId = "treino_geral";
+  state.currentStepId = "comprometimento";
   renderStep();
   buttonByText("Enviar").click();
-  assert.equal(title(), "Treino geral");
-  assert.ok(errorFor("onde_treina"));
+  assert.equal(title(), "COMPROMISSO");
+  assert.ok(errorFor("comprometimento"));
 });
 
 test("a mocked successful submit shows the success screen with no retry", async () => {
@@ -612,7 +712,7 @@ test("a mocked successful submit shows the success screen with no retry", async 
   await settle();
   const confirmation = root().querySelector("p.confirmation");
   assert.ok(confirmation);
-  assert.ok(confirmation.textContent.startsWith("A nossa equipa será informada"));
+  assert.ok(confirmation.textContent.startsWith("Em breve serás contactado"));
   assert.equal(buttonByText("Tentar novamente"), undefined);
 });
 
@@ -629,7 +729,7 @@ test("a failed submit shows the error screen with a working retry", async () => 
   failSubmit = false;
   retry.click();
   await settle();
-  assert.ok(root().querySelector("p.confirmation").textContent.startsWith("A nossa equipa"));
+  assert.ok(root().querySelector("p.confirmation").textContent.startsWith("Em breve serás contactado"));
 });
 
 test("the submit button shows a loading state while the request is in flight", async () => {
@@ -650,10 +750,10 @@ test("the submit button shows a loading state while the request is in flight", a
   assert.ok(root().querySelector("p.confirmation"));
 });
 
-test("renderConfirmation('success') splits the copy on its line break", () => {
+test("renderConfirmation('success') renders the success copy", () => {
   renderConfirmation("success");
   const p = root().querySelector("p.confirmation");
-  assert.equal(p.querySelectorAll("br").length, 1);
+  assert.equal(p.querySelectorAll("br").length, 0);
   assert.ok(p.textContent.includes("Obrigado!"));
 });
 
@@ -673,12 +773,13 @@ const IDENTITY = {
 
 const clickAdvance = () => buttonByText("Seguinte").click();
 const submittedOk = () =>
-  root().querySelector("p.confirmation")?.textContent.startsWith("A nossa equipa");
+  root().querySelector("p.confirmation")?.textContent.startsWith("Em breve serás contactado");
 
 test("E2E: walk the geral branch button-by-button and submit", async () => {
   state.answers = {
     ...IDENTITY,
     objetivo_treino: ["ganho_massa"],
+    modalidade_treino: "online",
     onde_treina: "casa",
     dificuldade_atual: "Falta de tempo",
     frequencia_treino: "2_3x",
@@ -688,12 +789,42 @@ test("E2E: walk the geral branch button-by-button and submit", async () => {
   renderStep();
   assert.equal(title(), "Dados básicos");
   clickAdvance();
-  assert.equal(title(), "Treino geral");
+  assert.equal(title(), "Treino online ou presencial");
+  clickAdvance();
+  assert.equal(title(), "SOBRE O TREINO (ONLINE)");
+  clickAdvance();
+  assert.equal(title(), "COMPROMISSO");
   assert.equal(buttonByText("Seguinte"), undefined, "last step: no 'Seguinte'");
   buttonByText("Enviar").click();
   await settle();
   assert.ok(submittedOk());
   assert.equal(buttonByText("Tentar novamente"), undefined);
+});
+
+test("E2E: walk the geral presencial sub-branch button-by-button and submit", async () => {
+  state.answers = {
+    ...IDENTITY,
+    objetivo_treino: ["ganho_massa"],
+    modalidade_treino: "presencial",
+    frequencia_presencial: "1x",
+    localizacao_presencial: "crossfit_4475",
+    disponibilidade_presencial: "Segunda 18h, quarta 19h",
+    comprometimento: "sim",
+  };
+  renderStep();
+  assert.equal(title(), "Dados básicos");
+  clickAdvance();
+  assert.equal(title(), "Treino online ou presencial");
+  clickAdvance();
+  assert.equal(title(), "SOBRE O TREINO (PRESENCIAL)");
+  assert.ok(root().querySelector("p.note"), "presencial step renders the closing note");
+  assert.ok(!root().querySelector('[name="onde_treina"]'), "no online-only field");
+  clickAdvance();
+  assert.equal(title(), "COMPROMISSO");
+  assert.equal(buttonByText("Seguinte"), undefined, "last step: no 'Seguinte'");
+  buttonByText("Enviar").click();
+  await settle();
+  assert.ok(submittedOk());
 });
 
 test("E2E: walk the gestação branch button-by-button and submit", async () => {
@@ -778,7 +909,7 @@ test("switching the goal off after entering the gestação branch reroutes to ge
   goal.dispatchEvent(new dom.window.Event("change"));
 
   // The branch is recomputed from answers on every move.
-  assert.equal(nextVisibleStep(state.answers, "dados_basicos").id, "treino_geral");
+  assert.equal(nextVisibleStep(state.answers, "dados_basicos").id, "modalidade_treino");
 
   // objetivo_treino is now empty and still required — the user must pick a
   // replacement goal before the form lets them leave step 1.
@@ -792,7 +923,7 @@ test("switching the goal off after entering the gestação branch reroutes to ge
   replacement.dispatchEvent(new dom.window.Event("change"));
 
   clickAdvance();
-  assert.equal(state.currentStepId, "treino_geral");
+  assert.equal(state.currentStepId, "modalidade_treino");
 
   // `fase` is not a field of dados_basicos, so pruneHiddenFieldAnswers leaves it
   // behind; the server drops it because columnsFor("geral") has no `fase` column
@@ -817,8 +948,8 @@ test("flipping the fase radio swaps the leaf step", () => {
 });
 
 test("Voltar does not run validation on the current step", () => {
-  state.answers = { objetivo_treino: ["ganho_massa"] }; // treino_geral fields all empty
-  state.currentStepId = "treino_geral";
+  state.answers = { objetivo_treino: ["ganho_massa"] }; // modalidade unanswered
+  state.currentStepId = "modalidade_treino";
   renderStep();
   buttonByText("Voltar").click();
   assert.equal(state.currentStepId, "dados_basicos");
@@ -837,4 +968,46 @@ test("como_chegou_outro is required once 'outro' is checked", () => {
   ]);
   answers.como_chegou_outro = "Um evento no ginásio";
   assert.deepEqual(validateStep(step, answers), []);
+});
+
+// --- Objetivo-driven theming (issue #48) -----------------------------------
+
+test("steps after dados_basicos get the gestacao_posparto accent + bg", () => {
+  state.answers = { objetivo_treino: ["gestacao_posparto"], fase: "gestacao" };
+  state.currentStepId = "gestacao";
+  renderStep();
+  const root = document.documentElement.style;
+  assert.equal(root.getPropertyValue("--accent"), THEME_BY_OBJETIVO.gestacao_posparto.accent);
+  assert.equal(root.getPropertyValue("--bg"), THEME_BY_OBJETIVO.gestacao_posparto.bg);
+});
+
+test("dados_basicos itself stays on the default theme even with gestacao_posparto picked", () => {
+  state.answers = { objetivo_treino: ["gestacao_posparto"] };
+  state.currentStepId = "dados_basicos";
+  renderStep();
+  const root = document.documentElement.style;
+  assert.equal(root.getPropertyValue("--accent"), DEFAULT_THEME.accent);
+  assert.equal(root.getPropertyValue("--bg"), DEFAULT_THEME.bg);
+});
+
+test("a themed step with other objectives (no gestacao_posparto) stays default", () => {
+  state.answers = { objetivo_treino: ["ganho_massa", "forca_atletismo"], modalidade_treino: "online", onde_treina: "casa" };
+  state.currentStepId = "treino_geral_online";
+  renderStep();
+  const root = document.documentElement.style;
+  assert.equal(root.getPropertyValue("--accent"), DEFAULT_THEME.accent);
+  assert.equal(root.getPropertyValue("--bg"), DEFAULT_THEME.bg);
+});
+
+test("clearing gestacao_posparto reverts a themed step to the default", () => {
+  state.currentStepId = "gestacao";
+  state.answers = { objetivo_treino: ["gestacao_posparto"], fase: "gestacao" };
+  renderStep();
+  state.currentStepId = "treino_geral_online";
+  state.answers = { objetivo_treino: ["ganho_massa"], modalidade_treino: "online" };
+  renderStep();
+  assert.equal(
+    document.documentElement.style.getPropertyValue("--accent"),
+    DEFAULT_THEME.accent,
+  );
 });

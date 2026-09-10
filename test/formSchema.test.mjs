@@ -15,26 +15,84 @@ const visibleStepIds = (answers) => visibleSteps(answers).map((s) => s.id);
 test("step order and ids match the schema contract", () => {
   assert.deepEqual(
     steps.map((s) => s.id),
-    ["dados_basicos", "treino_geral", "fase_gestacao", "gestacao", "posparto"],
+    [
+      "dados_basicos", "modalidade_treino", "treino_geral_online", "treino_geral_presencial",
+      "comprometimento", "fase_gestacao", "gestacao", "posparto",
+    ],
   );
 });
 
 test("general-training branch: no gestacao_posparto goal", () => {
   const answers = { objetivo_treino: ["ganho_massa", "recomposicao"] };
   assert.equal(selectedGestacaoPosparto(answers), false);
-  assert.deepEqual(visibleStepIds(answers), ["dados_basicos", "treino_geral"]);
+  // modalidade not yet answered => neither sub-branch step shown.
+  assert.deepEqual(visibleStepIds(answers), ["dados_basicos", "modalidade_treino", "comprometimento"]);
 });
 
-test("treino_geral step exposes the issue #7 field ids in order", () => {
-  const answers = { objetivo_treino: ["ganho_massa"] };
+test("modalidade_treino step: online selection shows only the online sub-branch", () => {
+  const answers = { objetivo_treino: ["ganho_massa"], modalidade_treino: "online" };
   assert.deepEqual(
-    visibleFields(stepById.treino_geral, answers).map((f) => f.id),
-    ["onde_treina", "dificuldade_atual", "frequencia_treino", "orientacao_nutricional", "comprometimento"],
+    visibleStepIds(answers),
+    ["dados_basicos", "modalidade_treino", "treino_geral_online", "comprometimento"],
   );
 });
 
-test("every treino_geral labelKey (field + option) resolves in pt-PT.json", () => {
-  for (const field of stepById.treino_geral.fields) {
+test("modalidade_treino step: presencial selection shows only the presencial sub-branch", () => {
+  const answers = { objetivo_treino: ["ganho_massa"], modalidade_treino: "presencial" };
+  assert.deepEqual(
+    visibleStepIds(answers),
+    ["dados_basicos", "modalidade_treino", "treino_geral_presencial", "comprometimento"],
+  );
+});
+
+test("treino_geral_online step exposes the issue #7 field ids in order", () => {
+  const answers = { objetivo_treino: ["ganho_massa"], modalidade_treino: "online" };
+  assert.deepEqual(
+    visibleFields(stepById.treino_geral_online, answers).map((f) => f.id),
+    ["onde_treina", "dificuldade_atual", "frequencia_treino", "orientacao_nutricional"],
+  );
+});
+
+test("treino_geral_presencial step exposes its field ids in order", () => {
+  const answers = { objetivo_treino: ["ganho_massa"], modalidade_treino: "presencial" };
+  assert.deepEqual(
+    visibleFields(stepById.treino_geral_presencial, answers).map((f) => f.id),
+    ["frequencia_presencial", "localizacao_presencial", "disponibilidade_presencial", "nota_contacto_equipa"],
+  );
+});
+
+test("treino_geral_presencial closing note is a read-only `note` field", () => {
+  const nota = stepById.treino_geral_presencial.fields.find((f) => f.id === "nota_contacto_equipa");
+  assert.equal(nota.type, "note");
+  assert.ok(!nota.required);
+  assert.equal(nota.labelKey, undefined);
+  assert.ok(locale[nota.textKey], `missing locale key ${nota.textKey}`);
+});
+
+test("every modalidade / presencial labelKey resolves in pt-PT.json", () => {
+  for (const stepId of ["modalidade_treino", "treino_geral_presencial"]) {
+    assert.ok(locale[stepById[stepId].titleKey], `missing step title key for ${stepId}`);
+    for (const field of stepById[stepId].fields) {
+      assert.ok(locale[field.labelKey ?? field.textKey], `missing locale key for ${field.id}`);
+      for (const opt of field.options ?? []) {
+        assert.ok(locale[opt.labelKey], `missing locale key ${opt.labelKey}`);
+      }
+    }
+  }
+});
+
+test("comprometimento is its own step in the general branch (issue #45)", () => {
+  const answers = { objetivo_treino: ["ganho_massa"] };
+  assert.deepEqual(
+    visibleFields(stepById.comprometimento, answers).map((f) => f.id),
+    ["comprometimento"],
+  );
+  assert.ok(locale[stepById.comprometimento.titleKey], "missing step title key");
+  assert.ok(locale[stepById.comprometimento.fields[0].labelKey], "missing field key");
+});
+
+test("every treino_geral_online labelKey (field + option) resolves in pt-PT.json", () => {
+  for (const field of stepById.treino_geral_online.fields) {
     assert.ok(locale[field.labelKey], `missing locale key ${field.labelKey}`);
     for (const opt of field.options ?? []) {
       assert.ok(locale[opt.labelKey], `missing locale key ${opt.labelKey}`);
@@ -126,7 +184,7 @@ test("fase not yet answered: splitter shown, neither leaf shown", () => {
 
 test("empty answers: defaults to the general-training branch", () => {
   // No gestacao_posparto goal selected => general branch is the default path.
-  assert.deepEqual(visibleStepIds({}), ["dados_basicos", "treino_geral"]);
+  assert.deepEqual(visibleStepIds({}), ["dados_basicos", "modalidade_treino", "comprometimento"]);
 });
 
 test("field-level condition: como_chegou_outro appears only when 'outro' checked", () => {

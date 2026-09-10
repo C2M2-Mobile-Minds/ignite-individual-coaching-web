@@ -27,9 +27,20 @@ Always shown (entry step).
 | `como_chegou_outro` | text | yes | — | shown only when `como_chegou` includes `outro`; cleared when `outro` is unchecked |
 | `objetivo_treino` | checkbox (multiple) | yes | `ganho_massa`, `recomposicao`, `saude_longevidade`, `reforco_modalidade`, `forca_atletismo`, `gestacao_posparto` | training goals; `gestacao_posparto` drives the branch |
 
-## Step: `treino_geral`
+## Step: `modalidade_treino`
 
-Condition: `objetivo_treino` does **not** include `gestacao_posparto`.
+Condition: `objetivo_treino` does **not** include `gestacao_posparto`. Forks the
+general-training branch into an online and a presencial question set (issue #50);
+placed immediately after `dados_basicos`.
+
+| field id | type | required | option ids | notes |
+|---|---|---|---|---|
+| `modalidade_treino` | radio | yes | `online`, `presencial` | selects the sub-branch below |
+
+## Step: `treino_geral_online`
+
+Condition: `objetivo_treino` excludes `gestacao_posparto` **and** `modalidade_treino === "online"`.
+The unchanged issue #7 question set (renamed from `treino_geral` in #50 — one-off, step unshipped).
 
 | field id | type | required | option ids | notes |
 |---|---|---|---|---|
@@ -37,6 +48,24 @@ Condition: `objetivo_treino` does **not** include `gestacao_posparto`.
 | `dificuldade_atual` | text | yes | — | free text |
 | `frequencia_treino` | radio | yes | `2_3x`, `4_5x`, `5_mais` | sessions per week (option ids retained across the #7 rename) |
 | `orientacao_nutricional` | radio | yes | `sim`, `nao` | |
+
+## Step: `treino_geral_presencial`
+
+Condition: `objetivo_treino` excludes `gestacao_posparto` **and** `modalidade_treino === "presencial"` (issue #50).
+
+| field id | type | required | option ids | notes |
+|---|---|---|---|---|
+| `frequencia_presencial` | radio | yes | `1x`, `2x` | desired sessions per week |
+| `localizacao_presencial` | radio | yes | `crossfit_4475`, `templo_fitness` | preferred in-person location (own option keys, ids shared with `preferencia_local`) |
+| `disponibilidade_presencial` | text | yes | — | availability (2 slots across 2ª, 3ª, 4ª, 6ª) |
+| `nota_contacto_equipa` | note | — | — | read-only closing note (`form.note.contacto_equipa`) |
+
+## Step: `comprometimento`
+
+Condition: `objetivo_treino` does **not** include `gestacao_posparto` — both general sub-branches converge here. Own step (issue #45).
+
+| field id | type | required | option ids | notes |
+|---|---|---|---|---|
 | `comprometimento` | radio | yes | `sim`, `nao` | confidence/commitment with online coaching |
 
 ## Step: `fase_gestacao`
@@ -94,11 +123,13 @@ to row 1 when a tab is empty. One synthetic leading column:
 
 Array answers (`como_chegou`, `objetivo_treino`) are joined with `, ` (raw
 option ids, e.g. `redes_sociais, fisioterapia`);
-booleans render as `Sim` / `Não`. `note` fields (`nota_contacto`) are never
-written.
+booleans render as `Sim` / `Não`. `note` fields (`nota_contacto`,
+`nota_contacto_equipa`) are never written.
 
 - **Tab `Geral`** — flow `geral` (`objetivo_treino` excludes `gestacao_posparto`).
-  Columns: `submitted_at` + `dados_basicos` ids + `treino_geral` ids.
+  Columns: `submitted_at` + `dados_basicos` ids + `modalidade_treino` +
+  `treino_geral_online` ids + `treino_geral_presencial` ids + `comprometimento`.
+  Only one sub-branch's columns are filled per row; the other stays blank.
 - **Tab `Gestação-Pós-parto`** — flow `gestacao_posparto` (`objetivo_treino`
   includes `gestacao_posparto`, either `fase`). Columns: `submitted_at` +
   `dados_basicos` ids + `fase` + the union of `gestacao` and `posparto` ids

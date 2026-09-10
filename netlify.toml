@@ -1,6 +1,10 @@
 [build]
   publish = "."
   functions = "netlify/functions"
+  # Always skip Netlify's Git-triggered builds (exit 0 = "nothing changed, skip").
+  # Deploys happen only via the manual GitHub Actions "Deploy" workflow, which
+  # uploads the dir directly with netlify-cli and bypasses this build entirely.
+  ignore = "exit 0"
 
 [build.environment]
   NODE_VERSION = "22"

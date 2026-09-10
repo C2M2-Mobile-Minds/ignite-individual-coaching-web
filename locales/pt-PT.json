@@ -1,8 +1,15 @@
 {
   "app.title": "Ignite Individual Coaching",
 
+  "landing.message": "Se chegaste até à Ignite é porque queres investir em ti. Descobre como é que um plano de ação estruturado e acompanhado vai potenciar o alcance dos teus objetivos.",
+  "landing.tagline": "Ignite your true potential",
+  "landing.cta": "Começar",
+
   "form.step.dados_basicos.title": "Dados básicos",
-  "form.step.treino_geral.title": "Treino geral",
+  "form.step.modalidade_treino.title": "Treino online ou presencial",
+  "form.step.treino_geral_online.title": "SOBRE O TREINO (ONLINE)",
+  "form.step.treino_geral_presencial.title": "SOBRE O TREINO (PRESENCIAL)",
+  "form.step.comprometimento.title": "COMPROMISSO",
   "form.step.fase_gestacao.title": "Em que fase te encontras",
   "form.step.gestacao.title": "Gestação",
   "form.step.posparto.title": "Pós-parto",
@@ -13,6 +20,10 @@
   "form.field.como_chegou": "Como chegou até à Ignite?",
   "form.field.como_chegou_outro": "Outro — indique como",
   "form.field.objetivo_treino": "Qual o seu objetivo de treino?",
+  "form.field.modalidade_treino": "Treino online ou presencial",
+  "form.field.frequencia_presencial": "Frequência de treino desejada",
+  "form.field.localizacao_presencial": "Localização preferencial",
+  "form.field.disponibilidade_presencial": "Qual a disponibilidade de treino (indicar 2 horários possíveis nos respetivos dias segunda, terça, quarta e sexta)",
   "form.field.onde_treina": "Onde treinas?",
   "form.field.dificuldade_atual": "Qual a maior dificuldade neste momento?",
   "form.field.frequencia_treino": "Como é a tua rotina de treinos",
@@ -46,6 +57,15 @@
   "form.option.objetivo_treino.forca_atletismo": "Aumento de força/atleticismo/agilidade",
   "form.option.objetivo_treino.gestacao_posparto": "Acompanhamento gestação e pós-parto",
 
+  "form.option.modalidade_treino.online": "Online",
+  "form.option.modalidade_treino.presencial": "Presencial",
+
+  "form.option.frequencia_presencial.1x": "1x/semana",
+  "form.option.frequencia_presencial.2x": "2x/semana",
+
+  "form.option.localizacao_presencial.crossfit_4475": "CrossFit 4475",
+  "form.option.localizacao_presencial.templo_fitness": "Templo Fitness Estúdio",
+
   "form.option.onde_treina.casa": "Casa",
   "form.option.onde_treina.ginasio": "Ginásio",
 
@@ -63,6 +83,7 @@
   "form.option.tipo_parto.cesariana": "Cesariana",
 
   "form.note.contacto_treinadora": "Será contactada por parte da treinadora, para uma conversa mais aprofundada e verificação da compatibilidade de horário.",
+  "form.note.contacto_equipa": "Será contactado(a) por um elemento da equipa.",
 
   "form.progress.step": "Passo",
   "form.progress.of": "de",
@@ -72,7 +93,7 @@
   "form.nav.submit": "Enviar",
   "form.nav.submitting": "A enviar…",
 
-  "form.confirmation.success": "A nossa equipa será informada do interesse no acompanhamento, em breve um treinador entrará em contacto contigo.\nObrigado!",
+  "form.confirmation.success": "Em breve serás contactado via WhatsApp pela nossa equipa. Obrigado!",
   "form.confirmation.error": "Não foi possível enviar a tua resposta. Verifica a tua ligação à internet e tenta novamente. Se o problema persistir, contacta-nos diretamente através do Instagram.",
   "form.confirmation.retry_button": "Tentar novamente",
 
