@@ -31,7 +31,8 @@ the live Sheet, the notification email).
 
 ## Branch 1 — Geral (general training)
 
-Step 1 `dados_basicos` → step 2 `treino_geral` → step 3 `comprometimento` → submit.
+Step 1 `dados_basicos` → step 2 `modalidade_treino` → step 3 `treino_geral_online`
+**or** `treino_geral_presencial` → step 4 `comprometimento` → submit.
 
 - [ ] Step 1: fill `nome`, `contacto_telefonico` (pick a country, type a local number),
       `email`; check one `como_chegou` option; check one `objetivo_treino` option
@@ -45,18 +46,28 @@ Step 1 `dados_basicos` → step 2 `treino_geral` → step 3 `comprometimento` �
       screen switch to the gestação palette — background + accent (progress bar,
       labels, option highlight, nav button, hover states). Going "Voltar" to
       Página 1 shows neutral again.
-- [ ] Step 2 title "SOBRE O TREINO"; 4 controls: `onde_treina` (Casa/Ginásio),
-      `dificuldade_atual` (text), `frequencia_treino` (2-3x / 4-5x / 5+),
-      `orientacao_nutricional` (Sim/Não). "Seguinte" advances.
-- [ ] Step 3 title "COMPROMISSO"; single control `comprometimento` (Sim/Não) alone
-      on the page. "Voltar" returns to "SOBRE O TREINO" with answers intact.
-- [ ] Progress indicator reads "Passo 3 de 3" on the commitment step.
+- [ ] Step 2 title "Treino online ou presencial"; single radio `modalidade_treino`
+      (Online / Presencial). "Seguinte" advances.
+- [ ] **Online path**: step 3 title "SOBRE O TREINO (ONLINE)"; 4 controls: `onde_treina`
+      (Casa/Ginásio), `dificuldade_atual` (text), `frequencia_treino` (2-3x / 4-5x / 5+),
+      `orientacao_nutricional` (Sim/Não). No presencial-only field present.
+- [ ] **Presencial path**: step 3 title "SOBRE O TREINO (PRESENCIAL)"; 3 controls:
+      `frequencia_presencial` (1x/2x semana), `localizacao_presencial` (CrossFit 4475 /
+      Templo Fitness Estúdio), `disponibilidade_presencial` (text), then a read-only
+      note "Será contactado(a) por um elemento da equipa." No `onde_treina` field.
+- [ ] "Voltar" from either step 3 returns to "Treino online ou presencial" with the
+      previous selection still checked.
+- [ ] Step 4 title "COMPROMISSO"; single control `comprometimento` (Sim/Não) alone
+      on the page.
+- [ ] Progress indicator reads "Passo 4 de 4" on the commitment step.
 - [ ] Last step shows **"Enviar"**, not "Seguinte".
 - [ ] Submit → success screen ("Em breve serás contactado via WhatsApp…"), no retry button.
 - [ ] **Geral tab** gets one new row, columns in this order, values correct:
       `submitted_at, nome, contacto_telefonico, email, como_chegou, como_chegou_outro,
-      objetivo_treino, onde_treina, dificuldade_atual, frequencia_treino,
-      orientacao_nutricional, comprometimento`
+      objetivo_treino, modalidade_treino, onde_treina, dificuldade_atual, frequencia_treino,
+      orientacao_nutricional, frequencia_presencial, localizacao_presencial,
+      disponibilidade_presencial, comprometimento`
+      (the unused sub-branch's columns stay blank)
       (radios stored as raw option ids — `casa`, `2_3x`, `sim` — not labels; multi-checkbox
       joined with `, `; `como_chegou_outro` blank unless "outro" was picked).
 - [ ] Notification email received, subject mentions "Geral", body lists every answer
@@ -114,7 +125,7 @@ Step 1 → `fase_gestacao` (fase = Pós-parto) → `posparto` → submit.
       `fase_gestacao`, pick a `fase`, go **Voltar** to step 1, **uncheck**
       "Gestação e pós-parto". Because `objetivo_treino` is now empty and required,
       "Seguinte" is blocked with an error until you pick another goal. After picking
-      one, "Seguinte" goes to **SOBRE O TREINO** — the gestação steps are gone.
+      one, "Seguinte" goes to **Treino online ou presencial** — the gestação steps are gone.
 - [ ] The resulting **Geral** row has no stale gestação data (`fase`, `semanas_gravidez`
       etc. are simply not columns on that tab).
 - [ ] On `fase_gestacao`, flip Gestação ↔ Pós-parto: the following step swaps between
@@ -132,7 +143,9 @@ Step 1 → `fase_gestacao` (fase = Pós-parto) → `posparto` → submit.
       the phone error.
 - [ ] `email`: a malformed address (no `@`, no domain dot) shows the email error;
       an empty email shows the "required" error, not the format one.
-- [ ] `treino_geral`: all 4 fields block when empty.
+- [ ] `modalidade_treino`: the lone radio blocks when unpicked.
+- [ ] `treino_geral_online`: all 4 fields block when empty.
+- [ ] `treino_geral_presencial`: all 3 fields block when empty; the note never blocks.
 - [ ] `comprometimento`: the lone field blocks when unpicked.
 - [ ] `fase_gestacao`: `fase` blocks when unpicked.
 - [ ] `gestacao`: all 5 inputs block when empty; the note never blocks.

@@ -34,6 +34,16 @@ const preferenciaLocalOptions = [
   { id: "templo_fitness", labelKey: "form.option.preferencia_local.templo_fitness" },
 ];
 
+const frequenciaPresencialOptions = [
+  { id: "1x", labelKey: "form.option.frequencia_presencial.1x" },
+  { id: "2x", labelKey: "form.option.frequencia_presencial.2x" },
+];
+
+const localizacaoPresencialOptions = [
+  { id: "crossfit_4475", labelKey: "form.option.localizacao_presencial.crossfit_4475" },
+  { id: "templo_fitness", labelKey: "form.option.localizacao_presencial.templo_fitness" },
+];
+
 export const steps = [
   {
     id: "dados_basicos",
@@ -84,10 +94,32 @@ export const steps = [
   },
 
   {
-    id: "treino_geral",
-    titleKey: "form.step.treino_geral.title",
+    id: "modalidade_treino",
+    titleKey: "form.step.modalidade_treino.title",
     // General-training branch: shown when gestação/pós-parto was NOT selected.
+    // Forks the branch into an online and a presencial question set (issue #50).
     condition: (answers) => !selectedGestacaoPosparto(answers),
+    fields: [
+      {
+        id: "modalidade_treino",
+        type: "radio",
+        required: true,
+        labelKey: "form.field.modalidade_treino",
+        options: [
+          { id: "online", labelKey: "form.option.modalidade_treino.online" },
+          { id: "presencial", labelKey: "form.option.modalidade_treino.presencial" },
+        ],
+      },
+    ],
+  },
+
+  {
+    id: "treino_geral_online",
+    titleKey: "form.step.treino_geral_online.title",
+    // Online sub-branch — the original issue #7 question set, unchanged.
+    // (Renamed from `treino_geral` in #50 — one-off, step unshipped.)
+    condition: (answers) =>
+      !selectedGestacaoPosparto(answers) && answers.modalidade_treino === "online",
     fields: [
       {
         id: "onde_treina",
@@ -122,10 +154,37 @@ export const steps = [
   },
 
   {
+    id: "treino_geral_presencial",
+    titleKey: "form.step.treino_geral_presencial.title",
+    // Presencial sub-branch — distinct, smaller question set (issue #50).
+    condition: (answers) =>
+      !selectedGestacaoPosparto(answers) && answers.modalidade_treino === "presencial",
+    fields: [
+      {
+        id: "frequencia_presencial",
+        type: "radio",
+        required: true,
+        labelKey: "form.field.frequencia_presencial",
+        options: frequenciaPresencialOptions,
+      },
+      {
+        id: "localizacao_presencial",
+        type: "radio",
+        required: true,
+        labelKey: "form.field.localizacao_presencial",
+        options: localizacaoPresencialOptions,
+      },
+      { id: "disponibilidade_presencial", type: "text", required: true, labelKey: "form.field.disponibilidade_presencial" },
+      { id: "nota_contacto_equipa", type: "note", textKey: "form.note.contacto_equipa" },
+    ],
+  },
+
+  {
     id: "comprometimento",
     titleKey: "form.step.comprometimento.title",
-    // Own step in the general-training branch (issue #45) — same condition as
-    // treino_geral so it appears/disappears with that branch.
+    // Own step in the general-training branch (issue #45). Both the online and
+    // presencial sub-branches (issue #50) converge here — condition is the plain
+    // general-branch negation, independent of `modalidade_treino`.
     condition: (answers) => !selectedGestacaoPosparto(answers),
     fields: [
       {

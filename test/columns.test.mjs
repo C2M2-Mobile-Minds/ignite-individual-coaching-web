@@ -49,7 +49,7 @@ test("serializeCell: strings pass through", () => {
 
 // --- columns / tabs --------------------------------------------------------
 
-test("columnsFor(geral): submitted_at first, then dados_basicos, then treino_geral ids", () => {
+test("columnsFor(geral): submitted_at, dados_basicos, modalidade + both sub-branches, comprometimento", () => {
   assert.deepEqual(columnsFor("geral"), [
     "submitted_at",
     "nome",
@@ -58,10 +58,14 @@ test("columnsFor(geral): submitted_at first, then dados_basicos, then treino_ger
     "como_chegou",
     "como_chegou_outro",
     "objetivo_treino",
+    "modalidade_treino",
     "onde_treina",
     "dificuldade_atual",
     "frequencia_treino",
     "orientacao_nutricional",
+    "frequencia_presencial",
+    "localizacao_presencial",
+    "disponibilidade_presencial",
     "comprometimento",
   ]);
 });
@@ -107,6 +111,7 @@ test("rowFor(geral): values in column order, serialized", () => {
     email: "ana@example.com",
     como_chegou: ["redes_sociais", "fisioterapia"],
     objetivo_treino: ["ganho_massa"],
+    modalidade_treino: "online",
     onde_treina: "casa",
     dificuldade_atual: "tempo",
     frequencia_treino: "2_3x",
@@ -121,10 +126,14 @@ test("rowFor(geral): values in column order, serialized", () => {
     "redes_sociais, fisioterapia",
     "", // como_chegou_outro absent
     "ganho_massa",
+    "online",
     "casa",
     "tempo",
     "2_3x",
     "nao",
+    "", // frequencia_presencial absent (online path)
+    "", // localizacao_presencial absent
+    "", // disponibilidade_presencial absent
     "sim",
   ]);
 });
