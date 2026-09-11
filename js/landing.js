@@ -11,7 +11,7 @@ import { t } from "./i18n.js";
 export function renderLanding(onStart) {
   const root = document.getElementById("form-root");
   root.replaceChildren();
-  root.classList.add("step-enter");
+  root.classList.add("step-enter-fwd");
 
   const view = document.createElement("div");
   view.className = "landing";

@@ -140,20 +140,25 @@ label,
 }
 
 /* Entrance animation — only when the step actually changes (renderStep adds
-   .step-enter). Intra-step re-renders (radio / checkbox toggles) skip it so
-   the page doesn't blink on every click. */
-#form-root.step-enter > * {
-  animation: fadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+   .step-enter-fwd / .step-enter-back depending on nav direction). Intra-step
+   re-renders (radio / checkbox toggles) skip it so the page doesn't blink on
+   every click. Forward slides in from the right, back from the left — same
+   left/right convention as iOS/Android step navigation. */
+#form-root.step-enter-fwd > * {
+  animation: slideInFwd 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+#form-root.step-enter-back > * {
+  animation: slideInBack 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-@keyframes fadeUp {
+@keyframes slideInFwd {
   from {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateX(24px);
   }
   to {
     opacity: 1;
-    /* `none`, not translateY(0): with animation-fill-mode: both the end state
+    /* `none`, not translateX(0): with animation-fill-mode: both the end state
        lingers, and any real transform value keeps each field a separate
        stacking context — which would trap the country dropdown behind the
        fields that follow it in the DOM. */
@@ -161,8 +166,20 @@ label,
   }
 }
 
+@keyframes slideInBack {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  #form-root.step-enter > * {
+  #form-root.step-enter-fwd > *,
+  #form-root.step-enter-back > * {
     animation: none;
   }
 }

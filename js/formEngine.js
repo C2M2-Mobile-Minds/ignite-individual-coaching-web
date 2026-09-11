@@ -437,8 +437,13 @@ function navButton(labelKey, onClick, disabled = false) {
 // (radio / checkbox toggles re-render the whole step).
 let lastRenderedStepId = null;
 
-// Drop `.step-enter` once the entrance animation has played. While the class
-// is on #form-root, `#form-root.step-enter > *` keeps `animation: fadeUp`
+// "fwd" or "back" — which way the user is navigating, set by goNext/goSubmit/
+// startForm/init ("fwd") and goBack ("back"). renderStep() reads it to pick
+// the matching entrance animation (slide-from-right vs slide-from-left).
+let navDirection = "fwd";
+
+// Drop the entrance class once the animation has played. While it's on
+// #form-root, `#form-root.step-enter-* > *` keeps a slide animation
 // *declared* on every field, and a still-declared transform animation makes
 // each field its own stacking context / composited layer in Chrome — which
 // traps the country dropdown behind the fields that follow it, regardless of
@@ -446,7 +451,7 @@ let lastRenderedStepId = null;
 function clearEntranceAnimation(root) {
   root.addEventListener(
     "animationend",
-    () => root.classList.remove("step-enter"),
+    () => root.classList.remove("step-enter-fwd", "step-enter-back"),
     { once: true },
   );
 }
@@ -461,8 +466,10 @@ export function renderStep() {
   const { answers, currentStepId } = state;
   const step = steps.find((s) => s.id === currentStepId);
 
-  root.classList.toggle("step-enter", currentStepId !== lastRenderedStepId);
-  if (root.classList.contains("step-enter")) clearEntranceAnimation(root);
+  const stepChanged = currentStepId !== lastRenderedStepId;
+  root.classList.toggle("step-enter-fwd", stepChanged && navDirection !== "back");
+  root.classList.toggle("step-enter-back", stepChanged && navDirection === "back");
+  if (stepChanged) clearEntranceAnimation(root);
   lastRenderedStepId = currentStepId;
 
   const totalSteps = visibleSteps(answers).length;
@@ -519,7 +526,7 @@ export function renderConfirmation(status) {
   const root = document.getElementById("form-root");
   root.replaceChildren();
   applyTheme(state.answers); // keep the terminal screen on-theme
-  root.classList.add("step-enter"); // the terminal screen always animates in
+  root.classList.add("step-enter-fwd"); // the terminal screen always animates in
   clearEntranceAnimation(root);
   lastRenderedStepId = null;
 
@@ -590,6 +597,7 @@ export function goNext() {
   const next = nextVisibleStep(state.answers, state.currentStepId);
   if (next) {
     state.errors.clear();
+    navDirection = "fwd";
     state.currentStepId = next.id;
     renderStep();
   }
@@ -599,6 +607,7 @@ export function goBack() {
   const prev = prevVisibleStep(state.answers, state.currentStepId);
   if (prev) {
     state.errors.clear();
+    navDirection = "back";
     state.currentStepId = prev.id;
     renderStep();
   }
@@ -607,6 +616,7 @@ export function goBack() {
 /** Reveal the header logo and render the first form step (landing CTA target). */
 export function startForm() {
   document.querySelector(".page-header")?.removeAttribute("hidden");
+  navDirection = "fwd";
   renderStep();
 }
 
@@ -614,6 +624,8 @@ export function startForm() {
 export async function init() {
   await loadLocale("pt-PT");
   document.title = t("app.title");
+  navDirection = "fwd";
+  lastRenderedStepId = null;
   applyTheme({}); // explicit neutral reset (matters on re-init, e.g. in tests)
   document.querySelector(".page-header")?.setAttribute("hidden", "");
   renderLanding(startForm);
