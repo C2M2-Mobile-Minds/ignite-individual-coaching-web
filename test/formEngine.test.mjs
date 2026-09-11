@@ -36,6 +36,8 @@ const {
   renderField,
   renderConfirmation,
   goSubmit,
+  goNext,
+  goBack,
   nextVisibleStep,
   prevVisibleStep,
   currentStepIndex,
@@ -161,7 +163,10 @@ test("progress total and fill follow the visible branch", () => {
   assert.equal(root().querySelector(".progress-fill").style.width, "100%");
 });
 
-test("#form-root gets .step-enter only when the step changes", () => {
+const hasEntranceClass = () =>
+  root().classList.contains("step-enter-fwd") || root().classList.contains("step-enter-back");
+
+test("#form-root gets a step-enter-* class only when the step changes", () => {
   // Prime from a known step so the first assertion doesn't depend on
   // whatever step a previous test last rendered.
   state.currentStepId = "dados_basicos";
@@ -170,28 +175,47 @@ test("#form-root gets .step-enter only when the step changes", () => {
   state.answers = { objetivo_treino: ["gestacao_posparto"] };
   state.currentStepId = "fase_gestacao";
   renderStep(); // step changed -> animate
-  assert.ok(root().classList.contains("step-enter"));
+  assert.ok(hasEntranceClass());
 
   renderStep(); // same step (e.g. after a radio toggle) -> no entrance replay
-  assert.ok(!root().classList.contains("step-enter"));
+  assert.ok(!hasEntranceClass());
 
   state.currentStepId = "dados_basicos";
   renderStep(); // step changed again -> animate
-  assert.ok(root().classList.contains("step-enter"));
+  assert.ok(hasEntranceClass());
 });
 
-test("#form-root drops .step-enter once the entrance animation ends", () => {
-  // While the class lingers, `animation: fadeUp` stays declared on every field
-  // and makes each its own stacking context in Chrome — trapping the country
-  // dropdown behind later fields. It must clear on animationend.
+test("#form-root drops its step-enter-* class once the entrance animation ends", () => {
+  // While the class lingers, the slide animation stays declared on every
+  // field and makes each its own stacking context in Chrome — trapping the
+  // country dropdown behind later fields. It must clear on animationend.
   state.currentStepId = "treino_geral_online";
   renderStep();
   state.currentStepId = "dados_basicos";
   renderStep();
-  assert.ok(root().classList.contains("step-enter"));
+  assert.ok(hasEntranceClass());
 
   root().dispatchEvent(new window.Event("animationend"));
-  assert.ok(!root().classList.contains("step-enter"));
+  assert.ok(!hasEntranceClass());
+});
+
+test("goBack plays the back-direction entrance, goNext plays the forward one", () => {
+  state.answers = {
+    nome: "Ana",
+    contacto_telefonico: "+351 912345678",
+    email: "ana@example.com",
+    como_chegou: ["redes_sociais"],
+    objetivo_treino: ["ganho_massa"],
+    modalidade_treino: "online",
+  };
+  state.currentStepId = "dados_basicos";
+  renderStep();
+
+  goNext();
+  assert.ok(root().classList.contains("step-enter-fwd"));
+
+  goBack();
+  assert.ok(root().classList.contains("step-enter-back"));
 });
 
 test("radio/checkbox options render as .option-button rows with a check mark", () => {
