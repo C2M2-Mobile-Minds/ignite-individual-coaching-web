@@ -57,16 +57,8 @@ test("treino_geral_presencial step exposes its field ids in order", () => {
   const answers = { objetivo_treino: ["ganho_massa"], modalidade_treino: "presencial" };
   assert.deepEqual(
     visibleFields(stepById.treino_geral_presencial, answers).map((f) => f.id),
-    ["frequencia_presencial", "localizacao_presencial", "disponibilidade_presencial", "nota_contacto_equipa"],
+    ["frequencia_presencial", "localizacao_presencial", "disponibilidade_presencial"],
   );
-});
-
-test("treino_geral_presencial closing note is a read-only `note` field", () => {
-  const nota = stepById.treino_geral_presencial.fields.find((f) => f.id === "nota_contacto_equipa");
-  assert.equal(nota.type, "note");
-  assert.ok(!nota.required);
-  assert.equal(nota.labelKey, undefined);
-  assert.ok(locale[nota.textKey], `missing locale key ${nota.textKey}`);
 });
 
 test("every modalidade / presencial labelKey resolves in pt-PT.json", () => {
@@ -120,16 +112,8 @@ test("gestacao step exposes the issue #9 field ids in order", () => {
   const answers = { objetivo_treino: ["gestacao_posparto"], fase: "gestacao" };
   assert.deepEqual(
     visibleFields(stepById.gestacao, answers).map((f) => f.id),
-    ["fisio_pelvica", "semanas_gravidez", "historial_risco", "preferencia_local", "disponibilidade_horario", "nota_contacto"],
+    ["fisio_pelvica", "semanas_gravidez", "historial_risco", "preferencia_local", "disponibilidade_horario"],
   );
-});
-
-test("gestacao closing note is a read-only `note` field, not a control", () => {
-  const nota = stepById.gestacao.fields.find((f) => f.id === "nota_contacto");
-  assert.equal(nota.type, "note");
-  assert.ok(!nota.required);
-  assert.equal(nota.labelKey, undefined);
-  assert.ok(locale[nota.textKey], `missing locale key ${nota.textKey}`);
 });
 
 test("every gestacao labelKey / textKey (field + option) resolves in pt-PT.json", () => {
@@ -154,17 +138,8 @@ test("posparto step exposes the issue #10 field ids in order", () => {
     [
       "tipo_parto", "complicacoes_parto", "acomp_exercicio_gravidez", "acomp_fisio_gravidez",
       "tempo_posparto", "primeira_consulta_posparto", "preferencia_local", "disponibilidade_horario",
-      "nota_contacto",
     ],
   );
-});
-
-test("posparto closing note is a read-only `note` field, not a control", () => {
-  const nota = stepById.posparto.fields.find((f) => f.id === "nota_contacto");
-  assert.equal(nota.type, "note");
-  assert.ok(!nota.required);
-  assert.equal(nota.labelKey, undefined);
-  assert.ok(locale[nota.textKey], `missing locale key ${nota.textKey}`);
 });
 
 test("every posparto labelKey / textKey (field + option) resolves in pt-PT.json", () => {
