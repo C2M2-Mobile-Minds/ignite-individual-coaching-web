@@ -16,13 +16,11 @@ export function renderLanding(onStart) {
   const view = document.createElement("div");
   view.className = "landing";
 
-  // --- Placeholder assets ---------------------------------------------------
-  // Final logotype + neutral palette/fonts pending from client (issue #47).
-  // Swap `img/ignite.png` and the `.landing*` tokens in css/main.css when they
-  // land; markup/keys stay as-is.
+  // Landing always renders pre-objetivo_treino, so it always shows the green
+  // logo — formEngine.js's setLogo() keeps it in sync afterwards too.
   const logo = document.createElement("img");
   logo.className = "landing-logo";
-  logo.src = "img/ignite.png";
+  logo.src = "img/ignite-green.png";
   logo.alt = t("app.title");
 
   const tagline = document.createElement("p");

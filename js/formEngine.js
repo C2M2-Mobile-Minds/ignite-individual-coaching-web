@@ -16,7 +16,7 @@ import { steps, visibleSteps, visibleFields } from "./formSchema.js";
 import { EEA_COUNTRIES, DEFAULT_DIAL_CODE, parsePhone, combinePhone } from "./countries.js";
 import { submitForm } from "./submit.js";
 import { renderLanding } from "./landing.js";
-import { applyTheme } from "./theme.js";
+import { applyTheme, applyNeutralTheme, logoForAnswers } from "./theme.js";
 
 /** The single source of truth for what the user has entered and where they are. */
 export const state = {
@@ -456,12 +456,40 @@ function clearEntranceAnimation(root) {
   );
 }
 
+// Favicon <link> elements that swap with the theme, by their index.html id ->
+// the filename (inside img/favicons/<variant>/) each one points to.
+const FAVICON_LINKS = {
+  "favicon-svg": "favicon.svg",
+  "favicon-96": "favicon-96x96.png",
+  "favicon-ico": "favicon.ico",
+  "favicon-apple": "apple-touch-icon.png",
+  "favicon-manifest": "site.webmanifest",
+};
+
+/** Point the header/landing logo `<img>` and the favicon `<link>`s at the
+ * green/pink variant matching `variant` ("green" | "pink"). */
+function setBrandAssets(variant) {
+  const logoSrc = `img/ignite-${variant}.png`;
+  document.getElementById("header-logo")?.setAttribute("src", logoSrc);
+  document.querySelector(".landing-logo")?.setAttribute("src", logoSrc);
+
+  for (const [id, file] of Object.entries(FAVICON_LINKS)) {
+    document.getElementById(id)?.setAttribute("href", `img/favicons/${variant}/${file}`);
+  }
+}
+
 /** Clear #form-root and render the current step: title, fields, nav row. */
 export function renderStep() {
   const root = document.getElementById("form-root");
   root.replaceChildren();
   // Theme the steps AFTER dados_basicos; landing + dados_basicos stay neutral.
-  applyTheme(state.currentStepId === "dados_basicos" ? {} : state.answers);
+  if (state.currentStepId === "dados_basicos") {
+    applyNeutralTheme();
+    setBrandAssets("green");
+  } else {
+    applyTheme(state.answers);
+    setBrandAssets(logoForAnswers(state.answers));
+  }
 
   const { answers, currentStepId } = state;
   const step = steps.find((s) => s.id === currentStepId);
@@ -525,7 +553,9 @@ export function renderStep() {
 export function renderConfirmation(status) {
   const root = document.getElementById("form-root");
   root.replaceChildren();
-  applyTheme(state.answers); // keep the terminal screen on-theme
+  applyTheme(state.answers, undefined, { confirmation: true }); // keep the terminal screen on-theme
+  setBrandAssets(logoForAnswers(state.answers));
+  document.querySelector(".page-header")?.setAttribute("hidden", ""); // logo shows below the message instead
   root.classList.add("step-enter-fwd"); // the terminal screen always animates in
   clearEntranceAnimation(root);
   lastRenderedStepId = null;
@@ -547,6 +577,14 @@ export function renderConfirmation(status) {
     );
     root.append(el("div", { className: "nav" }, [retry]));
   }
+
+  // Logo always last — below the message and (on error) the retry button.
+  const logo = el("img", {
+    className: "confirmation-logo",
+    src: `img/ignite-${logoForAnswers(state.answers)}.png`,
+    alt: "",
+  });
+  root.append(logo);
 }
 
 /**
@@ -626,7 +664,8 @@ export async function init() {
   document.title = t("app.title");
   navDirection = "fwd";
   lastRenderedStepId = null;
-  applyTheme({}); // explicit neutral reset (matters on re-init, e.g. in tests)
+  applyNeutralTheme(); // explicit neutral reset (matters on re-init, e.g. in tests)
   document.querySelector(".page-header")?.setAttribute("hidden", "");
   renderLanding(startForm);
+  setBrandAssets("green");
 }

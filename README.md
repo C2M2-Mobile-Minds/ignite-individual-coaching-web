@@ -46,7 +46,7 @@ ignite-individual-coaching-web/
 │   ├── formEngine.js      # renders current step from schema, handles forward/back nav + validation
 │   ├── countries.js       # EU/EEA dial codes + parse/combine helpers for the phone field
 │   ├── i18n.js            # loads locale JSON, exposes t('key') helper
-│   ├── theme.js           # gestacao_posparto palette (bg + accent) + applyTheme (CSS custom props)
+│   ├── theme.js           # neutral/default/gestacao_posparto palettes + applyTheme/applyNeutralTheme (CSS custom props)
 │   └── submit.js          # POSTs final payload to the serverless function
 ├── locales/
 │   └── pt-PT.json
@@ -66,9 +66,11 @@ ignite-individual-coaching-web/
 
 ## Form flow
 
-Before the form, a neutral landing screen (`js/landing.js`, copy under `landing.*` in `pt-PT.json`) shows a centered logotype, the intro message, and a "Começar" CTA. It collects no answers, so it lives outside `formSchema.js`; clicking the CTA swaps it for Página 1 with no page reload. The header logo is hidden until then.
+Before the form, a landing screen (`js/landing.js`, copy under `landing.*` in `pt-PT.json`) shows a centered logotype, the intro message, and a "Começar" CTA. It collects no answers, so it lives outside `formSchema.js`; clicking the CTA swaps it for Página 1 with no page reload. The header logo is hidden until then.
 
-From the step **after** `dados_basicos` onward (and the confirmation screen), the page takes a distinct palette **only when `objetivo_treino` includes "Gestação e pós-parto"** — any other objective selection (single or multiple) keeps the default. `js/theme.js` holds the config (`THEME_BY_OBJETIVO`, currently just the `gestacao_posparto` entry) and `applyTheme` writes the palette — background plus accent — onto `:root` as CSS custom properties (`--bg`, `--accent`, `--accent-bright`, `--accent-hover`, `--accent-soft`). The landing screen and `dados_basicos` itself always render neutral (default green / black). Palettes are placeholders until the client delivers finals — only `theme.js` changes then (add more option-id entries there to theme other objectives).
+The landing screen and `dados_basicos` always render on `NEUTRAL_THEME` (`#F2F0EB` background, dark text, green logo) via `applyNeutralTheme()` — this is fixed, not answer-driven. From the step **after** `dados_basicos` onward, the page takes a distinct palette **only when `objetivo_treino` includes "Gestação e pós-parto"** (`#CA9A8E` background, pink logo) — any other objective selection (single or multiple) keeps `DEFAULT_THEME` (`#899064` background, green logo). The confirmation screen uses its own background per theme (`confirmationBg`: `#EAA794` gestação / `#899064` default) rather than the preceding step's. `js/theme.js` is the single source for all of this (`NEUTRAL_THEME`, `DEFAULT_THEME`, `THEME_BY_OBJETIVO`) — `applyTheme`/`applyNeutralTheme` write the palette onto `:root` as CSS custom properties (`--bg`, `--bg-accent`, `--text`, `--accent`, `--accent-bright`, `--accent-hover`, `--accent-soft`), and `logoForAnswers`/`setLogo` (in `formEngine.js`) swap the header/landing `<img>` between `img/ignite-green.png` and `img/ignite-pink.png`. Add more option-id entries to `THEME_BY_OBJETIVO` to theme other objectives.
+
+Typography: Playfair Display for every step/screen title, Lora for everything else (labels, questions, body copy, buttons) — set via `--font-display` / `--font-body` / `--font-cond` in `css/main.css`.
 
 The form is schema-driven: each step is a data object with an optional `condition` function that decides whether it's shown, based on answers collected so far. The schema below mirrors this flowchart exactly — there is no separate page per branch, just conditional steps evaluated at runtime.
 

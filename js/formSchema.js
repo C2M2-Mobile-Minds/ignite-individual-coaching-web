@@ -175,7 +175,6 @@ export const steps = [
         options: localizacaoPresencialOptions,
       },
       { id: "disponibilidade_presencial", type: "text", required: true, labelKey: "form.field.disponibilidade_presencial" },
-      { id: "nota_contacto_equipa", type: "note", textKey: "form.note.contacto_equipa" },
     ],
   },
 
@@ -238,7 +237,6 @@ export const steps = [
         options: preferenciaLocalOptions,
       },
       { id: "disponibilidade_horario", type: "text", required: true, labelKey: "form.field.disponibilidade_horario" },
-      { id: "nota_contacto", type: "note", textKey: "form.note.contacto_treinadora" },
     ],
   },
 
@@ -288,7 +286,6 @@ export const steps = [
         options: preferenciaLocalOptions,
       },
       { id: "disponibilidade_horario", type: "text", required: true, labelKey: "form.field.disponibilidade_horario" },
-      { id: "nota_contacto", type: "note", textKey: "form.note.contacto_treinadora" },
     ],
   },
 ];

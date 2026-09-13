@@ -47,7 +47,7 @@ const {
 
 const { steps } = await import("../js/formSchema.js");
 const { t } = await import("../js/i18n.js");
-const { DEFAULT_THEME, THEME_BY_OBJETIVO } = await import("../js/theme.js");
+const { DEFAULT_THEME, NEUTRAL_THEME, THEME_BY_OBJETIVO } = await import("../js/theme.js");
 const stepById = (id) => steps.find((s) => s.id === id);
 
 before(async () => {
@@ -283,7 +283,7 @@ test("treino_geral_presencial validation: 3 required errors when empty, none whe
   assert.deepEqual(validateStep(step, filled), []);
 });
 
-test("treino_geral_presencial renders its controls + read-only note, no unresolved keys", () => {
+test("treino_geral_presencial renders its controls, no unresolved keys", () => {
   state.answers = { objetivo_treino: ["ganho_massa"], modalidade_treino: "presencial" };
   state.currentStepId = "treino_geral_presencial";
   renderStep();
@@ -291,10 +291,9 @@ test("treino_geral_presencial renders its controls + read-only note, no unresolv
   assert.equal(root().querySelectorAll('input[type="radio"][name="frequencia_presencial"]').length, 2);
   assert.equal(root().querySelectorAll('input[type="radio"][name="localizacao_presencial"]').length, 2);
   assert.equal(root().querySelector("input#disponibilidade_presencial").type, "text");
-  assert.ok(root().querySelector("p.note"), "closing note rendered");
+  assert.ok(!root().querySelector("p.note"), "no note rendered");
   assert.ok(!root().querySelector('[name="onde_treina"]'), "no online-only field");
   assert.ok(!root().textContent.includes("form.field."), "unresolved locale key rendered");
-  assert.ok(!root().textContent.includes("form.note."), "unresolved note key rendered");
 });
 
 test("modalidade_treino step renders the online/presencial radio and validates required", () => {
@@ -358,7 +357,7 @@ test("bare checkbox field (no options) renders a single box wired to a boolean a
   assert.equal(state.answers._bare, true);
 });
 
-test("posparto renders all eight controls plus the read-only closing note", () => {
+test("posparto renders all eight controls, no note", () => {
   state.answers = { objetivo_treino: ["gestacao_posparto"], fase: "posparto" };
   state.currentStepId = "posparto";
   renderStep();
@@ -369,10 +368,7 @@ test("posparto renders all eight controls plus the read-only closing note", () =
   ]) {
     assert.ok(root().querySelector(`#${id}, [name="${id}"]`), `no control rendered for ${id}`);
   }
-  const note = root().querySelector("p.note");
-  assert.ok(note);
-  assert.ok(note.textContent.startsWith("Será contactada por parte da treinadora"));
-  assert.equal(root().querySelectorAll('[name="nota_contacto"]').length, 0);
+  assert.ok(!root().querySelector("p.note"), "no note rendered");
   assert.ok(!root().textContent.includes("form.field."), "unresolved locale key rendered");
 });
 
@@ -395,7 +391,7 @@ test("posparto validation: 8 required errors when empty, none when filled; note 
   assert.deepEqual(validateStep(step, filled), []);
 });
 
-test("gestacao renders all five controls plus the read-only closing note", () => {
+test("gestacao renders all five controls, no note", () => {
   state.answers = { objetivo_treino: ["gestacao_posparto"], fase: "gestacao" };
   state.currentStepId = "gestacao";
   renderStep();
@@ -404,12 +400,7 @@ test("gestacao renders all five controls plus the read-only closing note", () =>
     assert.ok(root().querySelector(`#${id}, [name="${id}"]`), `no control rendered for ${id}`);
   }
   assert.equal(root().querySelectorAll('input[type="radio"][name="preferencia_local"]').length, 2);
-  // The note is plain text, not a form control.
-  const note = root().querySelector("p.note");
-  assert.ok(note);
-  assert.ok(note.textContent.startsWith("Será contactada por parte da treinadora"));
-  assert.equal(root().querySelectorAll('[name="nota_contacto"]').length, 0);
-  assert.ok(!root().textContent.includes("form.note."), "unresolved locale key rendered");
+  assert.ok(!root().querySelector("p.note"), "no note rendered");
 });
 
 test("gestacao validation: 5 required errors when empty, none when filled; note never blocks", () => {
@@ -841,7 +832,6 @@ test("E2E: walk the geral presencial sub-branch button-by-button and submit", as
   assert.equal(title(), "Treino online ou presencial");
   clickAdvance();
   assert.equal(title(), "SOBRE O TREINO (PRESENCIAL)");
-  assert.ok(root().querySelector("p.note"), "presencial step renders the closing note");
   assert.ok(!root().querySelector('[name="onde_treina"]'), "no online-only field");
   clickAdvance();
   assert.equal(title(), "COMPROMISSO");
@@ -867,7 +857,6 @@ test("E2E: walk the gestação branch button-by-button and submit", async () => 
   assert.equal(title(), "Em que fase te encontras");
   clickAdvance();
   assert.equal(title(), "Gestação");
-  assert.ok(root().querySelector("p.note"), "leaf step still renders the closing note");
   assert.equal(buttonByText("Seguinte"), undefined);
   buttonByText("Enviar").click();
   await settle();
@@ -1005,13 +994,13 @@ test("steps after dados_basicos get the gestacao_posparto accent + bg", () => {
   assert.equal(root.getPropertyValue("--bg"), THEME_BY_OBJETIVO.gestacao_posparto.bg);
 });
 
-test("dados_basicos itself stays on the default theme even with gestacao_posparto picked", () => {
+test("dados_basicos itself stays on the neutral theme even with gestacao_posparto picked", () => {
   state.answers = { objetivo_treino: ["gestacao_posparto"] };
   state.currentStepId = "dados_basicos";
   renderStep();
   const root = document.documentElement.style;
-  assert.equal(root.getPropertyValue("--accent"), DEFAULT_THEME.accent);
-  assert.equal(root.getPropertyValue("--bg"), DEFAULT_THEME.bg);
+  assert.equal(root.getPropertyValue("--accent"), NEUTRAL_THEME.accent);
+  assert.equal(root.getPropertyValue("--bg"), NEUTRAL_THEME.bg);
 });
 
 test("a themed step with other objectives (no gestacao_posparto) stays default", () => {
@@ -1034,4 +1023,42 @@ test("clearing gestacao_posparto reverts a themed step to the default", () => {
     document.documentElement.style.getPropertyValue("--accent"),
     DEFAULT_THEME.accent,
   );
+});
+
+test("confirmation screen uses each theme's confirmationBg, not its step bg", () => {
+  state.answers = { objetivo_treino: ["gestacao_posparto"] };
+  renderConfirmation("success");
+  assert.equal(
+    document.documentElement.style.getPropertyValue("--bg"),
+    THEME_BY_OBJETIVO.gestacao_posparto.confirmationBg,
+  );
+
+  state.answers = { objetivo_treino: ["ganho_massa"] };
+  renderConfirmation("success");
+  assert.equal(document.documentElement.style.getPropertyValue("--bg"), DEFAULT_THEME.confirmationBg);
+});
+
+test("header logo swaps green/pink with the theme", () => {
+  document.body.innerHTML =
+    '<header class="page-header"><img id="header-logo" src="img/ignite-green.png" /></header><div id="form-root"></div>';
+
+  state.currentStepId = "dados_basicos";
+  state.answers = { objetivo_treino: ["gestacao_posparto"] };
+  renderStep();
+  assert.match(document.getElementById("header-logo").src, /ignite-green\.png$/);
+
+  state.currentStepId = "gestacao";
+  state.answers = { objetivo_treino: ["gestacao_posparto"], fase: "gestacao" };
+  renderStep();
+  assert.match(document.getElementById("header-logo").src, /ignite-pink\.png$/);
+
+  state.currentStepId = "treino_geral_online";
+  state.answers = { objetivo_treino: ["ganho_massa"], modalidade_treino: "online" };
+  renderStep();
+  assert.match(document.getElementById("header-logo").src, /ignite-green\.png$/);
+
+  renderConfirmation("success");
+  assert.match(document.getElementById("header-logo").src, /ignite-green\.png$/);
+
+  document.body.innerHTML = '<header class="page-header" hidden></header><div id="form-root"></div>';
 });

@@ -20,14 +20,20 @@ the live Sheet, the notification email).
 > A plain static server (`python -m http.server`) will load the form but the
 > submit call 404s — use `netlify dev` for anything that submits.
 
+## Typography
+
+- [ ] Every step/screen title uses Playfair Display; labels, questions, body
+      copy, and buttons use Lora.
+
 ## Landing screen (all branches)
 
 - [ ] Visiting the site shows the landing screen first, **not** Página 1.
-- [ ] Centered logotype; the header logo above the form is hidden here.
+- [ ] Centered logotype (green mark); the header logo above the form is hidden here.
+- [ ] Background is the light neutral `#F2F0EB`, text dark — legible, not the old dark ground.
 - [ ] Intro message and tagline ("Ignite your true potential") render exactly as
       approved; no raw `landing.*` keys visible.
 - [ ] Clicking **"Começar"** transitions to Página 1 `dados_basicos` with no page
-      reload; the header logo appears.
+      reload; the header logo appears (green mark).
 
 ## Branch 1 — Geral (general training)
 
@@ -37,15 +43,20 @@ Step 1 `dados_basicos` → step 2 `modalidade_treino` → step 3 `treino_geral_o
 - [ ] Step 1: fill `nome`, `contacto_telefonico` (pick a country, type a local number),
       `email`; check one `como_chegou` option; check one `objetivo_treino` option
       that is **not** "Gestação e pós-parto". "Seguinte" advances.
-- [ ] **Theming**: Página 1 (`dados_basicos`) always stays neutral (black ground,
-      green accent) regardless of `objetivo_treino` selection.
+- [ ] **Theming**: Página 1 (`dados_basicos`) always stays on the light neutral
+      theme (`#F2F0EB` ground, green mark) regardless of `objetivo_treino` selection.
 - [ ] **Theming**: selecting only non-"Gestação e pós-parto" objectives (one or
-      several) leaves every later step on the default theme too.
+      several) leaves every later step on the default olive-green theme (`#899064`,
+      green mark) too.
 - [ ] **Theming**: when `objetivo_treino` **includes "Gestação e pós-parto"**,
-      the steps after Página 1 (fase / gestação / pós-parto) and the confirmation
-      screen switch to the gestação palette — background + accent (progress bar,
-      labels, option highlight, nav button, hover states). Going "Voltar" to
-      Página 1 shows neutral again.
+      the steps after Página 1 (fase / gestação / pós-parto) switch to the
+      gestação palette (`#CA9A8E` ground) — background + accent (progress bar,
+      labels, option highlight, nav button, hover states) — and the header logo
+      swaps to the pink mark. Going "Voltar" to Página 1 shows the neutral theme
+      and green logo again.
+- [ ] **Theming**: the confirmation screen uses its own background — `#EAA794`
+      (gestação) or `#899064` (every other selection) — not the same shade as the
+      preceding step; logo matches (pink/green).
 - [ ] Step 2 title "Treino online ou presencial"; single radio `modalidade_treino`
       (Online / Presencial). "Seguinte" advances.
 - [ ] **Online path**: step 3 title "SOBRE O TREINO (ONLINE)"; 4 controls: `onde_treina`
@@ -53,8 +64,8 @@ Step 1 `dados_basicos` → step 2 `modalidade_treino` → step 3 `treino_geral_o
       `orientacao_nutricional` (Sim/Não). No presencial-only field present.
 - [ ] **Presencial path**: step 3 title "SOBRE O TREINO (PRESENCIAL)"; 3 controls:
       `frequencia_presencial` (1x/2x semana), `localizacao_presencial` (CrossFit 4475 /
-      Templo Fitness Estúdio), `disponibilidade_presencial` (text), then a read-only
-      note "Será contactado(a) por um elemento da equipa." No `onde_treina` field.
+      Templo Fitness Estúdio), `disponibilidade_presencial` (text). No trailing note
+      (removed). No `onde_treina` field.
 - [ ] "Voltar" from either step 3 returns to "Treino online ou presencial" with the
       previous selection still checked.
 - [ ] Step 4 title "COMPROMISSO"; single control `comprometimento` (Sim/Não) alone
@@ -82,8 +93,7 @@ Step 1 → `fase_gestacao` (fase = Gestação) → `gestacao` → submit.
 - [ ] `fase_gestacao`: 2-option radio (Gestação / Pós-parto). Pick **Gestação**.
 - [ ] `gestacao` step: `fisio_pelvica` (Sim/Não), `semanas_gravidez` (text),
       `historial_risco` (text), `preferencia_local` (CrossFit 4475 / Templo Fitness),
-      `disponibilidade_horario` (text), then a read-only note ("Será contactada por
-      parte da treinadora…") that is **not** a form control.
+      `disponibilidade_horario` (text). No trailing note (removed).
 - [ ] Last step shows "Enviar". Submit → success screen.
 - [ ] **Gestação-Pós-parto tab** gets one row, 19 columns:
       `submitted_at, nome, contacto_telefonico, email, como_chegou, como_chegou_outro,
@@ -104,7 +114,7 @@ Step 1 → `fase_gestacao` (fase = Pós-parto) → `posparto` → submit.
       `complicacoes_parto` (text), `acomp_exercicio_gravidez` (Sim/Não),
       `acomp_fisio_gravidez` (Sim/Não), `tempo_posparto` (text),
       `primeira_consulta_posparto` (Sim/Não), `preferencia_local`,
-      `disponibilidade_horario` (text), then the same read-only note.
+      `disponibilidade_horario` (text). No trailing note (removed).
 - [ ] Submit → success screen.
 - [ ] **Gestação-Pós-parto tab** row: `fase` = `posparto`; the **gestação-only**
       columns `fisio_pelvica`, `semanas_gravidez`, `historial_risco` **blank**;

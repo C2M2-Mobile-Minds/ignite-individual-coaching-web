@@ -1,6 +1,6 @@
-/* Ignite Individual Coaching — dark brand reskin.
-   Design system lifted from the reference site (c2m2-mobile-minds.github.io/ignite):
-   black ground, green accent, Bebas Neue / Barlow / Barlow Condensed, zero radius.
+/* Ignite Individual Coaching — light brand reskin.
+   Typography: Playfair Display for titles, Lora for everything else (labels,
+   questions, body copy, buttons).
 
    Mobile-first: base rules target a 360px phone. Two up-queries scale it —
    `min-width: 600px` (large phone / small tablet: type + control sizing step up)
@@ -8,14 +8,16 @@
    There are deliberately no max-width queries. */
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 
-  --bg: #000;
-  --surface: #121212;
-  --surface-2: #151515;
-  --text: #f2f2f0;
-  --text-dim: #b0b0b0;
-  --text-faint: #555;
+  --bg: #f2f0eb;
+  /* Input/control surfaces sit on top of the flat --bg fill, so they need to
+     read as a distinct layer now that the page is light. */
+  --surface: #fff;
+  --surface-2: #f7f5f0;
+  --text: #899064;
+  --text-dim: #6b6b5e;
+  --text-faint: #9a978c;
 
   --green: #4a783a;
   --green-bright: #6aaa55;
@@ -28,18 +30,18 @@
   --accent-bright: var(--green-bright);
   --accent-hover: var(--green-hover);
   --accent-soft: rgba(74, 120, 58, 0.16);
-  /* Lower stop of the page background gradient; top stop is always #000 so the
-     black header blends in. Equal to #000 by default (flat black). */
-  --bg-accent: #000;
+  /* Lower stop of the page background gradient; equal to --bg by default so
+     the page is a flat fill (js/theme.js keeps both equal on every theme). */
+  --bg-accent: #f2f0eb;
 
-  --hairline: rgba(255, 255, 255, 0.07);
-  --border: rgba(255, 255, 255, 0.16);
+  --hairline: rgba(0, 0, 0, 0.08);
+  --border: rgba(0, 0, 0, 0.18);
 
-  --error: #ff6b6b;
+  --error: #c23b3b;
 
-  --font-body: Barlow, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-cond: "Barlow Condensed", var(--font-body);
-  --font-display: "Bebas Neue", var(--font-cond);
+  --font-body: "Lora", Georgia, "Times New Roman", serif;
+  --font-cond: "Lora", var(--font-body);
+  --font-display: "Playfair Display", var(--font-cond);
 }
 
 * {
@@ -56,13 +58,12 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Page ground: black at the very top (under the always-black header), easing
-   into the themed --bg-accent lower down. --bg / --bg-accent are re-themed per
-   objetivo on steps after dados_basicos (js/theme.js); by default both are
-   black, so this is a flat black page. */
+/* Page ground: a flat themed fill (--bg == --bg-accent for every theme in
+   js/theme.js). The always-black header sits opaque on top, so no gradient
+   is needed to blend into it. */
 body {
   background-color: var(--bg);
-  background-image: linear-gradient(180deg, #000 0, #000 140px, var(--bg-accent) 720px);
+  background-image: linear-gradient(180deg, var(--bg) 0, var(--bg-accent) 720px);
   background-repeat: no-repeat;
   transition: background-color 0.35s ease;
 }
@@ -117,16 +118,14 @@ label,
     max(16px, env(safe-area-inset-left));
 }
 
-/* The logo PNG has a solid black backdrop, so the header stays black even when
-   the page is themed — the background gradient starts from #000 to meet it. */
 .page-header {
   padding: 28px 0 4px;
-  background: #000;
+  background: var(--bg);
 }
 
 .logo-frame {
   display: inline-flex;
-  background: #000;
+  background: var(--bg);
 }
 
 .logo-frame img {
@@ -430,9 +429,9 @@ label.option-button {
   font-weight: 400;
   letter-spacing: 0.03em;
   text-transform: none;
-  color: #d8d8d8;
+  color: var(--text-dim);
   background: var(--surface);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--border);
   cursor: pointer;
   transition: border-color 0.18s ease, background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
 }
@@ -576,7 +575,7 @@ label.field > input[type="checkbox"] {
 }
 
 .nav button:first-child:not(:only-child):hover:not([disabled]) {
-  color: #fff;
+  color: var(--text);
   border-color: rgba(74, 120, 58, 0.35);
   background: none;
 }
@@ -601,6 +600,17 @@ label.field > input[type="checkbox"] {
   letter-spacing: 0.04em;
   text-align: center;
   color: var(--text);
+}
+
+.confirmation-logo {
+  display: block;
+  width: 140px;
+  max-width: 50%;
+  height: auto;
+  /* Same gap above the logo as above the retry button (.nav's margin-top),
+     so the spacing reads consistently whether the logo follows the message
+     directly (success) or the retry button (error). */
+  margin: 2rem auto 0;
 }
 
 /* --- Landing screen ---------------------------------------------------------
