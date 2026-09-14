@@ -589,12 +589,11 @@ export function renderConfirmation(status) {
   }
 
   // Logo always last — below the message and (on error) the retry button.
-  // Gestação/pós-parto's confirmation background is dark enough that the
-  // pink logo loses contrast, so that branch uses the white variant here only.
-  const confirmationLogoVariant = logoForAnswers(state.answers) === "pink" ? "white" : logoForAnswers(state.answers);
+  // Both confirmation backgrounds (green and pink) are solid accent colors,
+  // so the green/pink logo variants lose contrast here — always use white.
   const logo = el("img", {
     className: "confirmation-logo",
-    src: `img/ignite-${confirmationLogoVariant}.png`,
+    src: "img/ignite-white.png",
     alt: "",
   });
   root.append(logo);

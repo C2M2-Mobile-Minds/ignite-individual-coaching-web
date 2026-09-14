@@ -38,9 +38,9 @@ test("locked-in palette hex values", () => {
   // Every page is a flat #F2F0EB fill; only text/logo vary by branch, except
   // the gestação confirmation screen, which breaks from the fill.
   assert.equal(DEFAULT_THEME.bg, "#F2F0EB");
-  assert.equal(DEFAULT_THEME.confirmationBg, "#F2F0EB");
+  assert.equal(DEFAULT_THEME.confirmationBg, "#899064");
   assert.equal(DEFAULT_THEME.text, "#899064");
-  assert.equal(DEFAULT_THEME.confirmationText, "#899064");
+  assert.equal(DEFAULT_THEME.confirmationText, "#F2F0EB");
   assert.equal(DEFAULT_THEME.logo, "green");
 
   assert.equal(THEME_BY_OBJETIVO.gestacao_posparto.bg, "#F2F0EB");

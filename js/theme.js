@@ -47,8 +47,8 @@ export const DEFAULT_THEME = {
   accentSoft: "rgba(137, 144, 100, 0.16)",
   // Confirmation screen background (and text, for contrast against it) for
   // this theme.
-  confirmationBg: "#F2F0EB",
-  confirmationText: "#899064",
+  confirmationBg: "#899064",
+  confirmationText: "#F2F0EB",
   logo: "green",
 };
 
