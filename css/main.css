@@ -635,7 +635,7 @@ label.field > input[type="checkbox"] {
 .confirmation {
   margin: 2.5rem 0 1.5rem;
   font-family: var(--font-cond);
-  font-size: 1.05rem;
+  font-size: 1.4rem;
   line-height: 1.6;
   letter-spacing: 0.04em;
   text-align: center;
@@ -690,7 +690,7 @@ label.field > input[type="checkbox"] {
   font-size: 1.5rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--accent-bright);
+  color: #899064;
 }
 
 .landing-message {
@@ -700,7 +700,7 @@ label.field > input[type="checkbox"] {
   font-size: 1.05rem;
   line-height: 1.6;
   letter-spacing: 0.02em;
-  color: var(--text-dim);
+  color: #899064;
 }
 
 .landing-cta {
@@ -713,7 +713,7 @@ label.field > input[type="checkbox"] {
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: #fff;
-  background: var(--accent);
+  background: #899064;
   border: none;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
   cursor: pointer;
@@ -721,8 +721,8 @@ label.field > input[type="checkbox"] {
 }
 
 .landing-cta:hover {
-  background: var(--accent-hover);
-  box-shadow: 0 12px 30px rgba(74, 120, 58, 0.35);
+  background: #899064;
+  box-shadow: 0 12px 30px rgba(137, 144, 100, 0.35);
 }
 
 .landing-cta:active {
@@ -762,7 +762,7 @@ label.field > input[type="checkbox"] {
   }
   .confirmation {
     margin: 3rem 0 2rem;
-    font-size: 1.15rem;
+    font-size: 1.6rem;
   }
   .landing-logo {
     width: 260px;

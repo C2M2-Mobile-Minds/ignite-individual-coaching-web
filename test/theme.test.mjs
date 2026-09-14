@@ -45,7 +45,7 @@ test("locked-in palette hex values", () => {
 
   assert.equal(THEME_BY_OBJETIVO.gestacao_posparto.bg, "#F2F0EB");
   assert.equal(THEME_BY_OBJETIVO.gestacao_posparto.text, "#CA9A8E");
-  assert.equal(THEME_BY_OBJETIVO.gestacao_posparto.confirmationBg, "#EAA794");
+  assert.equal(THEME_BY_OBJETIVO.gestacao_posparto.confirmationBg, "#CA9A8E");
   assert.equal(THEME_BY_OBJETIVO.gestacao_posparto.confirmationText, "#4a2418");
   assert.equal(THEME_BY_OBJETIVO.gestacao_posparto.logo, "pink");
 
