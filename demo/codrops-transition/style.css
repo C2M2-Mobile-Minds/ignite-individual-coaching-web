@@ -1,0 +1,254 @@
+:root {
+  --bg: #0f1115;
+  --surface: #1a1d24;
+  --accent: #7c9a5c;
+  --accent-bright: #97b878;
+  --text: #f2f0eb;
+  --text-dim: #9aa0ab;
+  --border: #2a2e37;
+  --radius: 14px;
+  --ease: cubic-bezier(0.7, 0, 0.3, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: radial-gradient(circle at 20% 20%, #1c2029 0%, var(--bg) 60%);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100dvh;
+  padding: 24px;
+  overflow-x: hidden;
+}
+
+/* Codrops-style perspective wrapper: gives 3D depth to the page moves */
+.pt-perspective {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  height: 560px;
+  perspective: 1200px;
+}
+
+.pt-page {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+  pointer-events: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.6);
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+.pt-page-current {
+  visibility: visible;
+  pointer-events: auto;
+  z-index: 2;
+}
+
+.pt-page-inner {
+  height: 100%;
+  padding: 40px 32px;
+  display: flex;
+  flex-direction: column;
+}
+
+.pt-step {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent-bright);
+  font-weight: 600;
+}
+
+.pt-page-inner h1 {
+  font-size: 26px;
+  margin: 10px 0 4px;
+  line-height: 1.2;
+}
+
+.pt-sub {
+  color: var(--text-dim);
+  margin: 0 0 28px;
+  font-size: 14px;
+}
+
+.pt-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 18px;
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.pt-field input,
+.pt-field select,
+.pt-field textarea {
+  font: inherit;
+  font-size: 15px;
+  color: var(--text);
+  background: #12141a;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  resize: none;
+}
+
+.pt-field input:focus,
+.pt-field select:focus,
+.pt-field textarea:focus {
+  outline: none;
+  border-color: var(--accent-bright);
+}
+
+.pt-field-check {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.pt-field-check input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent-bright);
+}
+
+.pt-nav {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pt-btn {
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 12px 26px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s var(--ease), background 0.15s var(--ease);
+}
+
+.pt-btn:active {
+  transform: scale(0.96);
+}
+
+.pt-btn-primary {
+  background: var(--accent-bright);
+  color: #10130d;
+}
+
+.pt-btn-primary:hover {
+  background: var(--accent);
+}
+
+.pt-btn-ghost {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text-dim);
+}
+
+.pt-btn-ghost:hover {
+  color: var(--text);
+  border-color: var(--text-dim);
+}
+
+/* --- MOVE transition (Codrops-style) --- */
+/* Forward (Next): outgoing slides out right, incoming enters from left. */
+/* Backward (Back): outgoing slides out left, incoming enters from right. */
+
+.pt-page-moveToRight,
+.pt-page-moveToLeft {
+  visibility: visible;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.pt-page-moveToRight {
+  animation: moveToRight 0.6s var(--ease) both;
+}
+
+.pt-page-moveToLeft {
+  animation: moveToLeft 0.6s var(--ease) both;
+}
+
+.pt-page-moveFromLeft {
+  animation: moveFromLeft 0.6s var(--ease) both;
+}
+
+.pt-page-moveFromRight {
+  animation: moveFromRight 0.6s var(--ease) both;
+}
+
+@keyframes moveToRight {
+  from {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+  to {
+    transform: translate3d(100%, 0, 0);
+    opacity: 0.4;
+  }
+}
+
+@keyframes moveToLeft {
+  from {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+  to {
+    transform: translate3d(-100%, 0, 0);
+    opacity: 0.4;
+  }
+}
+
+@keyframes moveFromLeft {
+  from {
+    transform: translate3d(-100%, 0, 0);
+    opacity: 0.4;
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes moveFromRight {
+  from {
+    transform: translate3d(100%, 0, 0);
+    opacity: 0.4;
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 520px) {
+  .pt-perspective {
+    height: 620px;
+  }
+
+  .pt-page-inner {
+    padding: 32px 22px;
+  }
+}

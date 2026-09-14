@@ -65,12 +65,32 @@ body {
   background-color: var(--bg);
   background-image: linear-gradient(180deg, var(--bg) 0, var(--bg-accent) 720px);
   background-repeat: no-repeat;
-  transition: background-color 0.35s ease;
+  /* background-image transitions too: modern browsers interpolate a gradient's
+     colour stops when old/new value are structurally the same gradient
+     (same function, same number/position of stops) — true here, only the
+     colours themselves change between themes. */
+  transition: background-color 0.35s ease, background-image 0.35s ease;
+}
+
+/* Theme switch (green <-> pink, js/theme.js) fades text/border/icon colour
+   everywhere instead of hard-cutting. Scoped to the page content rather than
+   `*` globally so it can't fight more specific component transitions (nav
+   buttons, inputs, country picker, etc. already declare their own, faster,
+   interaction transitions and keep winning on specificity). */
+.page,
+.page *,
+.page-header,
+.page-header * {
+  transition: color 0.35s ease, background-color 0.35s ease, border-color 0.35s ease, fill 0.35s ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
   html,
-  body {
+  body,
+  .page,
+  .page *,
+  .page-header,
+  .page-header * {
     transition: none;
   }
 }
@@ -153,7 +173,7 @@ label,
 @keyframes slideInFwd {
   from {
     opacity: 0;
-    transform: translateX(24px);
+    transform: translateX(100%);
   }
   to {
     opacity: 1;
@@ -168,7 +188,7 @@ label,
 @keyframes slideInBack {
   from {
     opacity: 0;
-    transform: translateX(-24px);
+    transform: translateX(-100%);
   }
   to {
     opacity: 1;
@@ -179,6 +199,26 @@ label,
 @media (prefers-reduced-motion: reduce) {
   #form-root.step-enter-fwd > *,
   #form-root.step-enter-back > * {
+    animation: none;
+  }
+}
+
+/* Suppress the browser's default whole-page crossfade for the View Transition
+   above — only the named `brand-logo` element (old logo -> new logo position)
+   should animate; everything else keeps using the existing slide-in. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-group(brand-logo) {
+  animation-duration: 0.6s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(brand-logo) {
     animation: none;
   }
 }
@@ -595,7 +635,7 @@ label.field > input[type="checkbox"] {
 .confirmation {
   margin: 2.5rem 0 1.5rem;
   font-family: var(--font-cond);
-  font-size: 1.05rem;
+  font-size: 1.4rem;
   line-height: 1.6;
   letter-spacing: 0.04em;
   text-align: center;
@@ -626,6 +666,18 @@ label.field > input[type="checkbox"] {
   padding: 2rem 0 1rem;
 }
 
+/* Applied only transiently (by startForm() in js/formEngine.js) around the
+   landing -> step-1 swap, then removed. Same name on both = the browser
+   morphs one into the other (position, size) inside that View Transition,
+   instead of the logo just popping from center to the header's left spot.
+   Left permanently assigned, `view-transition-name` puts #header-logo in its
+   own compositing layer for the rest of the session, which is what caused
+   the small flicker/jump on later, unrelated step changes (Next/Back) —
+   same class of bug as the transform-stacking-context issue noted below. */
+.vt-brand-logo {
+  view-transition-name: brand-logo;
+}
+
 .landing-logo {
   width: 200px;
   max-width: 70%;
@@ -638,7 +690,7 @@ label.field > input[type="checkbox"] {
   font-size: 1.5rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--accent-bright);
+  color: #899064;
 }
 
 .landing-message {
@@ -648,7 +700,7 @@ label.field > input[type="checkbox"] {
   font-size: 1.05rem;
   line-height: 1.6;
   letter-spacing: 0.02em;
-  color: var(--text-dim);
+  color: #899064;
 }
 
 .landing-cta {
@@ -661,7 +713,7 @@ label.field > input[type="checkbox"] {
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: #fff;
-  background: var(--accent);
+  background: #899064;
   border: none;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
   cursor: pointer;
@@ -669,8 +721,8 @@ label.field > input[type="checkbox"] {
 }
 
 .landing-cta:hover {
-  background: var(--accent-hover);
-  box-shadow: 0 12px 30px rgba(74, 120, 58, 0.35);
+  background: #899064;
+  box-shadow: 0 12px 30px rgba(137, 144, 100, 0.35);
 }
 
 .landing-cta:active {
@@ -710,7 +762,7 @@ label.field > input[type="checkbox"] {
   }
   .confirmation {
     margin: 3rem 0 2rem;
-    font-size: 1.15rem;
+    font-size: 1.6rem;
   }
   .landing-logo {
     width: 260px;

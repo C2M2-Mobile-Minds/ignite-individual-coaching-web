@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Codrops MOVE Transition Demo</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="pt-perspective">
+
+  <section class="pt-page pt-page-current" data-step="0">
+    <div class="pt-page-inner">
+      <span class="pt-step">Step 1 of 3</span>
+      <h1>Let's get started</h1>
+      <p class="pt-sub">Tell us a bit about yourself.</p>
+
+      <label class="pt-field">
+        <span>Full name</span>
+        <input type="text" name="name" placeholder="Jane Doe" />
+      </label>
+
+      <label class="pt-field">
+        <span>Email</span>
+        <input type="email" name="email" placeholder="jane@example.com" />
+      </label>
+
+      <div class="pt-nav">
+        <span></span>
+        <button type="button" class="pt-btn pt-btn-primary" data-next>Next</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="pt-page" data-step="1">
+    <div class="pt-page-inner">
+      <span class="pt-step">Step 2 of 3</span>
+      <h1>What are you after?</h1>
+      <p class="pt-sub">Pick the option that fits best.</p>
+
+      <label class="pt-field">
+        <span>Main goal</span>
+        <select name="goal">
+          <option value="fitness">General fitness</option>
+          <option value="strength">Strength</option>
+          <option value="performance">Performance</option>
+        </select>
+      </label>
+
+      <label class="pt-field">
+        <span>Notes</span>
+        <textarea name="notes" rows="3" placeholder="Anything else we should know?"></textarea>
+      </label>
+
+      <div class="pt-nav">
+        <button type="button" class="pt-btn pt-btn-ghost" data-back>Back</button>
+        <button type="button" class="pt-btn pt-btn-primary" data-next>Next</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="pt-page" data-step="2">
+    <div class="pt-page-inner">
+      <span class="pt-step">Step 3 of 3</span>
+      <h1>Almost done</h1>
+      <p class="pt-sub">Confirm and submit.</p>
+
+      <label class="pt-field pt-field-check">
+        <input type="checkbox" name="confirm" />
+        <span>I confirm the details above are correct.</span>
+      </label>
+
+      <div class="pt-nav">
+        <button type="button" class="pt-btn pt-btn-ghost" data-back>Back</button>
+        <button type="button" class="pt-btn pt-btn-primary" data-submit>Submit</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

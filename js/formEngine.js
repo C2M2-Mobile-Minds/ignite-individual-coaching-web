@@ -466,9 +466,19 @@ const FAVICON_LINKS = {
   "favicon-manifest": "site.webmanifest",
 };
 
+// Variant last painted by setBrandAssets() — re-render (every Next/Back)
+// calls it again with the same variant most of the time, and re-setting an
+// unchanged src/href still makes the browser redecode/reflow the image, seen
+// as a brief flicker/jump of the header logo. Skip the DOM writes when
+// nothing actually changed.
+let lastBrandVariant = null;
+
 /** Point the header/landing logo `<img>` and the favicon `<link>`s at the
  * green/pink variant matching `variant` ("green" | "pink"). */
 function setBrandAssets(variant) {
+  if (variant === lastBrandVariant) return;
+  lastBrandVariant = variant;
+
   const logoSrc = `img/ignite-${variant}.png`;
   document.getElementById("header-logo")?.setAttribute("src", logoSrc);
   document.querySelector(".landing-logo")?.setAttribute("src", logoSrc);
@@ -579,9 +589,12 @@ export function renderConfirmation(status) {
   }
 
   // Logo always last — below the message and (on error) the retry button.
+  // Gestação/pós-parto's confirmation background is dark enough that the
+  // pink logo loses contrast, so that branch uses the white variant here only.
+  const confirmationLogoVariant = logoForAnswers(state.answers) === "pink" ? "white" : logoForAnswers(state.answers);
   const logo = el("img", {
     className: "confirmation-logo",
-    src: `img/ignite-${logoForAnswers(state.answers)}.png`,
+    src: `img/ignite-${confirmationLogoVariant}.png`,
     alt: "",
   });
   root.append(logo);
@@ -653,9 +666,31 @@ export function goBack() {
 
 /** Reveal the header logo and render the first form step (landing CTA target). */
 export function startForm() {
-  document.querySelector(".page-header")?.removeAttribute("hidden");
-  navDirection = "fwd";
-  renderStep();
+  const swap = () => {
+    document.querySelector(".page-header")?.removeAttribute("hidden");
+    navDirection = "fwd";
+    renderStep();
+  };
+
+  const landingLogo = document.querySelector(".landing-logo");
+  const headerLogo = document.getElementById("header-logo");
+
+  // Wrapping the swap lets the browser morph the logo (shared
+  // .vt-brand-logo / view-transition-name, css/main.css) from its centered
+  // landing spot into the header's left spot instead of it just popping
+  // there. Unsupported browsers fall back to the plain synchronous swap.
+  if (document.startViewTransition) {
+    landingLogo?.classList.add("vt-brand-logo");
+    headerLogo?.classList.add("vt-brand-logo");
+    const transition = document.startViewTransition(swap);
+    // Drop the name once the morph finishes — left on #header-logo
+    // permanently, it keeps the logo in its own compositing layer for every
+    // later Next/Back, which shows up as a small flicker/jump on unrelated
+    // step changes.
+    transition.finished.finally(() => headerLogo?.classList.remove("vt-brand-logo"));
+  } else {
+    swap();
+  }
 }
 
 /** Load the locale, set the document title, and show the landing screen. */
@@ -664,6 +699,7 @@ export async function init() {
   document.title = t("app.title");
   navDirection = "fwd";
   lastRenderedStepId = null;
+  lastBrandVariant = null;
   applyNeutralTheme(); // explicit neutral reset (matters on re-init, e.g. in tests)
   document.querySelector(".page-header")?.setAttribute("hidden", "");
   renderLanding(startForm);

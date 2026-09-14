@@ -28,10 +28,10 @@ export const NEUTRAL_THEME = {
   bg: "#F2F0EB",
   bgAccent: "#F2F0EB",
   text: "#899064",
-  accent: "#4a783a",
-  accentBright: "#6aaa55",
-  accentHover: "#5a8a4a",
-  accentSoft: "rgba(74, 120, 58, 0.16)",
+  accent: "#899064",
+  accentBright: "#899064",
+  accentHover: "#899064",
+  accentSoft: "rgba(137, 144, 100, 0.16)",
   logo: "green",
 };
 
@@ -41,10 +41,10 @@ export const DEFAULT_THEME = {
   bg: "#F2F0EB",
   bgAccent: "#F2F0EB",
   text: "#899064",
-  accent: "#4a783a",
-  accentBright: "#6aaa55",
-  accentHover: "#5a8a4a",
-  accentSoft: "rgba(74, 120, 58, 0.16)",
+  accent: "#899064",
+  accentBright: "#899064",
+  accentHover: "#899064",
+  accentSoft: "rgba(137, 144, 100, 0.16)",
   // Confirmation screen background (and text, for contrast against it) for
   // this theme.
   confirmationBg: "#F2F0EB",
@@ -66,9 +66,8 @@ export const THEME_BY_OBJETIVO = {
     accentHover: "#b04f80",
     accentSoft: "rgba(204, 100, 153, 0.16)",
     // Confirmation screen background for this theme — the one page that
-    // breaks from the flat #F2F0EB fill everywhere else. Text darkened here
-    // (the regular #CA9A8E is too close in tone to #EAA794 to stay legible).
-    confirmationBg: "#EAA794",
+    // breaks from the flat #F2F0EB fill everywhere else.
+    confirmationBg: "#CA9A8E",
     confirmationText: "#4a2418",
     logo: "pink",
   },
