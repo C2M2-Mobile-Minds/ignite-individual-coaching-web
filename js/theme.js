@@ -97,6 +97,11 @@ function writeTheme(theme, root, { confirmation = false } = {}) {
   root.style.setProperty("--bg", bg);
   root.style.setProperty("--bg-accent", bgAccent);
   root.style.setProperty("--text", text);
+  // Always the branch's non-confirmation text color, even on the confirmation
+  // screen (where --text itself switches to confirmationText for contrast) —
+  // used by the retry button, which must stay on-brand against its fixed
+  // neutral background rather than following the confirmation screen's text.
+  root.style.setProperty("--theme-text", theme.text);
   root.style.setProperty("--accent", theme.accent);
   root.style.setProperty("--accent-bright", theme.accentBright);
   root.style.setProperty("--accent-hover", theme.accentHover);

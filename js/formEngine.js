@@ -426,8 +426,8 @@ export function renderField(field) {
   throw new Error(`renderField: unknown field type "${type}" for "${id}"`);
 }
 
-function navButton(labelKey, onClick, disabled = false) {
-  const button = el("button", { type: "button", textContent: t(labelKey), disabled });
+function navButton(labelKey, onClick, disabled = false, className = "") {
+  const button = el("button", { type: "button", textContent: t(labelKey), disabled, className });
   button.addEventListener("click", onClick);
   return button;
 }
@@ -544,7 +544,7 @@ export function renderStep() {
 
   const nav = el("div", { className: "nav" });
   if (prevVisibleStep(answers, currentStepId)) {
-    nav.append(navButton("form.nav.back", goBack));
+    nav.append(navButton("form.nav.back", goBack, false, "nav-ghost"));
   }
   if (nextVisibleStep(answers, currentStepId)) {
     nav.append(navButton("form.nav.next", goNext));
@@ -584,6 +584,7 @@ export function renderConfirmation(status) {
       state.submitting ? "form.nav.submitting" : "form.confirmation.retry_button",
       () => runSubmit("error"),
       state.submitting,
+      "nav-retry",
     );
     root.append(el("div", { className: "nav" }, [retry]));
   }
