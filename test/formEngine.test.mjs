@@ -1062,3 +1062,25 @@ test("header logo swaps green/pink with the theme", () => {
 
   document.body.innerHTML = '<header class="page-header" hidden></header><div id="form-root"></div>';
 });
+
+test("logo src is not rewritten on a same-theme re-render (avoids a flicker on Next/Back)", () => {
+  document.body.innerHTML =
+    '<header class="page-header"><img id="header-logo" src="img/ignite-pink.png" /></header><div id="form-root"></div>';
+
+  state.currentStepId = "gestacao";
+  state.answers = { objetivo_treino: ["gestacao_posparto"], fase: "gestacao" };
+  renderStep(); // establishes "pink" as the last-painted variant
+
+  const logo = document.getElementById("header-logo");
+  let srcWrites = 0;
+  const originalSetAttribute = logo.setAttribute.bind(logo);
+  logo.setAttribute = (name, value) => {
+    if (name === "src") srcWrites++;
+    return originalSetAttribute(name, value);
+  };
+
+  renderStep(); // same step, same theme — variant is unchanged
+  assert.equal(srcWrites, 0);
+
+  document.body.innerHTML = '<header class="page-header" hidden></header><div id="form-root"></div>';
+});
