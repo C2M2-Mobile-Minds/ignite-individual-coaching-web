@@ -740,11 +740,21 @@ test("a failed submit shows the error screen with a working retry", async () => 
   assert.ok(confirmation.textContent.startsWith("Não foi possível enviar"));
   const retry = buttonByText("Tentar novamente");
   assert.ok(retry);
+  // Fixed neutral background + on-brand text — never the themed accent fill.
+  assert.ok(retry.classList.contains("nav-retry"));
+  assert.ok(!retry.classList.contains("nav-ghost"));
 
   failSubmit = false;
   retry.click();
   await settle();
   assert.ok(root().querySelector("p.confirmation").textContent.startsWith("Em breve serás contactado"));
+});
+
+test("Voltar renders with the ghost/secondary nav style", () => {
+  onFilledLastStep();
+  const back = buttonByText("Voltar");
+  assert.ok(back);
+  assert.ok(back.classList.contains("nav-ghost"));
 });
 
 test("the submit button shows a loading state while the request is in flight", async () => {

@@ -91,6 +91,19 @@ test("applyTheme: confirmation option swaps bg/bg-accent for confirmationBg", ()
   assert.equal(props["--bg-accent"], DEFAULT_THEME.confirmationBg);
 });
 
+test("applyTheme: --theme-text stays the branch's non-confirmation text color even on the confirmation screen", () => {
+  const props = {};
+  const root = { style: { setProperty: (k, v) => (props[k] = v) } };
+
+  applyTheme({ objetivo_treino: ["gestacao_posparto"] }, root, { confirmation: true });
+  assert.equal(props["--theme-text"], THEME_BY_OBJETIVO.gestacao_posparto.text);
+  assert.notEqual(props["--text"], props["--theme-text"]); // --text switched to confirmationText
+
+  applyTheme({}, root, { confirmation: true });
+  assert.equal(props["--theme-text"], DEFAULT_THEME.text);
+  assert.notEqual(props["--text"], props["--theme-text"]);
+});
+
 test("applyNeutralTheme: writes NEUTRAL_THEME regardless of answers", () => {
   const props = {};
   const root = { style: { setProperty: (k, v) => (props[k] = v) } };

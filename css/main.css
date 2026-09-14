@@ -16,6 +16,7 @@
   --surface: #fff;
   --surface-2: #f7f5f0;
   --text: #899064;
+  --theme-text: #899064;
   --text-dim: #6b6b5e;
   --text-faint: #9a978c;
 
@@ -604,20 +605,38 @@ label.field > input[type="checkbox"] {
   transform: scale(0.98);
 }
 
-/* "Voltar" is the first button when present — render it as a ghost/secondary. */
-.nav button:first-child:not(:only-child) {
-  flex: 0 0 auto;
-  min-width: 96px;
+/* "Voltar" and the error-screen retry button are secondary actions — render
+   them as a ghost/outline style, never the themed (green/pink) accent fill. */
+.nav button.nav-ghost {
   color: var(--text-dim);
   background: none;
   border: 1px solid var(--hairline);
   box-shadow: none;
 }
 
-.nav button:first-child:not(:only-child):hover:not([disabled]) {
+/* Voltar sits beside "Seguinte"/"Enviar" and stays compact; the retry button
+   is alone in its .nav and keeps the full-width flex: 1 from ".nav button". */
+.nav button.nav-ghost:not(:only-child) {
+  flex: 0 0 auto;
+  min-width: 96px;
+}
+
+.nav button.nav-ghost:hover:not([disabled]) {
   color: var(--text);
   border-color: rgba(74, 120, 58, 0.35);
   background: none;
+}
+
+/* Retry button (error screen): fixed neutral background, not the themed
+   (green/pink) accent fill — stays readable regardless of objetivo theme. */
+.nav button.nav-retry {
+  color: var(--theme-text);
+  background: #f2f0eb;
+  box-shadow: none;
+}
+
+.nav button.nav-retry:hover:not([disabled]) {
+  background: #e5e2da;
 }
 
 .nav button[disabled] {
