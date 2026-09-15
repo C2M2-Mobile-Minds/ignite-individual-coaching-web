@@ -13,7 +13,7 @@
 // formEngine.js. In practice the themed steps (fase_gestacao / gestacao /
 // posparto) only exist when gestacao_posparto is selected anyway.
 
-const GESTACAO_POSPARTO = "gestacao_posparto";
+export const GESTACAO_POSPARTO = "gestacao_posparto";
 
 // Every page shares one flat background (#F2F0EB) — only the text color and
 // logo vary by branch. bg/bgAccent/confirmationBg are all the same value on
@@ -125,4 +125,10 @@ export function applyNeutralTheme(root = document.documentElement) {
 /** Which logo variant ("green" | "pink") to show for the given answers. */
 export function logoForAnswers(answers) {
   return themeForAnswers(answers).logo;
+}
+
+/** Whether `gestacao_posparto` is among the selected `objetivo_treino` options. */
+export function isGestacaoPosparto(answers) {
+  const selected = Array.isArray(answers?.objetivo_treino) ? answers.objetivo_treino : [];
+  return selected.includes(GESTACAO_POSPARTO);
 }

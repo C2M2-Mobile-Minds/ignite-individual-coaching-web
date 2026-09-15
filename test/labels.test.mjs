@@ -19,7 +19,7 @@ test("resolveValue: maps a single option id to its label", () => {
 test("resolveValue: maps a multi-select array to a joined label list", () => {
   assert.equal(
     resolveValue("objetivo_treino", ["ganho_massa", "saude_longevidade"]),
-    "Aumento de massa muscular, Saúde/longevidade/bem-estar",
+    "Aumento de Massa Muscular, Bem-estar - Saúde - Longevidade",
   );
 });
 
@@ -71,7 +71,7 @@ test("notePairs: geral flow yields label/value pairs for filled fields only, in 
     { label: "Contacto telefónico", value: "+351 912345678" },
     { label: "E-mail", value: "ana@example.com" },
     { label: "Como chegou até à Ignite?", value: "Redes sociais" },
-    { label: "Qual o seu objetivo de treino?", value: "Aumento de massa muscular" },
+    { label: "Qual o seu objetivo de treino?", value: "Aumento de Massa Muscular" },
     { label: "Onde treinas?", value: "Casa" },
     { label: "Qual a maior dificuldade neste momento?", value: "Falta de tempo" },
     { label: "Como é a tua rotina de treinos", value: "2-3x/semana" },

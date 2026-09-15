@@ -16,7 +16,7 @@ import { steps, visibleSteps, visibleFields } from "./formSchema.js";
 import { EEA_COUNTRIES, DEFAULT_DIAL_CODE, parsePhone, combinePhone } from "./countries.js";
 import { submitForm } from "./submit.js";
 import { renderLanding } from "./landing.js";
-import { applyTheme, applyNeutralTheme, logoForAnswers } from "./theme.js";
+import { applyTheme, applyNeutralTheme, logoForAnswers, isGestacaoPosparto } from "./theme.js";
 
 /** The single source of truth for what the user has entered and where they are. */
 export const state = {
@@ -505,6 +505,7 @@ export function renderStep() {
   const step = steps.find((s) => s.id === currentStepId);
 
   const stepChanged = currentStepId !== lastRenderedStepId;
+  if (stepChanged) window.scrollTo(0, 0); // keep the header in view on step change, not on every re-render
   root.classList.toggle("step-enter-fwd", stepChanged && navDirection !== "back");
   root.classList.toggle("step-enter-back", stepChanged && navDirection === "back");
   if (stepChanged) clearEntranceAnimation(root);
@@ -546,7 +547,12 @@ export function renderStep() {
   if (prevVisibleStep(answers, currentStepId)) {
     nav.append(navButton("form.nav.back", goBack, false, "nav-ghost"));
   }
-  if (nextVisibleStep(answers, currentStepId)) {
+  // fase_gestacao always leads to a leaf step (gestacao/posparto) once "fase"
+  // is answered — before that, nextVisibleStep can't resolve it yet since the
+  // leaf's condition reads answers.fase. Treat it as non-terminal regardless,
+  // so the button never flashes "Enviar" ahead of a required-field choice.
+  const hasNext = nextVisibleStep(answers, currentStepId) || currentStepId === "fase_gestacao";
+  if (hasNext) {
     nav.append(navButton("form.nav.next", goNext));
   } else {
     const submitKey = state.submitting ? "form.nav.submitting" : "form.nav.submit";
@@ -563,6 +569,7 @@ export function renderStep() {
 export function renderConfirmation(status) {
   const root = document.getElementById("form-root");
   root.replaceChildren();
+  window.scrollTo(0, 0);
   applyTheme(state.answers, undefined, { confirmation: true }); // keep the terminal screen on-theme
   setBrandAssets(logoForAnswers(state.answers));
   document.querySelector(".page-header")?.setAttribute("hidden", ""); // logo shows below the message instead
@@ -570,7 +577,12 @@ export function renderConfirmation(status) {
   clearEntranceAnimation(root);
   lastRenderedStepId = null;
 
-  const key = status === "success" ? "form.confirmation.success" : "form.confirmation.error";
+  const key =
+    status === "success"
+      ? isGestacaoPosparto(state.answers)
+        ? "form.confirmation.success_gestacao_posparto"
+        : "form.confirmation.success"
+      : "form.confirmation.error";
   const message = el("p", { className: "confirmation" });
   const lines = t(key).split("\n");
   lines.forEach((line, i) => {
