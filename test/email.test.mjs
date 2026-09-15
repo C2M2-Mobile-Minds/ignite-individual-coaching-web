@@ -58,7 +58,7 @@ test("renderEmail: geral template shows only general-branch questions", () => {
   assert.match(html, /Casa/);
   assert.match(text, /Onde treinas\?/);
   // gestação-only field must not appear
-  assert.doesNotMatch(html, /De quantas semanas estás/);
+  assert.doesNotMatch(html, /De quantas semanas está/);
 });
 
 test("renderEmail: gestacao_posparto template shows that branch's questions and resolved values", () => {
@@ -67,7 +67,7 @@ test("renderEmail: gestacao_posparto template shows that branch's questions and 
   assert.match(subject, /Gestação/);
   assert.match(html, /Em que fase te encontras/);
   assert.match(html, /Gestação/);
-  assert.match(html, /De quantas semanas estás/);
+  assert.match(html, /De quantas semanas está/);
   assert.doesNotMatch(html, /Onde treinas\?/);
 });
 

@@ -328,7 +328,7 @@ test("fase_gestacao renders the single radio with resolved labels", () => {
   state.answers = { objetivo_treino: ["gestacao_posparto"] };
   state.currentStepId = "fase_gestacao";
   renderStep();
-  assert.equal(title(), "Em que fase te encontras");
+  assert.equal(title(), "Em que fase te encontras?");
   const radios = root().querySelectorAll('input[type="radio"][name="fase"]');
   assert.equal(radios.length, 2);
   assert.deepEqual([...radios].map((r) => r.value), ["gestacao", "posparto"]);
@@ -878,7 +878,7 @@ test("E2E: walk the gestação branch button-by-button and submit", async () => 
   };
   renderStep();
   clickAdvance();
-  assert.equal(title(), "Em que fase te encontras");
+  assert.equal(title(), "Em que fase te encontras?");
   clickAdvance();
   assert.equal(title(), "Gestação");
   assert.equal(buttonByText("Seguinte"), undefined);
@@ -903,7 +903,7 @@ test("E2E: walk the pós-parto branch button-by-button and submit", async () => 
   };
   renderStep();
   clickAdvance();
-  assert.equal(title(), "Em que fase te encontras");
+  assert.equal(title(), "Em que fase te encontras?");
   clickAdvance();
   assert.equal(title(), "Pós-parto");
   buttonByText("Enviar").click();
@@ -915,12 +915,12 @@ test("E2E: an empty required field on the fase splitter blocks submit", () => {
   state.answers = { ...IDENTITY, objetivo_treino: ["gestacao_posparto"] };
   renderStep();
   clickAdvance(); // dados_basicos -> fase_gestacao
-  assert.equal(title(), "Em que fase te encontras");
+  assert.equal(title(), "Em que fase te encontras?");
   // The splitter always leads to a leaf step once `fase` is picked, so it
   // shows "Seguinte" even before `fase` is answered. Advancing is blocked
   // until `fase` is picked.
   buttonByText("Seguinte").click();
-  assert.equal(title(), "Em que fase te encontras");
+  assert.equal(title(), "Em que fase te encontras?");
   assert.ok(root().querySelector('.error[data-for="fase"]'));
 });
 

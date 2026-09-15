@@ -208,6 +208,7 @@ export const steps = [
         type: "radio",
         required: true,
         labelKey: "form.field.fase",
+        hideLabel: true,
         options: [
           { id: "gestacao", labelKey: "form.option.fase.gestacao" },
           { id: "posparto", labelKey: "form.option.fase.posparto" },

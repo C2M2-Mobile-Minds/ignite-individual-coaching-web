@@ -106,7 +106,7 @@ test("notePairs: gestacao_posparto flow only references that branch's columns", 
   const labels = pairs.map((p) => p.label);
 
   assert.ok(labels.includes("Em que fase te encontras"));
-  assert.ok(labels.includes("De quantas semanas estás?"));
+  assert.ok(labels.includes("De quantas semanas está?"));
   // no general-branch-only field leaks in
   assert.ok(!labels.includes("Onde treinas?"));
   assert.equal(

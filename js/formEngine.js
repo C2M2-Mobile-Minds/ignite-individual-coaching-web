@@ -356,7 +356,7 @@ export function renderField(field) {
 
   if (type === "radio") {
     const fieldset = el("fieldset", { className: "field" }, [
-      el("legend", { textContent: t(field.labelKey) }),
+      el("legend", { textContent: field.hideLabel ? "" : t(field.labelKey) }),
     ]);
     for (const opt of field.options) {
       const input = el("input", {
