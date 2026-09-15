@@ -59,10 +59,10 @@ Step 1 `dados_basicos` → step 2 `modalidade_treino` → step 3 `treino_geral_o
       preceding step; logo matches (pink/green).
 - [ ] Step 2 title "Treino online ou presencial"; single radio `modalidade_treino`
       (Online / Presencial). "Seguinte" advances.
-- [ ] **Online path**: step 3 title "SOBRE O TREINO (ONLINE)"; 4 controls: `onde_treina`
+- [ ] **Online path**: step 3 title "SOBRE O TREINO"; 4 controls: `onde_treina`
       (Casa/Ginásio), `dificuldade_atual` (text), `frequencia_treino` (2-3x / 4-5x / 5+),
       `orientacao_nutricional` (Sim/Não). No presencial-only field present.
-- [ ] **Presencial path**: step 3 title "SOBRE O TREINO (PRESENCIAL)"; 3 controls:
+- [ ] **Presencial path**: step 3 title "SOBRE O TREINO"; 3 controls:
       `frequencia_presencial` (1x/2x semana), `localizacao_presencial` (CrossFit 4475 /
       Templo Fitness Estúdio), `disponibilidade_presencial` (text). No trailing note
       (removed). No `onde_treina` field.
