@@ -50,12 +50,12 @@
   "form.option.como_chegou.amigos_familiares": "Através de amigos/familiares",
   "form.option.como_chegou.outro": "Outro",
 
-  "form.option.objetivo_treino.ganho_massa": "Aumento de massa muscular",
-  "form.option.objetivo_treino.recomposicao": "Recomposição corporal",
-  "form.option.objetivo_treino.saude_longevidade": "Saúde/longevidade/bem-estar",
-  "form.option.objetivo_treino.reforco_modalidade": "Reforço muscular e complemento à modalidade desportiva principal",
-  "form.option.objetivo_treino.forca_atletismo": "Aumento de força/atleticismo/agilidade",
-  "form.option.objetivo_treino.gestacao_posparto": "Acompanhamento gestação e pós-parto",
+  "form.option.objetivo_treino.ganho_massa": "Aumento de Massa Muscular",
+  "form.option.objetivo_treino.recomposicao": "Perda de Peso/Massa Gorda",
+  "form.option.objetivo_treino.saude_longevidade": "Bem-estar - Saúde - Longevidade",
+  "form.option.objetivo_treino.reforco_modalidade": "Reforço Muscular e Prevenção de Lesões",
+  "form.option.objetivo_treino.forca_atletismo": "Aumento do Atleticismo - Força - Agilidade",
+  "form.option.objetivo_treino.gestacao_posparto": "Acompanhamento Gestação e Pós-Parto",
 
   "form.option.modalidade_treino.online": "Online",
   "form.option.modalidade_treino.presencial": "Presencial",
@@ -91,6 +91,7 @@
   "form.nav.submitting": "A enviar…",
 
   "form.confirmation.success": "Em breve serás contactado via WhatsApp pela nossa equipa. Obrigado!",
+  "form.confirmation.success_gestacao_posparto": "Em breve serás contactada via WhatsApp pela nossa equipa. Obrigado!",
   "form.confirmation.error": "Não foi possível enviar a tua resposta. Verifica a tua ligação à internet e tenta novamente. Se o problema persistir, contacta-nos diretamente através do Instagram.",
   "form.confirmation.retry_button": "Tentar novamente",
 

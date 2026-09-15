@@ -782,6 +782,20 @@ test("renderConfirmation('success') renders the success copy", () => {
   assert.ok(p.textContent.includes("Obrigado!"));
 });
 
+test("renderConfirmation('success') uses the masculine form by default", () => {
+  state.answers = { objetivo_treino: ["ganho_massa"] };
+  renderConfirmation("success");
+  const p = root().querySelector("p.confirmation");
+  assert.ok(p.textContent.startsWith("Em breve serás contactado"));
+});
+
+test("renderConfirmation('success') uses the feminine form for gestação/pós-parto", () => {
+  state.answers = { objetivo_treino: ["gestacao_posparto"] };
+  renderConfirmation("success");
+  const p = root().querySelector("p.confirmation");
+  assert.ok(p.textContent.startsWith("Em breve serás contactada"));
+});
+
 // --- End-to-end branch walks (issue #17) -----------------------------------
 //
 // These drive the whole branch through the rendered nav buttons — no direct
@@ -798,7 +812,7 @@ const IDENTITY = {
 
 const clickAdvance = () => buttonByText("Seguinte").click();
 const submittedOk = () =>
-  root().querySelector("p.confirmation")?.textContent.startsWith("Em breve serás contactado");
+  root().querySelector("p.confirmation")?.textContent.startsWith("Em breve serás contact");
 
 test("E2E: walk the geral branch button-by-button and submit", async () => {
   state.answers = {
@@ -902,9 +916,10 @@ test("E2E: an empty required field on the fase splitter blocks submit", () => {
   renderStep();
   clickAdvance(); // dados_basicos -> fase_gestacao
   assert.equal(title(), "Em que fase te encontras");
-  // With `fase` unanswered the splitter is the last visible step, so it shows
-  // "Enviar", not "Seguinte". Submitting is blocked until `fase` is picked.
-  buttonByText("Enviar").click();
+  // The splitter always leads to a leaf step once `fase` is picked, so it
+  // shows "Seguinte" even before `fase` is answered. Advancing is blocked
+  // until `fase` is picked.
+  buttonByText("Seguinte").click();
   assert.equal(title(), "Em que fase te encontras");
   assert.ok(root().querySelector('.error[data-for="fase"]'));
 });
