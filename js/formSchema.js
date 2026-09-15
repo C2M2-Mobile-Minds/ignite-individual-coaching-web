@@ -88,6 +88,7 @@ export const steps = [
           { id: "reforco_modalidade", labelKey: "form.option.objetivo_treino.reforco_modalidade" },
           { id: "forca_atletismo", labelKey: "form.option.objetivo_treino.forca_atletismo" },
           { id: GESTACAO_POSPARTO, labelKey: "form.option.objetivo_treino.gestacao_posparto" },
+          { id: "crossfit", labelKey: "form.option.objetivo_treino.crossfit" },
         ],
       },
     ],
