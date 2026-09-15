@@ -74,7 +74,7 @@ test("notePairs: geral flow yields label/value pairs for filled fields only, in 
     { label: "Qual o seu objetivo de treino?", value: "Aumento de Massa Muscular" },
     { label: "Onde treinas?", value: "Casa" },
     { label: "Qual a maior dificuldade neste momento?", value: "Falta de tempo" },
-    { label: "Como é a tua rotina de treinos", value: "2-3x/semana" },
+    { label: "Qual a tua rotina de treinos ideal?", value: "2-3x/semana" },
     {
       label: "Segues alguma orientação alimentar por parte de um nutricionista?",
       value: "Não",

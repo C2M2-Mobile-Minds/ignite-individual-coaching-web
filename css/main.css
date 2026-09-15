@@ -140,7 +140,7 @@ label,
 }
 
 .page-header {
-  padding: 28px 0 4px;
+  padding: 48px 0 28px max(32px, env(safe-area-inset-left));
   background: var(--bg);
 }
 
@@ -151,7 +151,7 @@ label,
 
 .logo-frame img {
   display: block;
-  width: 180px;
+  width: 32px;
   height: auto;
 }
 
@@ -682,7 +682,7 @@ label.field > input[type="checkbox"] {
   align-items: center;
   text-align: center;
   gap: 1.5rem;
-  padding: 2rem 0 1rem;
+  padding: 4rem 0 1rem;
 }
 
 /* Applied only transiently (by startForm() in js/formEngine.js) around the
@@ -698,7 +698,7 @@ label.field > input[type="checkbox"] {
 }
 
 .landing-logo {
-  width: 200px;
+  width: 50px;
   max-width: 70%;
   height: auto;
 }
@@ -784,7 +784,7 @@ label.field > input[type="checkbox"] {
     font-size: 1.6rem;
   }
   .landing-logo {
-    width: 260px;
+    width: 50px;
   }
   .landing-tagline {
     font-size: 1.9rem;
@@ -801,12 +801,12 @@ label.field > input[type="checkbox"] {
 /* Desktop: roomier gutters, larger brand mark and header. */
 @media (min-width: 900px) {
   .page {
-    padding: 0 24px 32px;
+    padding: 0 24px 2px 50px;
   }
   .page-header {
-    padding: 40px 0 8px;
+    padding: 16px 0 2px 50px;
   }
   .logo-frame img {
-    width: 240px;
+    width: 38px;
   }
 }

@@ -1,12 +1,12 @@
 {
   "app.title": "Ignite Individual Coaching",
 
-  "landing.message": "Se chegaste até à Ignite é porque queres investir em ti. Descobre como é que um plano de ação estruturado e acompanhado vai potenciar o alcance dos teus objetivos.",
+  "landing.message": "Se chegaste até à Ignite é porque queres investir em ti. Descobre o impacto que um plano de ação estruturado e acompanhado tem nos teus objetivos.",
   "landing.tagline": "Ignite your true potential",
   "landing.cta": "Começar",
 
   "form.step.dados_basicos.title": "Dados básicos",
-  "form.step.modalidade_treino.title": "Treino online ou presencial",
+  "form.step.modalidade_treino.title": "Preferência de acompanhamento",
   "form.step.treino_geral_online.title": "SOBRE O TREINO (ONLINE)",
   "form.step.treino_geral_presencial.title": "SOBRE O TREINO (PRESENCIAL)",
   "form.step.comprometimento.title": "COMPROMISSO",
@@ -26,7 +26,7 @@
   "form.field.disponibilidade_presencial": "Qual a disponibilidade de treino (indicar 2 horários possíveis nos respetivos dias segunda, terça, quarta e sexta)",
   "form.field.onde_treina": "Onde treinas?",
   "form.field.dificuldade_atual": "Qual a maior dificuldade neste momento?",
-  "form.field.frequencia_treino": "Como é a tua rotina de treinos",
+  "form.field.frequencia_treino": "Qual a tua rotina de treinos ideal?",
   "form.field.orientacao_nutricional": "Segues alguma orientação alimentar por parte de um nutricionista?",
   "form.field.comprometimento": "Estás confiante e comprometido(a) a investir em ti neste acompanhamento on-line?",
   "form.field.fase": "Em que fase te encontras",
@@ -56,6 +56,7 @@
   "form.option.objetivo_treino.reforco_modalidade": "Reforço Muscular e Prevenção de Lesões",
   "form.option.objetivo_treino.forca_atletismo": "Aumento do Atleticismo - Força - Agilidade",
   "form.option.objetivo_treino.gestacao_posparto": "Acompanhamento Gestação e Pós-Parto",
+  "form.option.objetivo_treino.crossfit": "Crossfit",
 
   "form.option.modalidade_treino.online": "Online",
   "form.option.modalidade_treino.presencial": "Presencial",

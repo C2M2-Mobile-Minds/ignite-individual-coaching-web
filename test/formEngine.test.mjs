@@ -300,7 +300,7 @@ test("modalidade_treino step renders the online/presencial radio and validates r
   state.answers = { objetivo_treino: ["ganho_massa"] };
   state.currentStepId = "modalidade_treino";
   renderStep();
-  assert.equal(title(), "Treino online ou presencial");
+  assert.equal(title(), "Preferência de acompanhamento");
   assert.equal(root().querySelectorAll('input[type="radio"][name="modalidade_treino"]').length, 2);
   const step = stepById("modalidade_treino");
   assert.deepEqual(
@@ -514,10 +514,10 @@ test("unchecking 'outro' hides the free-text input and clears its stored answer"
   assert.equal(state.answers.como_chegou_outro, undefined);
 });
 
-test("page 1 renders the spec option counts (4 como_chegou, 6 objetivo_treino)", () => {
+test("page 1 renders the spec option counts (4 como_chegou, 7 objetivo_treino)", () => {
   renderStep();
   assert.equal(root().querySelectorAll('input[type="checkbox"][name="como_chegou"]').length, 4);
-  assert.equal(root().querySelectorAll('input[type="checkbox"][name="objetivo_treino"]').length, 6);
+  assert.equal(root().querySelectorAll('input[type="checkbox"][name="objetivo_treino"]').length, 7);
 });
 
 test("clicking Seguinte advances to the next step with no reload", () => {
@@ -531,7 +531,7 @@ test("clicking Seguinte advances to the next step with no reload", () => {
   renderStep();
   assert.equal(title(), "Dados básicos");
   buttonByText("Seguinte").click();
-  assert.equal(title(), "Treino online ou presencial");
+  assert.equal(title(), "Preferência de acompanhamento");
   assert.equal(state.currentStepId, "modalidade_treino");
 });
 
@@ -678,7 +678,7 @@ test("advancing is allowed once all required fields are valid", () => {
   };
   renderStep();
   buttonByText("Seguinte").click();
-  assert.equal(title(), "Treino online ou presencial");
+  assert.equal(title(), "Preferência de acompanhamento");
   assert.equal(state.errors.size, 0);
 });
 
@@ -828,7 +828,7 @@ test("E2E: walk the geral branch button-by-button and submit", async () => {
   renderStep();
   assert.equal(title(), "Dados básicos");
   clickAdvance();
-  assert.equal(title(), "Treino online ou presencial");
+  assert.equal(title(), "Preferência de acompanhamento");
   clickAdvance();
   assert.equal(title(), "SOBRE O TREINO (ONLINE)");
   clickAdvance();
@@ -853,7 +853,7 @@ test("E2E: walk the geral presencial sub-branch button-by-button and submit", as
   renderStep();
   assert.equal(title(), "Dados básicos");
   clickAdvance();
-  assert.equal(title(), "Treino online ou presencial");
+  assert.equal(title(), "Preferência de acompanhamento");
   clickAdvance();
   assert.equal(title(), "SOBRE O TREINO (PRESENCIAL)");
   assert.ok(!root().querySelector('[name="onde_treina"]'), "no online-only field");
