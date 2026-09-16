@@ -147,15 +147,34 @@ test("renders the first step's title and field controls", () => {
 
 test("renders a progress indicator: step number, total, and fill width", () => {
   renderStep();
-  // With no goal picked yet the visible path is 3 steps (geral branch:
-  // dados_basicos -> modalidade_treino -> comprometimento).
+  // With no goal picked yet the geral branch total is still 4 (dados_basicos ->
+  // modalidade_treino -> treino_geral_online/presencial -> comprometimento):
+  // the still-undecided online/presencial fork counts once via groupCondition.
   const label = root().querySelector(".progress .progress-label").textContent;
-  assert.equal(label, "Passo 1 de 3");
-  assert.equal(root().querySelector(".progress-fill").style.width, "33%");
+  assert.equal(label, "Passo 1 de 4");
+  assert.equal(root().querySelector(".progress-fill").style.width, "25%");
+});
+
+test("progress total stays stable through the geral branch's modalidade fork", () => {
+  // On modalidade_treino itself, before online/presencial is answered, total is
+  // still 4 — it must not dip to 3 and then jump back up once chosen.
+  state.answers = { objetivo_treino: ["ganho_massa"] };
+  state.currentStepId = "modalidade_treino";
+  renderStep();
+  assert.equal(root().querySelector(".progress-label").textContent, "Passo 2 de 4");
+  state.answers = { objetivo_treino: ["ganho_massa"], modalidade_treino: "online" };
+  state.currentStepId = "treino_geral_online";
+  renderStep();
+  assert.equal(root().querySelector(".progress-label").textContent, "Passo 3 de 4");
 });
 
 test("progress total and fill follow the visible branch", () => {
-  // gestação branch: dados_basicos -> fase_gestacao -> gestacao = 3 steps
+  // gestação branch: dados_basicos -> fase_gestacao -> gestacao/posparto = 3 steps,
+  // stable even before `fase` is answered.
+  state.answers = { objetivo_treino: ["gestacao_posparto"] };
+  state.currentStepId = "fase_gestacao";
+  renderStep();
+  assert.equal(root().querySelector(".progress-label").textContent, "Passo 2 de 3");
   state.answers = { objetivo_treino: ["gestacao_posparto"], fase: "gestacao" };
   state.currentStepId = "gestacao";
   renderStep();

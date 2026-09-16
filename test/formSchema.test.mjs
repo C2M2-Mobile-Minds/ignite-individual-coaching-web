@@ -3,7 +3,13 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-import { steps, visibleSteps, visibleFields, selectedGestacaoPosparto } from "../js/formSchema.js";
+import {
+  steps,
+  visibleSteps,
+  visibleFields,
+  selectedGestacaoPosparto,
+  totalVisibleSteps,
+} from "../js/formSchema.js";
 
 const locale = JSON.parse(
   readFileSync(fileURLToPath(new URL("../locales/pt-PT.json", import.meta.url)), "utf8"),
@@ -150,6 +156,34 @@ test("every posparto labelKey / textKey (field + option) resolves in pt-PT.json"
       assert.ok(locale[opt.labelKey], `missing locale key ${opt.labelKey}`);
     }
   }
+});
+
+test("totalVisibleSteps: geral branch is 4 even before modalidade_treino is answered", () => {
+  assert.equal(totalVisibleSteps({ objetivo_treino: ["ganho_massa"] }), 4);
+  assert.equal(
+    totalVisibleSteps({ objetivo_treino: ["ganho_massa"], modalidade_treino: "online" }),
+    4,
+  );
+  assert.equal(
+    totalVisibleSteps({ objetivo_treino: ["ganho_massa"], modalidade_treino: "presencial" }),
+    4,
+  );
+});
+
+test("totalVisibleSteps: gestação/pós-parto branch is 3 even before fase is answered", () => {
+  assert.equal(totalVisibleSteps({ objetivo_treino: ["gestacao_posparto"] }), 3);
+  assert.equal(
+    totalVisibleSteps({ objetivo_treino: ["gestacao_posparto"], fase: "gestacao" }),
+    3,
+  );
+  assert.equal(
+    totalVisibleSteps({ objetivo_treino: ["gestacao_posparto"], fase: "posparto" }),
+    3,
+  );
+});
+
+test("totalVisibleSteps: empty answers default to the geral branch total of 4", () => {
+  assert.equal(totalVisibleSteps({}), 4);
 });
 
 test("fase not yet answered: splitter shown, neither leaf shown", () => {
