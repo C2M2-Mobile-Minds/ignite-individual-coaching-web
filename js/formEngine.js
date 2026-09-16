@@ -12,7 +12,7 @@
 // lives in submit.js (a stub for now).
 
 import { loadLocale, t } from "./i18n.js";
-import { steps, visibleSteps, visibleFields } from "./formSchema.js";
+import { steps, visibleSteps, visibleFields, totalVisibleSteps } from "./formSchema.js";
 import { EEA_COUNTRIES, DEFAULT_DIAL_CODE, parsePhone, combinePhone } from "./countries.js";
 import { submitForm } from "./submit.js";
 import { renderLanding } from "./landing.js";
@@ -511,7 +511,7 @@ export function renderStep() {
   if (stepChanged) clearEntranceAnimation(root);
   lastRenderedStepId = currentStepId;
 
-  const totalSteps = visibleSteps(answers).length;
+  const totalSteps = totalVisibleSteps(answers);
   const stepNumber = currentStepIndex(answers, currentStepId) + 1;
   const fill = el("span", { className: "progress-fill" });
   fill.style.width = `${Math.round((stepNumber / totalSteps) * 100)}%`;

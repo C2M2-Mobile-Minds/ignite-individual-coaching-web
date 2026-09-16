@@ -119,6 +119,8 @@ export const steps = [
     titleKey: "form.step.treino_geral_online.title",
     // Online sub-branch — the original issue #7 question set, unchanged.
     // (Renamed from `treino_geral` in #50 — one-off, step unshipped.)
+    group: "treino_geral",
+    groupCondition: (answers) => !selectedGestacaoPosparto(answers),
     condition: (answers) =>
       !selectedGestacaoPosparto(answers) && answers.modalidade_treino === "online",
     fields: [
@@ -158,6 +160,8 @@ export const steps = [
     id: "treino_geral_presencial",
     titleKey: "form.step.treino_geral_presencial.title",
     // Presencial sub-branch — distinct, smaller question set (issue #50).
+    group: "treino_geral",
+    groupCondition: (answers) => !selectedGestacaoPosparto(answers),
     condition: (answers) =>
       !selectedGestacaoPosparto(answers) && answers.modalidade_treino === "presencial",
     fields: [
@@ -220,6 +224,8 @@ export const steps = [
   {
     id: "gestacao",
     titleKey: "form.step.gestacao.title",
+    group: "leaf_gestacao_posparto",
+    groupCondition: (answers) => selectedGestacaoPosparto(answers),
     condition: (answers) => selectedGestacaoPosparto(answers) && answers.fase === "gestacao",
     fields: [
       {
@@ -245,6 +251,8 @@ export const steps = [
   {
     id: "posparto",
     titleKey: "form.step.posparto.title",
+    group: "leaf_gestacao_posparto",
+    groupCondition: (answers) => selectedGestacaoPosparto(answers),
     condition: (answers) => selectedGestacaoPosparto(answers) && answers.fase === "posparto",
     fields: [
       {
@@ -300,4 +308,25 @@ export function visibleSteps(answers) {
 /** Fields of a step whose `condition` (if any) passes for the given answers. */
 export function visibleFields(step, answers) {
   return step.fields.filter((field) => !field.condition || field.condition(answers));
+}
+
+/**
+ * Count of steps toward the progress total: like `visibleSteps().length`, but a
+ * still-undecided exclusive group (e.g. `treino_geral_online`/`_presencial`, both
+ * hidden pending a `modalidade_treino` answer) still counts once via `groupCondition`
+ * instead of vanishing until the sub-choice is made.
+ */
+export function totalVisibleSteps(answers) {
+  const seen = new Set();
+  let count = 0;
+  for (const step of steps) {
+    const key = step.group ?? step.id;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const passes = step.group
+      ? step.groupCondition(answers)
+      : !step.condition || step.condition(answers);
+    if (passes) count++;
+  }
+  return count;
 }
